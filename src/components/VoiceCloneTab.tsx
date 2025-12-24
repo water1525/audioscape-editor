@@ -17,7 +17,7 @@ const voiceProfiles = [
     original: "Cila 原声",
     cloned: "Cila 声音复刻",
     sampleText: "大家好，我是Cila，很高兴认识你。今天天气真不错，希望你有愉快的一天！",
-    voice: "cixingnvsheng",
+    voice: "tianmeinvsheng",
   },
   {
     id: "john",
