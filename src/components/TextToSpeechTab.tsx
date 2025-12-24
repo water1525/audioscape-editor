@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -26,79 +26,82 @@ const cases = [
 
 const TextToSpeechTab = () => {
   const [activeCase, setActiveCase] = useState("case1");
-  const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioCache, setAudioCache] = useState<Record<string, string>>({});
+  const [loadingCache, setLoadingCache] = useState<Record<string, boolean>>({});
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentCase = cases.find((c) => c.id === activeCase) || cases[0];
 
-  const handlePlayPause = async () => {
-    // If already playing, toggle pause/play
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        audioRef.current.play();
-        setIsPlaying(true);
+  // Preload audio for all cases
+  useEffect(() => {
+    cases.forEach(async (caseItem) => {
+      if (audioCache[caseItem.id]) return;
+      
+      setLoadingCache(prev => ({ ...prev, [caseItem.id]: true }));
+      try {
+        const response = await fetch(
+          `${SUPABASE_URL}/functions/v1/step-tts`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "apikey": SUPABASE_ANON_KEY,
+              "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({ text: caseItem.text }),
+          }
+        );
+
+        if (response.ok) {
+          const audioBlob = await response.blob();
+          const audioUrl = URL.createObjectURL(audioBlob);
+          setAudioCache(prev => ({ ...prev, [caseItem.id]: audioUrl }));
+        }
+      } catch (error) {
+        console.error("Preload error:", error);
+      } finally {
+        setLoadingCache(prev => ({ ...prev, [caseItem.id]: false }));
       }
+    });
+  }, []);
+
+  const handlePlayPause = () => {
+    const cachedUrl = audioCache[activeCase];
+    
+    // If already playing this audio, toggle pause/play
+    if (audioRef.current && isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
       return;
     }
 
-    // Generate new audio
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${SUPABASE_URL}/functions/v1/step-tts`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_ANON_KEY,
-            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({ 
-            text: currentCase.text,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        let errorMessage = "Failed to generate speech";
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || errorMessage;
-        } catch {
-          // Response is not JSON
-        }
-        throw new Error(errorMessage);
-      }
-
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
-      
-      audio.onended = () => {
-        setIsPlaying(false);
-        URL.revokeObjectURL(audioUrl);
-        audioRef.current = null;
-      };
-      
-      audio.onerror = () => {
-        setIsPlaying(false);
-        URL.revokeObjectURL(audioUrl);
-        audioRef.current = null;
-        toast.error("音频播放失败");
-      };
-
-      await audio.play();
+    if (audioRef.current && !isPlaying) {
+      audioRef.current.play();
       setIsPlaying(true);
-    } catch (error) {
-      console.error("TTS error:", error);
-      toast.error(error instanceof Error ? error.message : "语音合成失败");
-    } finally {
-      setIsLoading(false);
+      return;
     }
+
+    if (!cachedUrl) {
+      toast.error("音频加载中，请稍候");
+      return;
+    }
+
+    const audio = new Audio(cachedUrl);
+    audioRef.current = audio;
+    
+    audio.onended = () => {
+      setIsPlaying(false);
+      audioRef.current = null;
+    };
+    
+    audio.onerror = () => {
+      setIsPlaying(false);
+      audioRef.current = null;
+      toast.error("音频播放失败");
+    };
+
+    audio.play();
+    setIsPlaying(true);
   };
 
   // Reset audio when switching cases
@@ -110,6 +113,8 @@ const TextToSpeechTab = () => {
     setIsPlaying(false);
     setActiveCase(caseId);
   };
+
+  const isCurrentLoading = loadingCache[activeCase];
 
   return (
     <div className="animate-fade-in">
@@ -146,16 +151,16 @@ const TextToSpeechTab = () => {
           size="sm" 
           className="gap-2"
           onClick={handlePlayPause}
-          disabled={isLoading}
+          disabled={isCurrentLoading}
         >
-          {isLoading ? (
+          {isCurrentLoading ? (
             <Loader2 className="h-3 w-3 animate-spin" />
           ) : isPlaying ? (
             <Pause className="h-3 w-3" />
           ) : (
             <Play className="h-3 w-3" />
           )}
-          {isLoading ? "加载中..." : isPlaying ? "暂停" : "播放"}
+          {isCurrentLoading ? "加载中..." : isPlaying ? "暂停" : "播放"}
         </Button>
       </div>
     </div>
