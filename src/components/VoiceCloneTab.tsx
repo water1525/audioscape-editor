@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Loader2 } from "lucide-react";
+import { Play, Pause, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import avatarFemale from "@/assets/avatar-female.png";
 import avatarMale from "@/assets/avatar-male.png";
@@ -32,16 +32,31 @@ const voiceProfiles = [
 ];
 
 const VoiceCloneTab = () => {
+  const [loadingId, setLoadingId] = useState<string | null>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const handlePlay = async (profileId: string, type: 'original' | 'cloned') => {
+  const handlePlayPause = async (profileId: string, type: 'original' | 'cloned') => {
     const buttonId = `${profileId}-${type}`;
-    if (playingId) return;
+    
+    // If this button is playing, toggle pause/play
+    if (playingId === buttonId && audioRef.current) {
+      audioRef.current.pause();
+      setPlayingId(null);
+      return;
+    }
+
+    // If another audio is playing, stop it
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+      setPlayingId(null);
+    }
 
     const profile = voiceProfiles.find(p => p.id === profileId);
     if (!profile) return;
 
-    setPlayingId(buttonId);
+    setLoadingId(buttonId);
     try {
       const response = await fetch(
         `${SUPABASE_URL}/functions/v1/step-tts`,
@@ -66,23 +81,28 @@ const VoiceCloneTab = () => {
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
+      audioRef.current = audio;
       
       audio.onended = () => {
         setPlayingId(null);
         URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
       };
       
       audio.onerror = () => {
         setPlayingId(null);
         URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
         toast.error("音频播放失败");
       };
 
       await audio.play();
+      setPlayingId(buttonId);
     } catch (error) {
       console.error("TTS error:", error);
       toast.error("语音合成失败");
-      setPlayingId(null);
+    } finally {
+      setLoadingId(null);
     }
   };
 
@@ -116,11 +136,13 @@ const VoiceCloneTab = () => {
                 variant="play"
                 size="sm"
                 className="justify-start gap-2 text-xs"
-                onClick={() => handlePlay(profile.id, 'original')}
-                disabled={playingId !== null}
+                onClick={() => handlePlayPause(profile.id, 'original')}
+                disabled={loadingId !== null}
               >
-                {playingId === `${profile.id}-original` ? (
+                {loadingId === `${profile.id}-original` ? (
                   <Loader2 className="h-3 w-3 animate-spin" />
+                ) : playingId === `${profile.id}-original` ? (
+                  <Pause className="h-3 w-3" />
                 ) : (
                   <Play className="h-3 w-3" />
                 )}
@@ -130,11 +152,13 @@ const VoiceCloneTab = () => {
                 variant="play"
                 size="sm"
                 className="justify-start gap-2 text-xs"
-                onClick={() => handlePlay(profile.id, 'cloned')}
-                disabled={playingId !== null}
+                onClick={() => handlePlayPause(profile.id, 'cloned')}
+                disabled={loadingId !== null}
               >
-                {playingId === `${profile.id}-cloned` ? (
+                {loadingId === `${profile.id}-cloned` ? (
                   <Loader2 className="h-3 w-3 animate-spin" />
+                ) : playingId === `${profile.id}-cloned` ? (
+                  <Pause className="h-3 w-3" />
                 ) : (
                   <Play className="h-3 w-3" />
                 )}

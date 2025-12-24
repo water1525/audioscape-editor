@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Loader2 } from "lucide-react";
+import { Play, Pause, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const SUPABASE_URL = "https://vixczylcdviqivlziovw.supabase.co";
@@ -26,13 +26,26 @@ const cases = [
 
 const TextToSpeechTab = () => {
   const [activeCase, setActiveCase] = useState("case1");
+  const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentCase = cases.find((c) => c.id === activeCase) || cases[0];
 
-  const handlePlay = async () => {
-    if (isPlaying) return;
+  const handlePlayPause = async () => {
+    // If already playing, toggle pause/play
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        audioRef.current.play();
+        setIsPlaying(true);
+      }
+      return;
+    }
 
-    setIsPlaying(true);
+    // Generate new audio
+    setIsLoading(true);
     try {
       const response = await fetch(
         `${SUPABASE_URL}/functions/v1/step-tts`,
@@ -63,24 +76,39 @@ const TextToSpeechTab = () => {
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
+      audioRef.current = audio;
       
       audio.onended = () => {
         setIsPlaying(false);
         URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
       };
       
       audio.onerror = () => {
         setIsPlaying(false);
         URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
         toast.error("音频播放失败");
       };
 
       await audio.play();
+      setIsPlaying(true);
     } catch (error) {
       console.error("TTS error:", error);
       toast.error(error instanceof Error ? error.message : "语音合成失败");
-      setIsPlaying(false);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  // Reset audio when switching cases
+  const handleCaseChange = (caseId: string) => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setIsPlaying(false);
+    setActiveCase(caseId);
   };
 
   return (
@@ -99,7 +127,7 @@ const TextToSpeechTab = () => {
             key={caseItem.id}
             variant={activeCase === caseItem.id ? "caseActive" : "case"}
             size="sm"
-            onClick={() => setActiveCase(caseItem.id)}
+            onClick={() => handleCaseChange(caseItem.id)}
             className="min-w-[70px] transition-all duration-200"
           >
             {caseItem.label}
@@ -117,15 +145,17 @@ const TextToSpeechTab = () => {
           variant="outline" 
           size="sm" 
           className="gap-2"
-          onClick={handlePlay}
-          disabled={isPlaying}
+          onClick={handlePlayPause}
+          disabled={isLoading}
         >
-          {isPlaying ? (
+          {isLoading ? (
             <Loader2 className="h-3 w-3 animate-spin" />
+          ) : isPlaying ? (
+            <Pause className="h-3 w-3" />
           ) : (
             <Play className="h-3 w-3" />
           )}
-          {isPlaying ? "播放中..." : "播放"}
+          {isLoading ? "加载中..." : isPlaying ? "暂停" : "播放"}
         </Button>
       </div>
     </div>
