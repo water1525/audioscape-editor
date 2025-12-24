@@ -2,22 +2,23 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Play, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const cases = [
   {
     id: "case1",
     label: "case1",
-    text: "111\n11111\n111111\n1111111\n1111\n1\n1111111",
+    text: "智能阶跃，十倍每个人的可能。我们致力于打造最先进的人工智能技术，让每一个人都能享受到AI带来的便利。",
   },
   {
     id: "case2",
-    label: "case1",
-    text: "这是第二个示例文本。\n您可以在这里输入任何想要转换成语音的内容。",
+    label: "case2",
+    text: "这是第二个示例文本。您可以在这里输入任何想要转换成语音的内容。语音合成技术让文字变得生动有趣。",
   },
   {
     id: "case3",
-    label: "case1",
-    text: "欢迎使用AI语音平台。\n我们提供最先进的语音合成技术。",
+    label: "case3",
+    text: "欢迎使用AI语音平台。我们提供最先进的语音合成技术，支持多种音色和情感表达。",
   },
 ];
 
@@ -31,22 +32,32 @@ const TextToSpeechTab = () => {
 
     setIsPlaying(true);
     try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      console.log('Supabase URL:', supabaseUrl);
+      
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
+        `${supabaseUrl}/functions/v1/step-tts`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           },
           body: JSON.stringify({ 
-            text: currentCase.text.replace(/\n/g, ' '),
+            text: currentCase.text,
           }),
         }
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to generate speech");
+        let errorMessage = "Failed to generate speech";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // Response is not JSON
+        }
+        throw new Error(errorMessage);
       }
 
       const audioBlob = await response.blob();
