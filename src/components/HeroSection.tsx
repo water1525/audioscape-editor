@@ -1,6 +1,6 @@
 import heroBg from "@/assets/hero-bg.jpg";
 
-const tags = ["Coding", "Excellence", "Reasoning"];
+const tags = ["Hyper-realism", "Emotional mastery", "Instant cloning"];
 
 const HeroSection = () => {
   return (
@@ -19,12 +19,12 @@ const HeroSection = () => {
         <div className="max-w-2xl">
           {/* Title */}
           <h1 className="hero-title text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 animate-fade-in">
-            Step-tts-2
+            step-tts-2
           </h1>
 
           {/* Subtitle */}
           <p className="text-xl md:text-2xl font-semibold text-[hsl(0,0%,100%)] mb-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            MFA Fast-Large Model
+            Text to speech large model
           </p>
 
           {/* Tags */}
