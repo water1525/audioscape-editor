@@ -2,7 +2,7 @@ import { ChevronDown } from "lucide-react";
 
 const Navbar = () => {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[hsl(220,20%,8%)] border-b border-[hsl(220,20%,15%)]">
+    <nav className="absolute top-0 left-0 right-0 z-50 bg-transparent">
       <div className="container mx-auto px-6 md:px-12 lg:px-20">
         <div className="flex items-center justify-between h-14">
           {/* Left: Logo */}
