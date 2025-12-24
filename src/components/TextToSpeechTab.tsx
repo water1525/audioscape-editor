@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Play, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
+const SUPABASE_URL = "https://vixczylcdviqivlziovw.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpeGN6eWxjZHZpcWl2bHppb3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1NzQ0NzAsImV4cCI6MjA4MjE1MDQ3MH0.XKpCSVe3ctAZgjfh90W_x6mdA-lqcJRHUndy4LXROkg";
+
 const cases = [
   {
     id: "case1",
@@ -31,16 +34,14 @@ const TextToSpeechTab = () => {
 
     setIsPlaying(true);
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      console.log('Supabase URL:', supabaseUrl);
-      
       const response = await fetch(
-        `${supabaseUrl}/functions/v1/step-tts`,
+        `${SUPABASE_URL}/functions/v1/step-tts`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
           },
           body: JSON.stringify({ 
             text: currentCase.text,
