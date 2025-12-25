@@ -36,14 +36,34 @@ const otherTags = [
 const VoiceEditTab = () => {
   const [showModal, setShowModal] = useState(false);
   const [isEdited, setIsEdited] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const handleEdit = () => {
     setShowModal(true);
   };
 
-  const handleConfirm = () => {
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag) 
+        : [...prev, tag]
+    );
+  };
+
+  const handleConfirm = async () => {
+    if (selectedTags.length === 0) {
+      setShowModal(false);
+      return;
+    }
+    
+    setIsGenerating(true);
+    // 模拟生成过程
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsGenerating(false);
     setIsEdited(true);
     setShowModal(false);
+    setSelectedTags([]);
   };
 
   return (
@@ -129,7 +149,12 @@ const VoiceEditTab = () => {
                   {emotionTags.map((tag, i) => (
                     <span
                       key={i}
-                      className="px-3 py-1 text-xs rounded-full bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors"
+                      onClick={() => toggleTag(tag)}
+                      className={`px-3 py-1 text-xs rounded-full cursor-pointer transition-colors ${
+                        selectedTags.includes(tag)
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
+                      }`}
                     >
                       {tag}
                     </span>
@@ -143,7 +168,12 @@ const VoiceEditTab = () => {
                   {styleTags.map((tag, i) => (
                     <span
                       key={i}
-                      className="px-3 py-1 text-xs rounded-full bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors"
+                      onClick={() => toggleTag(tag)}
+                      className={`px-3 py-1 text-xs rounded-full cursor-pointer transition-colors ${
+                        selectedTags.includes(tag)
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
+                      }`}
                     >
                       {tag}
                     </span>
@@ -157,7 +187,12 @@ const VoiceEditTab = () => {
                   {ageTags.map((tag, i) => (
                     <span
                       key={i}
-                      className="px-3 py-1 text-xs rounded-full bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors"
+                      onClick={() => toggleTag(tag)}
+                      className={`px-3 py-1 text-xs rounded-full cursor-pointer transition-colors ${
+                        selectedTags.includes(tag)
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
+                      }`}
                     >
                       {tag}
                     </span>
@@ -173,7 +208,12 @@ const VoiceEditTab = () => {
                   {otherTags.map((tag, i) => (
                     <span
                       key={i}
-                      className="px-3 py-1 text-xs rounded-full bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors"
+                      onClick={() => toggleTag(tag)}
+                      className={`px-3 py-1 text-xs rounded-full cursor-pointer transition-colors ${
+                        selectedTags.includes(tag)
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
+                      }`}
                     >
                       {tag}
                     </span>
@@ -183,11 +223,18 @@ const VoiceEditTab = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-3">
-              <Button variant="outline" onClick={() => setShowModal(false)}>
-                取消
-              </Button>
-              <Button onClick={handleConfirm}>确认</Button>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">
+                已选择 {selectedTags.length} 个标签
+              </p>
+              <div className="flex items-center gap-3">
+                <Button variant="outline" onClick={() => { setShowModal(false); setSelectedTags([]); }}>
+                  取消
+                </Button>
+                <Button onClick={handleConfirm} disabled={isGenerating}>
+                  {isGenerating ? "生成中..." : "确认"}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
