@@ -41,25 +41,23 @@ const VoicePlatformSection = () => {
       {/* Main Content */}
       <div className="max-w-4xl mx-auto">
         <div className="bg-card border border-border rounded-2xl shadow-medium overflow-hidden">
-          <div className="flex flex-col md:flex-row">
-            {/* Sidebar Tabs */}
-            <div className="md:w-[140px] p-4 md:border-r border-border bg-secondary/30 flex md:flex-col gap-2">
-              {tabs.map((tab) => (
-                <Button
-                  key={tab.id}
-                  variant={activeTab === tab.id ? "tabActive" : "tab"}
-                  size="sm"
-                  onClick={() => setActiveTab(tab.id)}
-                  className="w-full justify-center md:justify-start text-sm transition-all duration-200"
-                >
-                  {tab.label}
-                </Button>
-              ))}
-            </div>
-
-            {/* Content Area */}
-            <div className="flex-1 p-6 md:p-8">{renderTabContent()}</div>
+          {/* Top Tabs */}
+          <div className="p-4 border-b border-border bg-secondary/30 flex gap-2 justify-center">
+            {tabs.map((tab) => (
+              <Button
+                key={tab.id}
+                variant={activeTab === tab.id ? "tabActive" : "tab"}
+                size="sm"
+                onClick={() => setActiveTab(tab.id)}
+                className="text-sm transition-all duration-200"
+              >
+                {tab.label}
+              </Button>
+            ))}
           </div>
+
+          {/* Content Area */}
+          <div className="p-6 md:p-8">{renderTabContent()}</div>
         </div>
 
         {/* Footer CTA */}
