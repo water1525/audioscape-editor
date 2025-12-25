@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, RefreshCw, Loader2, CheckCircle2 } from "lucide-react";
+import { Play, Pause, RefreshCw, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import avatarFemale from "@/assets/avatar-female.png";
 import avatarMale from "@/assets/avatar-male.png";
@@ -173,15 +173,8 @@ const VoiceCloneTab = () => {
         </div>
       )}
 
-      {audioReady && (
-        <div className="mb-4 flex items-center gap-2 text-xs text-green-600">
-          <CheckCircle2 className="h-4 w-4" />
-          <span>音频已就绪，点击即可播放</span>
-        </div>
-      )}
-
       {/* Voice Profiles Grid */}
-      <div className="flex items-start gap-6 mb-6">
+      <div className="flex items-start justify-center gap-6 mb-6">
         {voiceProfiles.map((profile) => (
           <div
             key={profile.id}
