@@ -1,4 +1,5 @@
 import { ChevronDown } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
@@ -7,23 +8,25 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-14">
           {/* Left: Logo */}
           <div className="flex items-center gap-3">
-            <span className="text-lg font-bold text-[hsl(0,0%,100%)]">阶跃星辰</span>
-            <span className="text-[hsl(220,10%,40%)]">|</span>
-            <span className="text-sm text-[hsl(220,10%,60%)]">开放平台</span>
+            <Link to="/" className="flex items-center gap-3">
+              <span className="text-lg font-bold text-[hsl(0,0%,100%)]">阶跃星辰</span>
+              <span className="text-[hsl(220,10%,40%)]">|</span>
+              <span className="text-sm text-[hsl(220,10%,60%)]">开放平台</span>
+            </Link>
           </div>
 
           {/* Center: Navigation Links */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="#" className="text-sm text-[hsl(0,0%,100%)] hover:text-[hsl(195,100%,50%)] transition-colors">
+            <Link to="/" className="text-sm text-[hsl(0,0%,100%)] hover:text-[hsl(195,100%,50%)] transition-colors">
               首页
-            </a>
+            </Link>
             <a href="#" className="text-sm text-[hsl(220,10%,70%)] hover:text-[hsl(0,0%,100%)] transition-colors">
               文档中心
             </a>
-            <button className="flex items-center gap-1 text-sm text-[hsl(220,10%,70%)] hover:text-[hsl(0,0%,100%)] transition-colors">
+            <Link to="/playground" className="flex items-center gap-1 text-sm text-[hsl(220,10%,70%)] hover:text-[hsl(0,0%,100%)] transition-colors">
               体验中心
               <ChevronDown size={14} />
-            </button>
+            </Link>
             <a href="#" className="text-sm text-[hsl(220,10%,70%)] hover:text-[hsl(0,0%,100%)] transition-colors">
               繁星计划
             </a>
