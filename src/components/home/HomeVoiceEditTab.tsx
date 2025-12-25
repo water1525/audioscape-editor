@@ -7,10 +7,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 // 参数设置分类
-const ganLianTags = ["电台", "纪录", "亲密", "稳健", "大气", "沉稳", "月亮", "阳光", "磁性"];
-const fengGeTags = ["严厉", "抒情", "共鸣", "清亮", "质朴", "李庄", "快速"];
-const gengDuoTags = ["严肃", "膨胀", "儿童", "平静", "可等", "呼呼", "吹唱", "请读"];
-const changYongTags = ["迷人", "法语", "风雨", "浏河", "法语", "中老年", "特别女"];
+const emotionTags = ["高兴", "愤怒", "悲伤", "幽默", "困惑", "厌恶", "共情", "尴尬", "恐惧", "惊讶", "兴奋", "沮丧", "冷漠", "钦佩"];
+const styleTags = [
+  "严肃", "傲慢", "儿童", "单纯", "夸张", "少女", "御姐", "朗诵",
+  "甜美", "空灵", "豪爽", "撒娇", "温暖", "害羞", "安慰", "权威",
+  "闲聊", "电台", "深情", "温柔", "磁性", "中老年", "悄悄话",
+  "气泡音", "讲故事", "绘声绘色", "节目主持", "新闻播报", "广告营销",
+  "娱乐八卦", "吼叫", "小声", "大声", "低沉", "高亢"
+];
+const speedTags = ["快速", "慢速", "更快", "更慢"];
 
 const HomeVoiceEditTab = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -353,21 +358,16 @@ const handleConfirm = async () => {
 
             {/* 副标题 */}
             <p className="text-sm text-muted-foreground mb-6">
-              通配只影响风格标识符，请尽量下载任意风格
+              选择您想要的音色特征，当前只支持单选
             </p>
 
             {/* 标签分类 */}
-            <div className="space-y-4 max-h-[300px] overflow-y-auto">
-              {renderTagSection("干练", ganLianTags)}
-              {renderTagSection("风格", fengGeTags)}
-              {renderTagSection("更多", gengDuoTags)}
-              {renderTagSection("常用标签", changYongTags)}
+            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+              {renderTagSection("情绪", emotionTags)}
+              {renderTagSection("风格", styleTags)}
+              {renderTagSection("速度控制", speedTags)}
             </div>
 
-            {/* 已选择数量 */}
-            <p className="text-sm text-muted-foreground mt-4">
-              已选择 {selectedTags.length} 个标签
-            </p>
 
             {/* 按钮 */}
             <div className="flex gap-3 mt-4">
