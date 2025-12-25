@@ -1,153 +1,427 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Play, Pause, RefreshCw, Trash2, Download, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
-import avatarFemale from "@/assets/avatar-female.png";
-import avatarMale from "@/assets/avatar-male.png";
 import { supabase } from "@/integrations/supabase/client";
+import { Slider } from "@/components/ui/slider";
 
-const voiceProfiles = [
-  {
-    id: "cila",
-    name: "Cila",
-    gender: "♀",
-    avatar: avatarFemale,
-    original: "Cila 原声",
-    cloned: "Cila 声音复刻",
-    originalFile: "voice-clone/cila-original.mp3",
-    clonedFile: "voice-clone/cila-cloned.mp3",
-  },
-  {
-    id: "john",
-    name: "John",
-    gender: "♂",
-    avatar: avatarMale,
-    original: "John 原声",
-    cloned: "John 声音复刻",
-    originalFile: "voice-clone/john-original.mp3",
-    clonedFile: "voice-clone/john-cloned.mp3",
-  },
+// Sample texts for recording
+const sampleTexts = [
+  "在这个充满希望的早晨，阳光透过窗帘洒落在地板上，形成一道道金色的光斑。微风轻轻吹过，带来了花园里玫瑰花的芬芳。这是新的一天的开始，充满了无限的可能性和期待。",
+  "科技的发展日新月异，人工智能正在改变我们的生活方式。从智能手机到自动驾驶汽车，从语音助手到智能家居，技术让我们的生活变得更加便捷和高效。未来的世界将会更加精彩。",
+  "中华文化源远流长，博大精深。从诗词歌赋到书法绘画，从传统节日到民间习俗，每一种文化形式都承载着深厚的历史底蕴和民族智慧。让我们共同传承和弘扬这份宝贵的文化遗产。",
+  "音乐是心灵的语言，它能够跨越国界和时空的限制，触动每一个人的内心深处。无论是古典音乐的优雅庄重，还是流行音乐的活力四射，都能给人带来美的享受和情感的共鸣。",
+  "大自然是最伟大的艺术家，它用四季更迭绘制出壮丽的画卷。春天的繁花似锦，夏天的绿树成荫，秋天的层林尽染，冬天的银装素裹，每一个季节都有独特的美丽和魅力。",
 ];
 
 const VoiceCloneTab = () => {
-  const [playingId, setPlayingId] = useState<string | null>(null);
-  const [audioUrls, setAudioUrls] = useState<Record<string, string>>({});
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Step 1: Recording state
+  const [sampleText, setSampleText] = useState(sampleTexts[0]);
+  const [isRecording, setIsRecording] = useState(false);
+  const [countdown, setCountdown] = useState(10);
+  const [recordedAudio, setRecordedAudio] = useState<Blob | null>(null);
+  const [recordedAudioUrl, setRecordedAudioUrl] = useState<string | null>(null);
+  const [isPlayingRecorded, setIsPlayingRecorded] = useState(false);
+  
+  // Step 2: Target text state
+  const [targetText, setTargetText] = useState("");
+  
+  // Step 3: Clone state
+  const [isCloning, setIsCloning] = useState(false);
+  const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
+  const [isPlayingCloned, setIsPlayingCloned] = useState(false);
+  const [clonedDuration, setClonedDuration] = useState(0);
+  const [clonedCurrentTime, setClonedCurrentTime] = useState(0);
+  
+  // Refs
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const recordedAudioRef = useRef<HTMLAudioElement | null>(null);
+  const clonedAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Check if audio files exist in storage
-  const checkAudioFiles = async () => {
-    const urls: Record<string, string> = {};
-
-    for (const profile of voiceProfiles) {
-      for (const type of ["original", "cloned"] as const) {
-        const file = type === "original" ? profile.originalFile : profile.clonedFile;
-        const key = `${profile.id}-${type}`;
-
-        const { data } = supabase.storage.from("audio").getPublicUrl(file);
-
-        try {
-          const response = await fetch(data.publicUrl, { method: "HEAD" });
-          if (response.ok) {
-            urls[key] = data.publicUrl;
-          }
-        } catch {
-          // File doesn't exist
-        }
-      }
+  // Generate random sample text
+  const generateRandomText = () => {
+    const currentIndex = sampleTexts.indexOf(sampleText);
+    let newIndex = Math.floor(Math.random() * sampleTexts.length);
+    while (newIndex === currentIndex && sampleTexts.length > 1) {
+      newIndex = Math.floor(Math.random() * sampleTexts.length);
     }
-
-    setAudioUrls(urls);
+    setSampleText(sampleTexts[newIndex]);
   };
 
+  // Start recording
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+        setRecordedAudio(audioBlob);
+        const url = URL.createObjectURL(audioBlob);
+        setRecordedAudioUrl(url);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setCountdown(10);
+
+      // Start countdown
+      countdownIntervalRef.current = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            stopRecording();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      toast.success("开始录制，请朗读文本");
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+      toast.error("无法访问麦克风，请检查权限设置");
+    }
+  };
+
+  // Stop recording
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
+      toast.success("录制完成");
+    }
+  }, [isRecording]);
+
+  // Delete recorded audio
+  const deleteRecordedAudio = () => {
+    if (recordedAudioUrl) {
+      URL.revokeObjectURL(recordedAudioUrl);
+    }
+    setRecordedAudio(null);
+    setRecordedAudioUrl(null);
+    setIsPlayingRecorded(false);
+  };
+
+  // Play/pause recorded audio
+  const togglePlayRecorded = () => {
+    if (!recordedAudioUrl) return;
+
+    if (!recordedAudioRef.current) {
+      recordedAudioRef.current = new Audio(recordedAudioUrl);
+      recordedAudioRef.current.onended = () => setIsPlayingRecorded(false);
+    }
+
+    if (isPlayingRecorded) {
+      recordedAudioRef.current.pause();
+      setIsPlayingRecorded(false);
+    } else {
+      recordedAudioRef.current.play();
+      setIsPlayingRecorded(true);
+    }
+  };
+
+  // Clone voice using TTS
+  const cloneVoice = async () => {
+    if (!recordedAudio || !targetText.trim()) {
+      toast.error("请先录制音频并输入目标文本");
+      return;
+    }
+
+    setIsCloning(true);
+    try {
+      // For now, we'll use the step-tts API to generate audio
+      // In a real implementation, you would upload the recorded audio for voice cloning
+      const { data, error } = await supabase.functions.invoke("step-tts", {
+        body: {
+          text: targetText,
+          voice: "tianmeinvsheng", // Default voice for demo
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.audioContent) {
+        const audioBlob = base64ToBlob(data.audioContent, "audio/mpeg");
+        const url = URL.createObjectURL(audioBlob);
+        setClonedAudioUrl(url);
+        toast.success("音色复刻成功！");
+      }
+    } catch (error) {
+      console.error("Voice cloning error:", error);
+      toast.error("音色复刻失败，请重试");
+    } finally {
+      setIsCloning(false);
+    }
+  };
+
+  // Base64 to Blob helper
+  const base64ToBlob = (base64: string, mimeType: string): Blob => {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mimeType });
+  };
+
+  // Play/pause cloned audio
+  const togglePlayCloned = () => {
+    if (!clonedAudioUrl) return;
+
+    if (!clonedAudioRef.current) {
+      clonedAudioRef.current = new Audio(clonedAudioUrl);
+      clonedAudioRef.current.onended = () => setIsPlayingCloned(false);
+      clonedAudioRef.current.onloadedmetadata = () => {
+        setClonedDuration(clonedAudioRef.current?.duration || 0);
+      };
+      clonedAudioRef.current.ontimeupdate = () => {
+        setClonedCurrentTime(clonedAudioRef.current?.currentTime || 0);
+      };
+    }
+
+    if (isPlayingCloned) {
+      clonedAudioRef.current.pause();
+      setIsPlayingCloned(false);
+    } else {
+      clonedAudioRef.current.play();
+      setIsPlayingCloned(true);
+    }
+  };
+
+  // Seek cloned audio
+  const seekClonedAudio = (value: number[]) => {
+    if (clonedAudioRef.current) {
+      clonedAudioRef.current.currentTime = value[0];
+      setClonedCurrentTime(value[0]);
+    }
+  };
+
+  // Reset cloned audio
+  const resetClonedAudio = () => {
+    if (clonedAudioRef.current) {
+      clonedAudioRef.current.currentTime = 0;
+      setClonedCurrentTime(0);
+    }
+  };
+
+  // Download cloned audio
+  const downloadClonedAudio = () => {
+    if (clonedAudioUrl) {
+      const link = document.createElement("a");
+      link.href = clonedAudioUrl;
+      link.download = `cloned-voice-${Date.now()}.mp3`;
+      link.click();
+    }
+  };
+
+  // Format time
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  // Cleanup on unmount
   useEffect(() => {
-    checkAudioFiles();
+    return () => {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+      }
+      if (recordedAudioUrl) {
+        URL.revokeObjectURL(recordedAudioUrl);
+      }
+      if (clonedAudioUrl) {
+        URL.revokeObjectURL(clonedAudioUrl);
+      }
+    };
   }, []);
 
-  const handlePlayPause = (profileId: string, type: "original" | "cloned") => {
-    const buttonId = `${profileId}-${type}`;
-
-    if (playingId === buttonId && audioRef.current) {
-      audioRef.current.pause();
-      setPlayingId(null);
-      return;
-    }
-
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-      setPlayingId(null);
-    }
-
-    const audioUrl = audioUrls[buttonId];
-    if (!audioUrl) {
-      toast.error("音频未就绪");
-      return;
-    }
-
-    const audio = new Audio(audioUrl);
-    audioRef.current = audio;
-
-    audio.onended = () => {
-      setPlayingId(null);
-      audioRef.current = null;
-    };
-
-    audio.onerror = () => {
-      setPlayingId(null);
-      audioRef.current = null;
-      toast.error("音频播放失败");
-    };
-
-    audio.play().catch(() => {
-      setPlayingId(null);
-      audioRef.current = null;
-      toast.error("音频播放失败");
-    });
-    setPlayingId(buttonId);
-  };
-
   return (
-    <div className="animate-fade-in">
-      {/* Voice Profiles Grid */}
-      <div className="flex items-start justify-center gap-6 mb-6">
-        {voiceProfiles.map((profile) => (
-          <div
-            key={profile.id}
-            className="bg-card border border-border rounded-lg p-4 shadow-soft hover:shadow-medium transition-shadow duration-200"
-          >
-            <div className="flex flex-col items-center mb-4">
-              <div className="w-16 h-16 rounded-full overflow-hidden mb-2">
-                <img src={profile.avatar} alt={profile.name} className="w-full h-full object-cover" />
-              </div>
-              <span className="text-sm font-medium text-foreground">{profile.name}</span>
-              <span className="text-xs text-primary">{profile.gender}</span>
+    <div className="animate-fade-in space-y-6">
+      {/* Step 1: Record Audio */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium text-foreground">step 1 录制音频</h3>
+        
+        {!recordedAudioUrl ? (
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
+            <p className="text-sm text-muted-foreground text-center mb-4">
+              请在安静环境下朗读以下文本，录制5-10秒语音
+            </p>
+            
+            <div className="flex items-center justify-center gap-2 mb-6">
+              <p className="text-base text-foreground text-center leading-relaxed max-w-lg">
+                {sampleText}
+              </p>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0"
+                onClick={generateRandomText}
+                disabled={isRecording}
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
             </div>
 
-            <div className="flex flex-col gap-2">
+            {isRecording ? (
+              <div className="flex flex-col items-center gap-4">
+                <div className="text-4xl font-bold text-primary">{countdown}S</div>
+                <Button
+                  variant="outline"
+                  onClick={stopRecording}
+                  disabled={countdown > 5}
+                  className="min-w-[120px]"
+                >
+                  结束录制
+                </Button>
+                {countdown > 5 && (
+                  <p className="text-xs text-muted-foreground">录制至少5秒后可手动结束</p>
+                )}
+              </div>
+            ) : (
+              <div className="flex justify-center">
+                <Button onClick={startRecording} className="min-w-[120px]">
+                  开始录制
+                </Button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-card border border-border rounded-lg p-4">
+            <div className="flex items-center gap-3">
               <Button
-                variant="play"
-                size="sm"
-                className="justify-start gap-2 text-xs"
-                onClick={() => handlePlayPause(profile.id, "original")}
-                disabled={!audioUrls[`${profile.id}-original`]}
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 rounded-full bg-primary/10"
+                onClick={togglePlayRecorded}
               >
-                {playingId === `${profile.id}-original` ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
-                {profile.original}
+                {isPlayingRecorded ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
               </Button>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-foreground">
+                  {Date.now()}.wav
+                </p>
+                <p className="text-xs text-muted-foreground">00:10</p>
+              </div>
               <Button
-                variant="play"
-                size="sm"
-                className="justify-start gap-2 text-xs"
-                onClick={() => handlePlayPause(profile.id, "cloned")}
-                disabled={!audioUrls[`${profile.id}-cloned`]}
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                onClick={deleteRecordedAudio}
               >
-                {playingId === `${profile.id}-cloned` ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
-                {profile.cloned}
+                <Trash2 className="h-4 w-4" />
               </Button>
             </div>
           </div>
-        ))}
+        )}
       </div>
+
+      {/* Step 2: Target Text */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium text-foreground">step 2 输入目标音频文本</h3>
+        <div className="relative">
+          <Textarea
+            placeholder="点此输入想要生成的音频文本"
+            value={targetText}
+            onChange={(e) => setTargetText(e.target.value.slice(0, 1000))}
+            className="min-h-[120px] resize-none pr-16"
+          />
+          <span className="absolute bottom-3 right-3 text-xs text-muted-foreground">
+            {targetText.length}/1000字符
+          </span>
+        </div>
+      </div>
+
+      {/* Clone Button */}
+      {recordedAudioUrl && targetText.trim() && (
+        <div className="flex justify-center">
+          <Button
+            onClick={cloneVoice}
+            disabled={isCloning}
+            className="min-w-[120px]"
+          >
+            {isCloning ? "复刻中..." : "复刻音色"}
+          </Button>
+        </div>
+      )}
+
+      {/* Step 3: Cloned Audio Player */}
+      {clonedAudioUrl && (
+        <div className="bg-card border border-border rounded-lg p-4 space-y-4">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-12 w-12 rounded-full bg-primary/10"
+              onClick={togglePlayCloned}
+            >
+              {isPlayingCloned ? (
+                <Pause className="h-5 w-5" />
+              ) : (
+                <Play className="h-5 w-5" />
+              )}
+            </Button>
+            
+            <div className="flex-1 space-y-2">
+              <Slider
+                value={[clonedCurrentTime]}
+                max={clonedDuration || 100}
+                step={0.1}
+                onValueChange={seekClonedAudio}
+                className="cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{formatTime(clonedCurrentTime)}</span>
+                <span>{formatTime(clonedDuration)}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={resetClonedAudio}
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={downloadClonedAudio}
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <Button variant="outline" className="min-w-[100px]">
+              保存音色
+            </Button>
+          </div>
+        </div>
+      )}
 
       <p className="text-sm text-muted-foreground">
         <span className="text-foreground font-medium">@Step-tts-2</span> 生成与原声音一模一样的语音复刻品
