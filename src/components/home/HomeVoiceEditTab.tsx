@@ -11,7 +11,7 @@ const HomeVoiceEditTab = () => {
   const { playAudio, stopGlobalAudio } = useGlobalAudio();
 
   // Use one of the existing audio files as demo for voice edit
-  const audioFile = "tts/case2.mp3";
+  const audioFile = "voice-edit/xinxingren-maoxian.mp3";
 
   const getAudioUrl = () => {
     const { data } = supabase.storage.from("audio").getPublicUrl(audioFile);
