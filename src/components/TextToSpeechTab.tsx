@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Loader2, RefreshCw, CheckCircle2 } from "lucide-react";
+import { Play, Pause } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -233,29 +233,6 @@ const TextToSpeechTab = () => {
 
   return (
     <div className="animate-fade-in">
-      {/* Generate Button */}
-      {!audioReady && (
-        <div className="mb-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-foreground">首次使用需生成音频</p>
-              <p className="text-xs text-muted-foreground">点击按钮一键生成所有语音样本（约30秒）</p>
-            </div>
-            <Button onClick={generateAudio} disabled={isGenerating} className="gap-2">
-              {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-              {isGenerating ? "生成中..." : "生成音频"}
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {audioReady && (
-        <div className="mb-4 flex items-center gap-2 text-xs text-green-600">
-          <CheckCircle2 className="h-4 w-4" />
-          <span>音频已就绪，点击即可播放</span>
-        </div>
-      )}
-
       {/* Text Display Area */}
       <div className="bg-card border border-border rounded-lg p-6 mb-4 min-h-[160px] shadow-soft">
         <pre className="text-foreground font-mono text-sm whitespace-pre-wrap leading-relaxed">
