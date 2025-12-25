@@ -106,64 +106,68 @@ const TextToSpeechTab = () => {
     return null;
   };
 
-  // Preload audio sequentially to avoid rate limits
+  // Preload audio sequentially to avoid rate limits (6 RPM, 1 concurrent)
   useEffect(() => {
     const abortController = new AbortController();
     let cancelled = false;
 
     const loadAudioSequentially = async () => {
-      console.log("Starting audio preload...");
+      console.log("Starting audio preload (strict rate limiting: 1 request per 12s)...");
       
-      // Load case1 and case2 (single voice)
+      // Collect all items to load
+      const allItems: Array<{ id: string; text: string; voice: string; isDialogueLine: boolean; lineIndex?: number }> = [];
+      
+      // Add case1 and case2
       for (const caseItem of cases.filter(c => !c.isDialogue)) {
-        if (cancelled) return;
-
-        setLoadingCache((prev) => ({ ...prev, [caseItem.id]: true }));
-        console.log(`Loading ${caseItem.id}...`);
-
-        const audioUrl = await fetchAudio(caseItem.text, caseItem.voice, abortController.signal);
-        if (audioUrl && !cancelled) {
-          setAudioCache((prev) => ({ ...prev, [caseItem.id]: audioUrl }));
-          console.log(`${caseItem.id} loaded successfully`);
-        }
-
-        if (!cancelled) {
-          setLoadingCache((prev) => ({ ...prev, [caseItem.id]: false }));
-        }
-
-        // Wait longer between requests to avoid rate limits
-        await sleep(2000);
-      }
-
-      // Load case3 dialogue (multiple voices)
-      if (cancelled) return;
-      setLoadingCache((prev) => ({ ...prev, case3: true }));
-      console.log("Loading dialogue audio...");
-
-      const dialogueAudios: string[] = [];
-      for (let i = 0; i < dialogueLines.length; i++) {
-        if (cancelled) return;
-        const line = dialogueLines[i];
-        console.log(`Loading dialogue line ${i + 1}/${dialogueLines.length}...`);
-        
-        const audioUrl = await fetchAudio(line.text, line.voice, abortController.signal);
-        if (audioUrl) {
-          dialogueAudios.push(audioUrl);
-          console.log(`Dialogue line ${i + 1} loaded`);
-        } else {
-          console.error(`Failed to load dialogue line ${i + 1}`);
-        }
-        
-        // Wait longer between dialogue lines
-        await sleep(2500);
-      }
-
-      if (!cancelled && dialogueAudios.length > 0) {
-        setDialogueAudioCache(dialogueAudios);
-        console.log(`Dialogue loaded: ${dialogueAudios.length}/${dialogueLines.length} lines`);
+        allItems.push({ id: caseItem.id, text: caseItem.text, voice: caseItem.voice, isDialogueLine: false });
       }
       
+      // Add dialogue lines for case3
+      dialogueLines.forEach((line, index) => {
+        allItems.push({ id: `dialogue_${index}`, text: line.text, voice: line.voice, isDialogueLine: true, lineIndex: index });
+      });
+
+      const dialogueAudios: string[] = new Array(dialogueLines.length).fill("");
+      
+      // Set all as loading initially
+      setLoadingCache({ case1: true, case2: true, case3: true });
+
+      for (let i = 0; i < allItems.length; i++) {
+        if (cancelled) return;
+        
+        const item = allItems[i];
+        console.log(`Loading item ${i + 1}/${allItems.length}: ${item.id}`);
+
+        const audioUrl = await fetchAudio(item.text, item.voice, abortController.signal);
+        
+        if (cancelled) return;
+
+        if (audioUrl) {
+          if (item.isDialogueLine && item.lineIndex !== undefined) {
+            dialogueAudios[item.lineIndex] = audioUrl;
+          } else {
+            setAudioCache((prev) => ({ ...prev, [item.id]: audioUrl }));
+            setLoadingCache((prev) => ({ ...prev, [item.id]: false }));
+          }
+          console.log(`✓ ${item.id} loaded successfully`);
+        } else {
+          console.error(`✗ Failed to load ${item.id}`);
+        }
+
+        // Wait 12 seconds between requests to stay under 6 RPM (5 requests per minute max)
+        if (i < allItems.length - 1) {
+          console.log(`Waiting 12s before next request...`);
+          await sleep(12000);
+        }
+      }
+
+      // Set dialogue cache once all are loaded
       if (!cancelled) {
+        const validDialogues = dialogueAudios.filter(url => url !== "");
+        if (validDialogues.length > 0) {
+          setDialogueAudioCache(dialogueAudios);
+          console.log(`Dialogue loaded: ${validDialogues.length}/${dialogueLines.length} lines`);
+        }
         setLoadingCache((prev) => ({ ...prev, case3: false }));
       }
     };
