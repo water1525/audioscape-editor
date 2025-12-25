@@ -37,44 +37,66 @@ const VoiceCloneTab = () => {
   const [loadingCache, setLoadingCache] = useState<Record<string, boolean>>({});
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Preload audio for all profiles
+  // Preload audio sequentially to avoid rate limits
   useEffect(() => {
-    voiceProfiles.forEach(async (profile) => {
-      const types = ['original', 'cloned'] as const;
-      for (const type of types) {
-        const cacheKey = `${profile.id}-${type}`;
-        if (audioCache[cacheKey]) continue;
-        
-        setLoadingCache(prev => ({ ...prev, [cacheKey]: true }));
-        try {
-          const response = await fetch(
-            `${SUPABASE_URL}/functions/v1/step-tts`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "apikey": SUPABASE_ANON_KEY,
-                "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-              },
-              body: JSON.stringify({ 
-                text: profile.sampleText,
-                voice: profile.voice,
-              }),
-            }
-          );
+    const loadAudioSequentially = async () => {
+      for (const profile of voiceProfiles) {
+        const types = ['original', 'cloned'] as const;
+        for (const type of types) {
+          const cacheKey = `${profile.id}-${type}`;
+          if (audioCache[cacheKey]) continue;
+          
+          setLoadingCache(prev => ({ ...prev, [cacheKey]: true }));
+          try {
+            // Retry logic for rate limits
+            let retries = 3;
+            let response: Response | null = null;
+            
+            while (retries > 0) {
+              response = await fetch(
+                `${SUPABASE_URL}/functions/v1/step-tts`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "apikey": SUPABASE_ANON_KEY,
+                    "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+                  },
+                  body: JSON.stringify({ 
+                    text: profile.sampleText,
+                    voice: profile.voice,
+                  }),
+                }
+              );
 
-          if (response.ok) {
-            const audioBlob = await response.blob();
-            const audioUrl = URL.createObjectURL(audioBlob);
-            setAudioCache(prev => ({ ...prev, [cacheKey]: audioUrl }));
+              if (response.ok) {
+                break;
+              } else if (response.status === 429) {
+                retries--;
+                await new Promise(r => setTimeout(r, 1500)); // Wait before retry
+              } else {
+                break;
+              }
+            }
+
+            if (response?.ok) {
+              const audioBlob = await response.blob();
+              const audioUrl = URL.createObjectURL(audioBlob);
+              setAudioCache(prev => ({ ...prev, [cacheKey]: audioUrl }));
+            }
+          } catch (error) {
+            console.error("Preload error:", error);
+          } finally {
+            setLoadingCache(prev => ({ ...prev, [cacheKey]: false }));
           }
-        } catch (error) {
-          console.error("Preload error:", error);
-        } finally {
-          setLoadingCache(prev => ({ ...prev, [cacheKey]: false }));
+          
+          // Small delay between requests to avoid rate limits
+          await new Promise(r => setTimeout(r, 500));
         }
       }
-    });
+    };
+    
+    loadAudioSequentially();
   }, []);
 
   const handlePlayPause = (profileId: string, type: 'original' | 'cloned') => {

@@ -32,37 +32,59 @@ const TextToSpeechTab = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentCase = cases.find((c) => c.id === activeCase) || cases[0];
 
-  // Preload audio for all cases
+  // Preload audio sequentially to avoid rate limits
   useEffect(() => {
-    cases.forEach(async (caseItem) => {
-      if (audioCache[caseItem.id]) return;
-      
-      setLoadingCache(prev => ({ ...prev, [caseItem.id]: true }));
-      try {
-        const response = await fetch(
-          `${SUPABASE_URL}/functions/v1/step-tts`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "apikey": SUPABASE_ANON_KEY,
-              "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-            },
-            body: JSON.stringify({ text: caseItem.text }),
-          }
-        );
+    const loadAudioSequentially = async () => {
+      for (const caseItem of cases) {
+        if (audioCache[caseItem.id]) continue;
+        
+        setLoadingCache(prev => ({ ...prev, [caseItem.id]: true }));
+        try {
+          // Retry logic for rate limits
+          let retries = 3;
+          let response: Response | null = null;
+          
+          while (retries > 0) {
+            response = await fetch(
+              `${SUPABASE_URL}/functions/v1/step-tts`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "apikey": SUPABASE_ANON_KEY,
+                  "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+                },
+                body: JSON.stringify({ text: caseItem.text }),
+              }
+            );
 
-        if (response.ok) {
-          const audioBlob = await response.blob();
-          const audioUrl = URL.createObjectURL(audioBlob);
-          setAudioCache(prev => ({ ...prev, [caseItem.id]: audioUrl }));
+            if (response.ok) {
+              break;
+            } else if (response.status === 429) {
+              retries--;
+              await new Promise(r => setTimeout(r, 1500)); // Wait before retry
+            } else {
+              break;
+            }
+          }
+
+          if (response?.ok) {
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            setAudioCache(prev => ({ ...prev, [caseItem.id]: audioUrl }));
+          }
+        } catch (error) {
+          console.error("Preload error:", error);
+        } finally {
+          setLoadingCache(prev => ({ ...prev, [caseItem.id]: false }));
         }
-      } catch (error) {
-        console.error("Preload error:", error);
-      } finally {
-        setLoadingCache(prev => ({ ...prev, [caseItem.id]: false }));
+        
+        // Small delay between requests to avoid rate limits
+        await new Promise(r => setTimeout(r, 500));
       }
-    });
+    };
+    
+    loadAudioSequentially();
   }, []);
 
   const handlePlayPause = () => {
