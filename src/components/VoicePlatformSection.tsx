@@ -99,8 +99,8 @@ const VoicePlatformSection = () => {
         </div>
 
         {/* Footer CTA */}
-        <div className="flex items-center justify-end gap-4 mt-8 px-2">
-          <p className="text-sm font-semibold text-foreground">
+        <div className="flex flex-col items-center justify-center gap-4 mt-8 px-2">
+          <p className="text-lg font-semibold text-foreground">
             前往体验中心体验完整能力
           </p>
           <Button className="px-6 py-2.5 h-auto text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300">
