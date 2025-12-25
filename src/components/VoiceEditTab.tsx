@@ -1,8 +1,17 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, ArrowRight, X, Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Play, Pause, Upload, Mic, RefreshCw, Trash2, X, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+// Sample texts for recording (25-30 characters each)
+const sampleTexts = [
+  "清晨的阳光透过薄雾洒向大地，万物开始苏醒。",
+  "科技的进步让我们的生活变得更加便捷和美好。",
+  "春风轻轻吹过田野，带来花朵的芬芳和希望。",
+  "音乐能够治愈心灵，让人忘却烦恼找到平静。",
+  "夜空中繁星闪烁，诉说着宇宙无尽的神秘故事。",
+];
 
 const emotionTags = [
   "电台", "纪录", "亲密", "稳健", "大气", "沉稳", "月亮", "阳光", "磁性",
@@ -14,8 +23,6 @@ const ageTags = ["严肃", "膨胀", "儿童", "平静", "可等", "呼呼", "�
 const otherTags = [
   "迷人", "法语", "风雨", "浏河", "法语", "中老年", "特别女",
 ];
-
-const AUDIO_TEXT = "在遥远的星际中，星星人踏上了一段奇妙的冒险旅程。他们穿越星云，探索未知的宇宙奥秘。";
 
 // Waveform animation component
 const WaveformAnimation = ({ isPlaying, variant = "default" }: { isPlaying: boolean; variant?: "default" | "primary" }) => {
@@ -52,69 +59,181 @@ const WaveformAnimation = ({ isPlaying, variant = "default" }: { isPlaying: bool
 };
 
 const VoiceEditTab = () => {
-  const { toast } = useToast();
-  const [showModal, setShowModal] = useState(false);
-  const [isEdited, setIsEdited] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  
-  // Audio states
+  // Upload/Record state
+  const [audioSource, setAudioSource] = useState<"none" | "upload" | "record">("none");
+  const [originalAudioBlob, setOriginalAudioBlob] = useState<Blob | null>(null);
   const [originalAudioUrl, setOriginalAudioUrl] = useState<string | null>(null);
-  const [editedAudioUrl, setEditedAudioUrl] = useState<string | null>(null);
-  const [isLoadingOriginal, setIsLoadingOriginal] = useState(false);
+  const [originalFileName, setOriginalFileName] = useState<string>("");
+  
+  // Recording state
+  const [sampleText, setSampleText] = useState(sampleTexts[0]);
+  const [isRecording, setIsRecording] = useState(false);
+  const [countdown, setCountdown] = useState(10);
+  
+  // Audio playback state
   const [isPlayingOriginal, setIsPlayingOriginal] = useState(false);
   const [isPlayingEdited, setIsPlayingEdited] = useState(false);
   
+  // Edit state
+  const [showModal, setShowModal] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [editedAudioUrl, setEditedAudioUrl] = useState<string | null>(null);
+  
+  // Refs
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const originalAudioRef = useRef<HTMLAudioElement | null>(null);
   const editedAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Generate original audio on mount
-  useEffect(() => {
-    generateOriginalAudio();
-  }, []);
+  // Generate random sample text
+  const generateRandomText = () => {
+    const currentIndex = sampleTexts.indexOf(sampleText);
+    let newIndex = Math.floor(Math.random() * sampleTexts.length);
+    while (newIndex === currentIndex && sampleTexts.length > 1) {
+      newIndex = Math.floor(Math.random() * sampleTexts.length);
+    }
+    setSampleText(sampleTexts[newIndex]);
+  };
 
-  const generateOriginalAudio = async () => {
-    setIsLoadingOriginal(true);
+  // Handle file upload
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("audio/")) {
+      toast.error("请上传音频文件（mp3, wav等）");
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("文件大小不能超过10MB");
+      return;
+    }
+
+    const url = URL.createObjectURL(file);
+    setOriginalAudioBlob(file);
+    setOriginalAudioUrl(url);
+    setOriginalFileName(file.name);
+    setAudioSource("upload");
+    setEditedAudioUrl(null);
+    toast.success("音频上传成功");
+  };
+
+  // Start recording
+  const startRecording = async () => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            text: AUDIO_TEXT,
-            voice: "cixingnansheng",
-          }),
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
         }
-      );
+      };
 
-      if (!response.ok) {
-        throw new Error("Failed to generate audio");
-      }
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+        const url = URL.createObjectURL(audioBlob);
+        setOriginalAudioBlob(audioBlob);
+        setOriginalAudioUrl(url);
+        setOriginalFileName(`录制_${Date.now()}.wav`);
+        setAudioSource("record");
+        stream.getTracks().forEach(track => track.stop());
+      };
 
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      setOriginalAudioUrl(audioUrl);
+      mediaRecorder.start();
+      setIsRecording(true);
+      setCountdown(10);
+
+      // Start countdown
+      countdownIntervalRef.current = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+
+      toast.success("开始录制，请朗读文本");
     } catch (error) {
-      console.error("Error generating original audio:", error);
-      toast({
-        title: "音频生成失败",
-        description: "请稍后重试",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoadingOriginal(false);
+      console.error("Error accessing microphone:", error);
+      toast.error("无法访问麦克风，请检查权限设置");
     }
   };
 
-  const handleEdit = () => {
-    setShowModal(true);
+  // Stop recording
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
+      toast.success("录制完成");
+    }
+  }, [isRecording]);
+
+  // Auto stop when countdown reaches 0
+  useEffect(() => {
+    if (countdown === 0 && isRecording) {
+      stopRecording();
+    }
+  }, [countdown, isRecording, stopRecording]);
+
+  // Delete audio
+  const deleteAudio = () => {
+    if (originalAudioUrl) {
+      URL.revokeObjectURL(originalAudioUrl);
+    }
+    if (editedAudioUrl) {
+      URL.revokeObjectURL(editedAudioUrl);
+    }
+    setOriginalAudioBlob(null);
+    setOriginalAudioUrl(null);
+    setOriginalFileName("");
+    setAudioSource("none");
+    setEditedAudioUrl(null);
+    setIsPlayingOriginal(false);
+    setIsPlayingEdited(false);
   };
 
+  // Toggle play original
+  const togglePlayOriginal = () => {
+    if (!originalAudioRef.current || !originalAudioUrl) return;
+    
+    if (isPlayingOriginal) {
+      originalAudioRef.current.pause();
+    } else {
+      if (editedAudioRef.current && isPlayingEdited) {
+        editedAudioRef.current.pause();
+        setIsPlayingEdited(false);
+      }
+      originalAudioRef.current.play();
+    }
+    setIsPlayingOriginal(!isPlayingOriginal);
+  };
+
+  // Toggle play edited
+  const togglePlayEdited = () => {
+    if (!editedAudioRef.current || !editedAudioUrl) return;
+    
+    if (isPlayingEdited) {
+      editedAudioRef.current.pause();
+    } else {
+      if (originalAudioRef.current && isPlayingOriginal) {
+        originalAudioRef.current.pause();
+        setIsPlayingOriginal(false);
+      }
+      editedAudioRef.current.play();
+    }
+    setIsPlayingEdited(!isPlayingEdited);
+  };
+
+  // Toggle tag selection
   const toggleTag = (tag: string) => {
     setSelectedTags(prev => 
       prev.includes(tag) 
@@ -123,14 +242,16 @@ const VoiceEditTab = () => {
     );
   };
 
+  // Handle edit confirm
   const handleConfirm = async () => {
     if (selectedTags.length === 0) {
-      setShowModal(false);
+      toast.error("请至少选择一个编辑参数");
       return;
     }
     
     setIsGenerating(true);
     try {
+      // Simulate edited audio generation using TTS
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
         {
@@ -141,7 +262,7 @@ const VoiceEditTab = () => {
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
           body: JSON.stringify({
-            text: AUDIO_TEXT,
+            text: sampleText,
             voice: "tianmeinvsheng",
           }),
         }
@@ -152,62 +273,37 @@ const VoiceEditTab = () => {
       }
 
       const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      setEditedAudioUrl(audioUrl);
-      setIsEdited(true);
+      const url = URL.createObjectURL(audioBlob);
+      setEditedAudioUrl(url);
       setShowModal(false);
       setSelectedTags([]);
       
-      toast({
-        title: "音频生成成功",
-        description: `已应用 ${selectedTags.length} 个风格标签`,
-      });
+      toast.success(`音频编辑成功，已应用 ${selectedTags.length} 个风格标签`);
     } catch (error) {
       console.error("Error generating edited audio:", error);
-      toast({
-        title: "音频生成失败",
-        description: "请稍后重试",
-        variant: "destructive",
-      });
+      toast.error("音频编辑失败，请重试");
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const togglePlayOriginal = () => {
-    if (!originalAudioRef.current || !originalAudioUrl) return;
-    
-    if (isPlayingOriginal) {
-      originalAudioRef.current.pause();
-    } else {
-      // Pause edited if playing
-      if (editedAudioRef.current && isPlayingEdited) {
-        editedAudioRef.current.pause();
-        setIsPlayingEdited(false);
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
       }
-      originalAudioRef.current.play();
-    }
-    setIsPlayingOriginal(!isPlayingOriginal);
-  };
-
-  const togglePlayEdited = () => {
-    if (!editedAudioRef.current || !editedAudioUrl) return;
-    
-    if (isPlayingEdited) {
-      editedAudioRef.current.pause();
-    } else {
-      // Pause original if playing
-      if (originalAudioRef.current && isPlayingOriginal) {
-        originalAudioRef.current.pause();
-        setIsPlayingOriginal(false);
+      if (originalAudioUrl) {
+        URL.revokeObjectURL(originalAudioUrl);
       }
-      editedAudioRef.current.play();
-    }
-    setIsPlayingEdited(!isPlayingEdited);
-  };
+      if (editedAudioUrl) {
+        URL.revokeObjectURL(editedAudioUrl);
+      }
+    };
+  }, []);
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in space-y-6">
       {/* Hidden audio elements */}
       {originalAudioUrl && (
         <audio
@@ -224,86 +320,171 @@ const VoiceEditTab = () => {
         />
       )}
 
-      {/* Original Audio Section */}
-      <div className="mb-5">
-        <p className="text-sm text-muted-foreground mb-3 flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50" />
-          原始音频
-        </p>
-        <div className="relative group bg-gradient-to-br from-secondary via-secondary/80 to-secondary rounded-xl p-4 border border-border/50 shadow-[var(--shadow-audio)] hover:shadow-md transition-all duration-300">
-          {/* Decorative wave pattern */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none overflow-hidden rounded-xl">
-            <svg className="w-full h-full" viewBox="0 0 400 100" preserveAspectRatio="none">
-              <path d="M0,50 Q100,20 200,50 T400,50" stroke="currentColor" strokeWidth="2" fill="none" className="text-foreground" />
-              <path d="M0,60 Q100,30 200,60 T400,60" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-foreground" />
-              <path d="M0,40 Q100,70 200,40 T400,40" stroke="currentColor" strokeWidth="1" fill="none" className="text-foreground" />
-            </svg>
-          </div>
-          
-          <div className="relative flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button 
-                variant="audioSquare" 
-                size="icon"
-                onClick={togglePlayOriginal}
-                disabled={isLoadingOriginal || !originalAudioUrl}
-                className="w-12 h-12 shrink-0"
-              >
-                {isLoadingOriginal ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : isPlayingOriginal ? (
-                  <Pause className="h-5 w-5" />
-                ) : (
-                  <Play className="h-5 w-5 ml-0.5" />
-                )}
-              </Button>
-              
-              {/* Waveform Animation */}
-              <WaveformAnimation isPlaying={isPlayingOriginal} variant="default" />
-              
-              <div>
-                <p className="text-sm font-semibold text-foreground">
-                  星星人冒险.wav
-                </p>
-                <p className="text-xs text-muted-foreground mt-0.5">时长 00:10</p>
-              </div>
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="audio/*"
+        className="hidden"
+        onChange={handleFileUpload}
+      />
+
+      {/* Initial State: Upload or Record */}
+      {audioSource === "none" && !isRecording && (
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-8">
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex items-center gap-2 text-primary">
+              <Mic className="h-8 w-8" />
+              <Upload className="h-6 w-6" />
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleEdit}
-              className="gap-2 bg-background/80 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200"
-            >
-              <ArrowRight className="h-3.5 w-3.5" />
-              编辑
-            </Button>
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                请选择音频文件，可直接录制
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                支持mp3/wav格式，限制时长5-10S
+              </p>
+            </div>
+            <div className="flex items-center gap-3 mt-2">
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                className="gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                上传音频
+              </Button>
+              <Button
+                onClick={startRecording}
+                className="gap-2"
+              >
+                <Mic className="h-4 w-4" />
+                开始录制
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Edited Audio Section */}
-      {isEdited && (
-        <div className="mb-5 animate-slide-up">
-          <p className="text-sm text-muted-foreground mb-3 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-            编辑后的音频
+      {/* Recording State */}
+      {isRecording && (
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
+          <p className="text-sm text-muted-foreground text-center mb-4">
+            请在安静环境下朗读以下文本，需录制5-10秒语音
           </p>
-          <div className="relative group bg-gradient-to-br from-accent via-primary/5 to-accent rounded-xl p-4 border border-primary/20 shadow-[var(--shadow-audio)] hover:shadow-md hover:shadow-primary/10 transition-all duration-300">
-            {/* Decorative wave pattern - animated */}
-            <div className="absolute inset-0 opacity-[0.05] pointer-events-none overflow-hidden rounded-xl">
-              <svg className="w-full h-full" viewBox="0 0 400 100" preserveAspectRatio="none">
-                <path d="M0,50 Q100,20 200,50 T400,50" stroke="currentColor" strokeWidth="2" fill="none" className="text-primary" />
-                <path d="M0,60 Q100,30 200,60 T400,60" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-primary" />
-                <path d="M0,40 Q100,70 200,40 T400,40" stroke="currentColor" strokeWidth="1" fill="none" className="text-primary" />
-              </svg>
+          
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <p className="text-base text-foreground text-center leading-relaxed max-w-lg">
+              {sampleText}
+            </p>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 shrink-0"
+              onClick={generateRandomText}
+              disabled={isRecording}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="flex flex-col items-center gap-4">
+            {/* Recording animation */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                {[...Array(20)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-1 bg-primary rounded-full animate-pulse"
+                    style={{
+                      height: `${Math.random() * 20 + 10}px`,
+                      animationDelay: `${i * 0.05}s`,
+                    }}
+                  />
+                ))}
+              </div>
+              <span className="text-sm text-muted-foreground ml-2">🎙️</span>
             </div>
             
+            <div className="text-4xl font-bold text-primary">{countdown}S</div>
+            <Button
+              variant="outline"
+              onClick={stopRecording}
+              disabled={countdown > 5}
+              className="min-w-[120px]"
+            >
+              结束录制
+            </Button>
+            {countdown > 5 && (
+              <p className="text-xs text-muted-foreground">录制至少5秒后可手动结束</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Original Audio Section */}
+      {originalAudioUrl && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-medium text-foreground">原始音频</h3>
+          <div className="relative group bg-gradient-to-br from-secondary via-secondary/80 to-secondary rounded-xl p-4 border border-border/50 shadow-[var(--shadow-audio)] hover:shadow-md transition-all duration-300">
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Button 
+                  variant="audioSquare" 
+                  size="icon"
+                  onClick={togglePlayOriginal}
+                  className="w-12 h-12 shrink-0"
+                >
+                  {isPlayingOriginal ? (
+                    <Pause className="h-5 w-5" />
+                  ) : (
+                    <Play className="h-5 w-5 ml-0.5" />
+                  )}
+                </Button>
+                
+                <WaveformAnimation isPlaying={isPlayingOriginal} variant="default" />
+                
+                <div>
+                  <p className="text-sm font-semibold text-foreground">
+                    {originalFileName}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">时长 00:10</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={deleteAudio}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowModal(true)}
+                  className="gap-2 bg-background/80 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200"
+                >
+                  编辑
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edited Audio Section */}
+      {editedAudioUrl && (
+        <div className="space-y-3 animate-slide-up">
+          <h3 className="text-sm font-medium text-foreground">编辑后的音频</h3>
+          <div className="relative group bg-gradient-to-br from-accent via-primary/5 to-accent rounded-xl p-4 border border-primary/20 shadow-[var(--shadow-audio)] hover:shadow-md hover:shadow-primary/10 transition-all duration-300">
             <div className="relative flex items-center gap-4">
               <Button 
                 variant="audioSquare" 
                 size="icon"
                 onClick={togglePlayEdited}
-                disabled={!editedAudioUrl}
                 className="w-12 h-12 shrink-0"
               >
                 {isPlayingEdited ? (
@@ -313,12 +494,11 @@ const VoiceEditTab = () => {
                 )}
               </Button>
               
-              {/* Waveform Animation */}
               <WaveformAnimation isPlaying={isPlayingEdited} variant="primary" />
               
               <div>
                 <p className="text-sm font-semibold text-foreground">
-                  星星人冒险_edited.wav
+                  {originalFileName.replace(/\.\w+$/, "_edited.wav")}
                 </p>
                 <div className="flex items-center gap-2 mt-0.5">
                   <p className="text-xs text-muted-foreground">时长 00:10</p>
@@ -330,13 +510,7 @@ const VoiceEditTab = () => {
         </div>
       )}
 
-      {/* Description */}
-      <p className="text-sm text-muted-foreground">
-        <span className="text-foreground font-medium">@Step-tts-edit</span>{" "}
-        编辑原音频的情绪、风格、速度
-      </p>
-
-      {/* Edit Modal - Using Portal to prevent clipping */}
+      {/* Edit Modal */}
       {showModal && createPortal(
         <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm flex items-center justify-center z-[9999] animate-fade-in">
           <div className="bg-card border border-border rounded-xl p-6 w-full max-w-lg shadow-elevated animate-scale-in mx-4">
@@ -346,7 +520,7 @@ const VoiceEditTab = () => {
                   参数设置
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  通配只影响风格标识符，请尽量下载任意风格
+                  选择编辑参数来调整音频风格
                 </p>
               </div>
               <Button
@@ -361,7 +535,7 @@ const VoiceEditTab = () => {
             {/* Tags Section */}
             <div className="space-y-4 mb-6">
               <div>
-                <p className="text-sm font-medium text-foreground mb-2">干练</p>
+                <p className="text-sm font-medium text-foreground mb-2">情感</p>
                 <div className="flex flex-wrap gap-2">
                   {emotionTags.map((tag, i) => (
                     <span
@@ -399,7 +573,7 @@ const VoiceEditTab = () => {
               </div>
 
               <div>
-                <p className="text-sm font-medium text-foreground mb-2">更多</p>
+                <p className="text-sm font-medium text-foreground mb-2">年龄</p>
                 <div className="flex flex-wrap gap-2">
                   {ageTags.map((tag, i) => (
                     <span
@@ -419,7 +593,7 @@ const VoiceEditTab = () => {
 
               <div>
                 <p className="text-sm font-medium text-foreground mb-2">
-                  常用标签
+                  其他
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {otherTags.map((tag, i) => (
