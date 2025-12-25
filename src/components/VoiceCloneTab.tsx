@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Play, Pause, RefreshCw, Trash2, Download, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
+import WaveformAnimation from "@/components/ui/WaveformAnimation";
 import {
   Dialog,
   DialogContent,
@@ -384,7 +385,7 @@ const VoiceCloneTab = () => {
                 onClick={togglePlayRecorded}
               >
                 {isPlayingRecorded ? (
-                  <Pause className="h-4 w-4" />
+                  <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
                 ) : (
                   <Play className="h-4 w-4" />
                 )}
@@ -450,7 +451,7 @@ const VoiceCloneTab = () => {
               onClick={togglePlayCloned}
             >
               {isPlayingCloned ? (
-                <Pause className="h-5 w-5" />
+                <WaveformAnimation isPlaying={true} variant="primary" barCount={5} />
               ) : (
                 <Play className="h-5 w-5" />
               )}

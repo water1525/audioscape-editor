@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Upload, Mic, RefreshCw, Trash2, X, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import WaveformAnimation from "@/components/ui/WaveformAnimation";
 
 // Sample texts for recording (25-30 characters each)
 const sampleTexts = [
@@ -22,40 +23,6 @@ const styleTags = [
   "娱乐八卦", "吼叫", "小声", "大声", "低沉", "高亢"
 ];
 const speedTags = ["快速", "慢速", "更快", "更慢"];
-
-// Waveform animation component
-const WaveformAnimation = ({ isPlaying, variant = "default" }: { isPlaying: boolean; variant?: "default" | "primary" }) => {
-  const colorClass = variant === "primary" ? "bg-primary" : "bg-foreground/60";
-  
-  if (!isPlaying) {
-    return (
-      <div className="flex items-center gap-[3px] h-8">
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={i}
-            className={`w-[3px] rounded-full ${colorClass} opacity-30`}
-            style={{ height: `${12 + (i % 3) * 4}px` }}
-          />
-        ))}
-      </div>
-    );
-  }
-  
-  return (
-    <div className="flex items-center gap-[3px] h-8">
-      {[...Array(8)].map((_, i) => (
-        <div
-          key={i}
-          className={`w-[3px] rounded-full waveform-bar ${colorClass}`}
-          style={{ 
-            height: '24px',
-            transformOrigin: 'center'
-          }}
-        />
-      ))}
-    </div>
-  );
-};
 
 interface EditedAudio {
   url: string;
@@ -493,7 +460,7 @@ const VoiceEditTab = () => {
                   className="w-12 h-12 shrink-0"
                 >
                   {isPlayingOriginal ? (
-                    <Pause className="h-5 w-5" />
+                    <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
                   ) : (
                     <Play className="h-5 w-5 ml-0.5" />
                   )}
@@ -561,7 +528,7 @@ const VoiceEditTab = () => {
                     className="w-12 h-12 shrink-0"
                   >
                     {playingEditedIndex === index ? (
-                      <Pause className="h-5 w-5" />
+                      <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
                     ) : (
                       <Play className="h-5 w-5 ml-0.5" />
                     )}
