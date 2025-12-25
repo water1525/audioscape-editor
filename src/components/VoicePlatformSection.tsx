@@ -53,7 +53,7 @@ const VoicePlatformSection = () => {
                     variant={activeTab === tab.id ? "tabActive" : "tab"}
                     size="sm"
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full justify-start gap-2 text-xs px-2.5 py-2 h-auto transition-all duration-300 ${
+                    className={`w-full justify-center gap-2 text-xs px-2.5 py-2 h-auto transition-all duration-300 ${
                       activeTab === tab.id 
                         ? "bg-primary/20 text-primary border-primary/30 shadow-[0_0_12px_rgba(59,130,246,0.3)]" 
                         : "hover:bg-secondary/60 hover:text-foreground"
