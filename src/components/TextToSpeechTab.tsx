@@ -1,19 +1,19 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Loader2 } from "lucide-react";
+import { Play, Pause, Loader2, RefreshCw, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
-const SUPABASE_URL = "https://vixczylcdviqivlziovw.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpeGN6eWxjZHZpcWl2bHppb3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1NzQ0NzAsImV4cCI6MjA4MjE1MDQ3MH0.XKpCSVe3ctAZgjfh90W_x6mdA-lqcJRHUndy4LXROkg";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-// Dialogue lines for case3 with different voices
 const dialogueLines = [
-  { speaker: "客服小美", text: "您好，欢迎致电智能客服中心，请问有什么可以帮您？", voice: "tianmeinvsheng" },
-  { speaker: "客户先生", text: "你好，我昨天下的订单显示已发货，但物流信息一直没更新。", voice: "cixingnansheng" },
-  { speaker: "客服小美", text: "好的，请您提供一下订单号，我帮您查询。", voice: "tianmeinvsheng" },
-  { speaker: "客户先生", text: "订单号是202412250001。", voice: "cixingnansheng" },
-  { speaker: "客服小美", text: "已查到，您的包裹目前在转运中，预计明天送达，请您耐心等待。", voice: "tianmeinvsheng" },
-  { speaker: "客户先生", text: "好的，谢谢！", voice: "cixingnansheng" },
+  { speaker: "客服小美", text: "您好，欢迎致电智能客服中心，请问有什么可以帮您？", file: "tts/dialogue-0.mp3" },
+  { speaker: "客户先生", text: "你好，我昨天下的订单显示已发货，但物流信息一直没更新。", file: "tts/dialogue-1.mp3" },
+  { speaker: "客服小美", text: "好的，请您提供一下订单号，我帮您查询。", file: "tts/dialogue-2.mp3" },
+  { speaker: "客户先生", text: "订单号是202412250001。", file: "tts/dialogue-3.mp3" },
+  { speaker: "客服小美", text: "已查到，您的包裹目前在转运中，预计明天送达，请您耐心等待。", file: "tts/dialogue-4.mp3" },
+  { speaker: "客户先生", text: "好的，谢谢！", file: "tts/dialogue-5.mp3" },
 ];
 
 const cases = [
@@ -23,7 +23,7 @@ const cases = [
     description: "Step 3模型发布",
     icon: "📰",
     gradient: "from-blue-400 to-cyan-400",
-    voice: "cixingnansheng",
+    file: "tts/case1.mp3",
     text: "阶跃星辰近日正式发布新一代基础大模型Step 3，兼顾智能与效率，面向推理时代打造最适合应用的模型。Step 3将面向全球企业和开发者开源，为开源世界贡献最强多模态推理模型。",
     isDialogue: false,
   },
@@ -33,7 +33,7 @@ const cases = [
     description: "悬疑故事",
     icon: "📖",
     gradient: "from-purple-400 to-pink-400",
-    voice: "tianmeinvsheng",
+    file: "tts/case2.mp3",
     text: "深夜，老宅的钟敲响十二下。她推开尘封的阁楼门，发现一封泛黄的信——收件人竟是自己的名字，落款日期却是明天。信上只有一句话：不要回头。她的心跳骤然加速，身后传来轻微的脚步声。她屏住呼吸，缓缓转身，却只看见空荡荡的走廊和一面落满灰尘的镜子。镜中的自己正微笑着，但她此刻分明没有笑。",
     isDialogue: false,
   },
@@ -43,7 +43,7 @@ const cases = [
     description: "智能客服对话",
     icon: "🎧",
     gradient: "from-green-400 to-emerald-400",
-    voice: "tianmeinvsheng",
+    file: null,
     text: dialogueLines.map(line => `${line.speaker}：${line.text}`).join("\n"),
     isDialogue: true,
   },
@@ -52,140 +52,96 @@ const cases = [
 const TextToSpeechTab = () => {
   const [activeCase, setActiveCase] = useState("case1");
   const [isPlaying, setIsPlaying] = useState(false);
-  const [audioCache, setAudioCache] = useState<Record<string, string>>({});
-  const [dialogueAudioCache, setDialogueAudioCache] = useState<string[]>([]);
-  const [loadingCache, setLoadingCache] = useState<Record<string, boolean>>({});
+  const [audioUrls, setAudioUrls] = useState<Record<string, string>>({});
+  const [dialogueUrls, setDialogueUrls] = useState<string[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [audioReady, setAudioReady] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const dialogueIndexRef = useRef(0);
   const currentCase = cases.find((c) => c.id === activeCase) || cases[0];
 
-  const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+  // Check if audio files exist in storage
+  const checkAudioFiles = async () => {
+    const urls: Record<string, string> = {};
+    const dialogues: string[] = [];
+    let allExist = true;
 
-  // Fetch audio for a single text/voice with better retry logic
-  const fetchAudio = async (text: string, voice: string, signal?: AbortSignal): Promise<string | null> => {
-    let retries = 5;
-    let delay = 2000;
-    
-    while (retries > 0) {
+    // Check case1 and case2
+    for (const caseItem of cases.filter(c => !c.isDialogue)) {
+      if (!caseItem.file) continue;
+      const { data } = supabase.storage.from("audio").getPublicUrl(caseItem.file);
       try {
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/step-tts`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: SUPABASE_ANON_KEY,
-            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({ text, voice }),
-          signal,
-        });
-
+        const response = await fetch(data.publicUrl, { method: "HEAD" });
         if (response.ok) {
-          const audioBlob = await response.blob();
-          return URL.createObjectURL(audioBlob);
+          urls[caseItem.id] = data.publicUrl;
+        } else {
+          allExist = false;
         }
-
-        if (response.status === 429) {
-          console.log(`Rate limited, waiting ${delay}ms before retry...`);
-          retries -= 1;
-          await sleep(delay);
-          delay = Math.min(delay * 1.5, 10000); // Exponential backoff, max 10s
-          continue;
-        }
-        
-        console.error("TTS API error:", response.status);
-        break;
-      } catch (error) {
-        if ((error as { name?: string } | null)?.name === "AbortError") {
-          return null;
-        }
-        console.error("Fetch audio error:", error);
-        retries -= 1;
-        await sleep(delay);
+      } catch {
+        allExist = false;
       }
     }
-    return null;
+
+    // Check dialogue files
+    for (const line of dialogueLines) {
+      const { data } = supabase.storage.from("audio").getPublicUrl(line.file);
+      try {
+        const response = await fetch(data.publicUrl, { method: "HEAD" });
+        if (response.ok) {
+          dialogues.push(data.publicUrl);
+        } else {
+          allExist = false;
+          dialogues.push("");
+        }
+      } catch {
+        allExist = false;
+        dialogues.push("");
+      }
+    }
+
+    setAudioUrls(urls);
+    setDialogueUrls(dialogues);
+    setAudioReady(allExist && Object.keys(urls).length === 2 && dialogues.every(u => u !== ""));
   };
 
-  // Preload audio sequentially
   useEffect(() => {
-    const abortController = new AbortController();
-    let cancelled = false;
-
-    const loadAudioSequentially = async () => {
-      console.log("Starting audio preload...");
-      
-      // Collect all items to load
-      const allItems: Array<{ id: string; text: string; voice: string; isDialogueLine: boolean; lineIndex?: number }> = [];
-      
-      // Add case1 and case2
-      for (const caseItem of cases.filter(c => !c.isDialogue)) {
-        allItems.push({ id: caseItem.id, text: caseItem.text, voice: caseItem.voice, isDialogueLine: false });
-      }
-      
-      // Add dialogue lines for case3
-      dialogueLines.forEach((line, index) => {
-        allItems.push({ id: `dialogue_${index}`, text: line.text, voice: line.voice, isDialogueLine: true, lineIndex: index });
-      });
-
-      const dialogueAudios: string[] = new Array(dialogueLines.length).fill("");
-      
-      // Set all as loading initially
-      setLoadingCache({ case1: true, case2: true, case3: true });
-
-      for (let i = 0; i < allItems.length; i++) {
-        if (cancelled) return;
-        
-        const item = allItems[i];
-        console.log(`Loading item ${i + 1}/${allItems.length}: ${item.id}`);
-
-        const audioUrl = await fetchAudio(item.text, item.voice, abortController.signal);
-        
-        if (cancelled) return;
-
-        if (audioUrl) {
-          if (item.isDialogueLine && item.lineIndex !== undefined) {
-            dialogueAudios[item.lineIndex] = audioUrl;
-          } else {
-            setAudioCache((prev) => ({ ...prev, [item.id]: audioUrl }));
-            setLoadingCache((prev) => ({ ...prev, [item.id]: false }));
-          }
-          console.log(`✓ ${item.id} loaded successfully`);
-        } else {
-          console.error(`✗ Failed to load ${item.id}`);
-        }
-
-        // Short delay between requests
-        if (i < allItems.length - 1) {
-          await sleep(1000);
-        }
-      }
-
-      // Set dialogue cache once all are loaded
-      if (!cancelled) {
-        const validDialogues = dialogueAudios.filter(url => url !== "");
-        if (validDialogues.length > 0) {
-          setDialogueAudioCache(dialogueAudios);
-          console.log(`Dialogue loaded: ${validDialogues.length}/${dialogueLines.length} lines`);
-        }
-        setLoadingCache((prev) => ({ ...prev, case3: false }));
-      }
-    };
-
-    const t = window.setTimeout(() => {
-      void loadAudioSequentially();
-    }, 0);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(t);
-      abortController.abort();
-    };
+    checkAudioFiles();
   }, []);
 
-  // Play dialogue lines sequentially
+  const generateAudio = async () => {
+    setIsGenerating(true);
+    toast.info("正在生成音频文件，请稍候（约30秒）...");
+
+    try {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-tts-audio`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success("音频生成完成！");
+        await checkAudioFiles();
+      } else {
+        toast.error(`部分音频生成失败: ${result.message}`);
+        await checkAudioFiles();
+      }
+    } catch (error) {
+      toast.error("音频生成失败");
+      console.error(error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const playDialogue = () => {
-    if (dialogueAudioCache.length === 0) {
-      toast.error("音频加载中，请稍候");
+    if (dialogueUrls.length === 0 || dialogueUrls.some(u => !u)) {
+      toast.error("对话音频未就绪");
       return;
     }
 
@@ -193,13 +149,13 @@ const TextToSpeechTab = () => {
     setIsPlaying(true);
 
     const playNext = () => {
-      if (dialogueIndexRef.current >= dialogueAudioCache.length) {
+      if (dialogueIndexRef.current >= dialogueUrls.length) {
         setIsPlaying(false);
         audioRef.current = null;
         return;
       }
 
-      const audio = new Audio(dialogueAudioCache[dialogueIndexRef.current]);
+      const audio = new Audio(dialogueUrls[dialogueIndexRef.current]);
       audioRef.current = audio;
 
       audio.onended = () => {
@@ -220,7 +176,6 @@ const TextToSpeechTab = () => {
   };
 
   const handlePlayPause = () => {
-    // If already playing, toggle pause/play
     if (audioRef.current && isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
@@ -233,16 +188,14 @@ const TextToSpeechTab = () => {
       return;
     }
 
-    // Handle dialogue case specially
     if (currentCase.isDialogue) {
       playDialogue();
       return;
     }
 
-    // Handle single voice cases
-    const cachedUrl = audioCache[activeCase];
+    const cachedUrl = audioUrls[activeCase];
     if (!cachedUrl) {
-      toast.error("音频加载中，请稍候");
+      toast.error("音频未就绪，请先点击生成音频");
       return;
     }
 
@@ -264,7 +217,6 @@ const TextToSpeechTab = () => {
     setIsPlaying(true);
   };
 
-  // Reset audio when switching cases
   const handleCaseChange = (caseId: string) => {
     if (audioRef.current) {
       audioRef.current.pause();
@@ -275,10 +227,35 @@ const TextToSpeechTab = () => {
     setActiveCase(caseId);
   };
 
-  const isCurrentLoading = loadingCache[activeCase];
+  const isCurrentReady = currentCase.isDialogue
+    ? dialogueUrls.length > 0 && dialogueUrls.every(u => u !== "")
+    : !!audioUrls[activeCase];
 
   return (
     <div className="animate-fade-in">
+      {/* Generate Button */}
+      {!audioReady && (
+        <div className="mb-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">首次使用需生成音频</p>
+              <p className="text-xs text-muted-foreground">点击按钮一键生成所有语音样本（约30秒）</p>
+            </div>
+            <Button onClick={generateAudio} disabled={isGenerating} className="gap-2">
+              {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+              {isGenerating ? "生成中..." : "生成音频"}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {audioReady && (
+        <div className="mb-4 flex items-center gap-2 text-xs text-green-600">
+          <CheckCircle2 className="h-4 w-4" />
+          <span>音频已就绪，点击即可播放</span>
+        </div>
+      )}
+
       {/* Text Display Area */}
       <div className="bg-card border border-border rounded-lg p-6 mb-4 min-h-[160px] shadow-soft">
         <pre className="text-foreground font-mono text-sm whitespace-pre-wrap leading-relaxed">
@@ -322,16 +299,10 @@ const TextToSpeechTab = () => {
         <Button 
           className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
           onClick={handlePlayPause}
-          disabled={isCurrentLoading}
+          disabled={!isCurrentReady && !isGenerating}
         >
-          {isCurrentLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : isPlaying ? (
-            <Pause className="h-4 w-4" />
-          ) : (
-            <Play className="h-4 w-4" />
-          )}
-          {isCurrentLoading ? "加载中..." : isPlaying ? "暂停" : "播放"}
+          {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+          {isPlaying ? "暂停" : "播放"}
         </Button>
       </div>
     </div>
