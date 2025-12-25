@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Loader2 } from "lucide-react";
+import { Play, Pause, Loader2, Download } from "lucide-react";
 import { toast } from "sonner";
 import avatarFemale from "@/assets/avatar-female.png";
 import avatarMale from "@/assets/avatar-male.png";
@@ -45,6 +45,15 @@ const VoiceCloneTab = () => {
 
   const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
+  const downloadAudio = (url: string, filename: string) => {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
   // Preload cloned audio via API (original audio uses static files)
   useEffect(() => {
     const abortController = new AbortController();
@@ -152,22 +161,26 @@ const VoiceCloneTab = () => {
     }
 
     if (!audioUrl) {
-      toast.error("音频加载中，请稍候");
+      toast.error(type === "original" ? "原声音频未就绪" : "复刻音频生成中，请稍候");
       return;
     }
 
     const audio = new Audio(audioUrl);
     audioRef.current = audio;
-    
+
     audio.onended = () => {
       setPlayingId(null);
       audioRef.current = null;
     };
-    
+
     audio.onerror = () => {
       setPlayingId(null);
       audioRef.current = null;
-      toast.error("音频播放失败，请检查音频文件是否存在");
+      if (type === "original") {
+        toast.error("原声音频文件不存在：请上传 cila-original.mp3 / john-original.mp3");
+      } else {
+        toast.error("音频播放失败");
+      }
     };
 
     audio.play().catch(() => {
