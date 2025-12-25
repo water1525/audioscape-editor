@@ -219,7 +219,7 @@ const VoiceCloneTab = () => {
 
       {/* Description */}
       <p className="text-sm text-muted-foreground">
-        <span className="text-foreground font-medium">@step-tts-2</span>{" "}
+        <span className="text-foreground font-medium">@Step-tts-2</span>{" "}
         生成与原声音一模一样的语音复刻品
       </p>
     </div>

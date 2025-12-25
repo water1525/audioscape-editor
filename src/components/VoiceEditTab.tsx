@@ -95,7 +95,7 @@ const VoiceEditTab = () => {
 
       {/* Description */}
       <p className="text-sm text-muted-foreground">
-        <span className="text-foreground font-medium">@step-tts-edit</span>{" "}
+        <span className="text-foreground font-medium">@Step-tts-edit</span>{" "}
         编辑原音频的情绪、风格、速度
       </p>
 
