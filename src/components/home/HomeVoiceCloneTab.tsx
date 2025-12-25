@@ -9,9 +9,9 @@ interface VoiceSample {
   id: string;
   name: string;
   avatar: string;
+  gender: string;
   originalFile: string;
   clonedFile: string;
-  description: string;
 }
 
 const voiceSamples: VoiceSample[] = [
@@ -19,37 +19,36 @@ const voiceSamples: VoiceSample[] = [
     id: "cila",
     name: "Cila",
     avatar: avatarFemale,
+    gender: "♀",
     originalFile: "voice-clone/cila-original.mp3",
     clonedFile: "voice-clone/cila-cloned.mp3",
-    description: "温柔女声",
   },
   {
     id: "john",
     name: "John",
     avatar: avatarMale,
+    gender: "♂",
     originalFile: "voice-clone/john-original.mp3",
     clonedFile: "voice-clone/john-cloned.mp3",
-    description: "磁性男声",
   },
 ];
 
 const HomeVoiceCloneTab = () => {
-  const [selectedSample, setSelectedSample] = useState<string>("cila");
-  const [playingType, setPlayingType] = useState<"original" | "cloned" | null>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  const currentSample = voiceSamples.find((s) => s.id === selectedSample) || voiceSamples[0];
 
   const getAudioUrl = (filePath: string) => {
     const { data } = supabase.storage.from("audio").getPublicUrl(filePath);
     return data.publicUrl;
   };
 
-  const handlePlay = (type: "original" | "cloned") => {
-    // If already playing this type, pause it
-    if (playingType === type && audioRef.current) {
+  const handlePlay = (sampleId: string, type: "original" | "cloned") => {
+    const playId = `${sampleId}-${type}`;
+    
+    // If already playing this, pause it
+    if (playingId === playId && audioRef.current) {
       audioRef.current.pause();
-      setPlayingType(null);
+      setPlayingId(null);
       return;
     }
 
@@ -58,113 +57,81 @@ const HomeVoiceCloneTab = () => {
       audioRef.current.pause();
     }
 
-    // Play the selected type
-    const filePath = type === "original" ? currentSample.originalFile : currentSample.clonedFile;
+    // Find the sample and play
+    const sample = voiceSamples.find(s => s.id === sampleId);
+    if (!sample) return;
+
+    const filePath = type === "original" ? sample.originalFile : sample.clonedFile;
     const audio = new Audio(getAudioUrl(filePath));
     audioRef.current = audio;
 
     audio.onended = () => {
-      setPlayingType(null);
+      setPlayingId(null);
       audioRef.current = null;
     };
 
     audio.play();
-    setPlayingType(type);
-  };
-
-  const handleSampleChange = (sampleId: string) => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    setPlayingType(null);
-    setSelectedSample(sampleId);
+    setPlayingId(playId);
   };
 
   return (
     <div className="animate-fade-in space-y-6">
-      {/* Voice Sample Selector */}
-      <div className="flex items-center justify-center gap-6">
+      {/* Voice Sample Cards */}
+      <div className="flex items-start justify-center gap-6">
         {voiceSamples.map((sample) => (
-          <button
+          <div
             key={sample.id}
-            onClick={() => handleSampleChange(sample.id)}
-            className={`
-              flex flex-col items-center gap-2.5 rounded-2xl px-6 py-5 transition-all duration-300
-              ${selectedSample === sample.id
-                ? "bg-primary/5 border border-primary/30 shadow-md shadow-primary/10"
-                : "bg-card/40 border border-border/30 hover:bg-card/60 hover:border-border/50"
-              }
-            `}
+            className="flex flex-col items-center gap-3 rounded-xl border border-border/50 bg-card/30 px-8 py-6"
           >
-            <div
-              className={`
-                w-16 h-16 rounded-full overflow-hidden bg-background border transition-all duration-300
-                ${selectedSample === sample.id ? "border-primary" : "border-border/40"}
-              `}
-            >
+            {/* Avatar */}
+            <div className="w-16 h-16 rounded-full overflow-hidden bg-background">
               <img
                 src={sample.avatar}
                 alt={sample.name}
                 className="w-full h-full object-cover"
               />
             </div>
-            <span className={`
-              text-sm font-medium transition-colors
-              ${selectedSample === sample.id ? "text-primary" : "text-muted-foreground"}
-            `}>
-              {sample.name}
-            </span>
-            <span className="text-xs text-muted-foreground">{sample.description}</span>
-          </button>
+            
+            {/* Name and Gender */}
+            <div className="text-center">
+              <span className="text-base font-medium text-foreground">{sample.name}</span>
+              <div className="text-sm text-muted-foreground">{sample.gender}</div>
+            </div>
+
+            {/* Play Buttons */}
+            <div className="flex flex-col gap-2 w-full">
+              <Button
+                variant="outline"
+                className="w-full gap-2 h-10 rounded-lg border-primary/30 text-primary hover:bg-primary/5"
+                onClick={() => handlePlay(sample.id, "original")}
+              >
+                {playingId === `${sample.id}-original` ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+                {sample.name} 原声
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full gap-2 h-10 rounded-lg border-primary/30 text-primary hover:bg-primary/5"
+                onClick={() => handlePlay(sample.id, "cloned")}
+              >
+                {playingId === `${sample.id}-cloned` ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+                {sample.name} 声音复刻
+              </Button>
+            </div>
+          </div>
         ))}
       </div>
 
-      {/* Audio Comparison */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Original Voice */}
-        <div className="bg-card/60 border border-border/40 rounded-2xl p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-foreground">原声</span>
-            <span className="text-xs text-muted-foreground px-2 py-0.5 bg-muted rounded">Original</span>
-          </div>
-          <Button
-            variant="outline"
-            className="w-full gap-2 h-11 rounded-xl"
-            onClick={() => handlePlay("original")}
-          >
-            {playingType === "original" ? (
-              <Pause className="h-4 w-4" />
-            ) : (
-              <Play className="h-4 w-4" />
-            )}
-            {playingType === "original" ? "暂停" : "播放原声"}
-          </Button>
-        </div>
-
-        {/* Cloned Voice */}
-        <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-card border border-primary/20 rounded-2xl p-5">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-foreground">复刻声</span>
-            <span className="text-xs text-primary px-2 py-0.5 bg-primary/10 rounded">Cloned</span>
-          </div>
-          <Button
-            className="w-full gap-2 h-11 rounded-xl bg-gradient-to-r from-primary to-primary/80 hover:from-primary hover:to-primary"
-            onClick={() => handlePlay("cloned")}
-          >
-            {playingType === "cloned" ? (
-              <Pause className="h-4 w-4" />
-            ) : (
-              <Play className="h-4 w-4" />
-            )}
-            {playingType === "cloned" ? "暂停" : "播放复刻"}
-          </Button>
-        </div>
-      </div>
-
       {/* Description */}
-      <p className="text-center text-sm text-muted-foreground">
-        使用 <span className="text-foreground font-medium">Step-tts-mini</span> 模型，仅需5秒音频即可复刻任意音色
+      <p className="text-left text-sm text-muted-foreground">
+        <span className="text-foreground font-medium">@Step-tts-2</span> 生成与原声音一模一样的语音复刻品
       </p>
     </div>
   );
