@@ -17,6 +17,40 @@ const otherTags = [
 
 const AUDIO_TEXT = "在遥远的星际中，星星人踏上了一段奇妙的冒险旅程。他们穿越星云，探索未知的宇宙奥秘。";
 
+// Waveform animation component
+const WaveformAnimation = ({ isPlaying, variant = "default" }: { isPlaying: boolean; variant?: "default" | "primary" }) => {
+  const colorClass = variant === "primary" ? "bg-primary" : "bg-foreground/60";
+  
+  if (!isPlaying) {
+    return (
+      <div className="flex items-center gap-[3px] h-8">
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className={`w-[3px] rounded-full ${colorClass} opacity-30`}
+            style={{ height: `${12 + (i % 3) * 4}px` }}
+          />
+        ))}
+      </div>
+    );
+  }
+  
+  return (
+    <div className="flex items-center gap-[3px] h-8">
+      {[...Array(8)].map((_, i) => (
+        <div
+          key={i}
+          className={`w-[3px] rounded-full waveform-bar ${colorClass}`}
+          style={{ 
+            height: '24px',
+            transformOrigin: 'center'
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
 const VoiceEditTab = () => {
   const { toast } = useToast();
   const [showModal, setShowModal] = useState(false);
@@ -213,7 +247,7 @@ const VoiceEditTab = () => {
                 size="icon"
                 onClick={togglePlayOriginal}
                 disabled={isLoadingOriginal || !originalAudioUrl}
-                className="w-12 h-12"
+                className="w-12 h-12 shrink-0"
               >
                 {isLoadingOriginal ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -223,6 +257,10 @@ const VoiceEditTab = () => {
                   <Play className="h-5 w-5 ml-0.5" />
                 )}
               </Button>
+              
+              {/* Waveform Animation */}
+              <WaveformAnimation isPlaying={isPlayingOriginal} variant="default" />
+              
               <div>
                 <p className="text-sm font-semibold text-foreground">
                   星星人冒险.wav
@@ -266,7 +304,7 @@ const VoiceEditTab = () => {
                 size="icon"
                 onClick={togglePlayEdited}
                 disabled={!editedAudioUrl}
-                className="w-12 h-12"
+                className="w-12 h-12 shrink-0"
               >
                 {isPlayingEdited ? (
                   <Pause className="h-5 w-5" />
@@ -274,6 +312,10 @@ const VoiceEditTab = () => {
                   <Play className="h-5 w-5 ml-0.5" />
                 )}
               </Button>
+              
+              {/* Waveform Animation */}
+              <WaveformAnimation isPlaying={isPlayingEdited} variant="primary" />
+              
               <div>
                 <p className="text-sm font-semibold text-foreground">
                   星星人冒险_edited.wav
