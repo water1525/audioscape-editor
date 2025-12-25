@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, RefreshCw, Loader2 } from "lucide-react";
+import { Play, Pause } from "lucide-react";
 import { toast } from "sonner";
 import avatarFemale from "@/assets/avatar-female.png";
 import avatarMale from "@/assets/avatar-male.png";
@@ -149,30 +149,6 @@ const VoiceCloneTab = () => {
 
   return (
     <div className="animate-fade-in">
-      {/* Generate Button */}
-      {!audioReady && (
-        <div className="mb-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-foreground">首次使用需生成音频</p>
-              <p className="text-xs text-muted-foreground">点击按钮一键生成所有语音样本</p>
-            </div>
-            <Button
-              onClick={generateAudio}
-              disabled={isGenerating}
-              className="gap-2"
-            >
-              {isGenerating ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4 w-4" />
-              )}
-              {isGenerating ? "生成中..." : "生成音频"}
-            </Button>
-          </div>
-        </div>
-      )}
-
       {/* Voice Profiles Grid */}
       <div className="flex items-start justify-center gap-6 mb-6">
         {voiceProfiles.map((profile) => (
