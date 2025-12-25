@@ -6,6 +6,16 @@ import { toast } from "sonner";
 const SUPABASE_URL = "https://vixczylcdviqivlziovw.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpeGN6eWxjZHZpcWl2bHppb3Z3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY1NzQ0NzAsImV4cCI6MjA4MjE1MDQ3MH0.XKpCSVe3ctAZgjfh90W_x6mdA-lqcJRHUndy4LXROkg";
 
+// Dialogue lines for case3 with different voices
+const dialogueLines = [
+  { speaker: "客服小美", text: "您好，欢迎致电智能客服中心，请问有什么可以帮您？", voice: "tianmeinvsheng" },
+  { speaker: "客户先生", text: "你好，我昨天下的订单显示已发货，但物流信息一直没更新。", voice: "cixingnansheng" },
+  { speaker: "客服小美", text: "好的，请您提供一下订单号，我帮您查询。", voice: "tianmeinvsheng" },
+  { speaker: "客户先生", text: "订单号是202412250001。", voice: "cixingnansheng" },
+  { speaker: "客服小美", text: "已查到，您的包裹目前在转运中，预计明天送达，请您耐心等待。", voice: "tianmeinvsheng" },
+  { speaker: "客户先生", text: "好的，谢谢！", voice: "cixingnansheng" },
+];
+
 const cases = [
   {
     id: "case1",
@@ -15,6 +25,7 @@ const cases = [
     gradient: "from-blue-400 to-cyan-400",
     voice: "cixingnansheng",
     text: "阶跃星辰近日正式发布新一代基础大模型Step 3，兼顾智能与效率，面向推理时代打造最适合应用的模型。Step 3将面向全球企业和开发者开源，为开源世界贡献最强多模态推理模型。",
+    isDialogue: false,
   },
   {
     id: "case2",
@@ -24,6 +35,7 @@ const cases = [
     gradient: "from-purple-400 to-pink-400",
     voice: "tianmeinvsheng",
     text: "深夜，老宅的钟敲响十二下。她推开尘封的阁楼门，发现一封泛黄的信——收件人竟是自己的名字，落款日期却是明天。信上只有一句话：不要回头。她的心跳骤然加速，身后传来轻微的脚步声。她屏住呼吸，缓缓转身，却只看见空荡荡的走廊和一面落满灰尘的镜子。镜中的自己正微笑着，但她此刻分明没有笑。",
+    isDialogue: false,
   },
   {
     id: "case3",
@@ -32,7 +44,8 @@ const cases = [
     icon: "🎧",
     gradient: "from-green-400 to-emerald-400",
     voice: "tianmeinvsheng",
-    text: "客服小美：您好，欢迎致电智能客服中心，请问有什么可以帮您？\n客户先生：你好，我昨天下的订单显示已发货，但物流信息一直没更新。\n客服小美：好的，请您提供一下订单号，我帮您查询。\n客户先生：订单号是202412250001。\n客服小美：已查到，您的包裹目前在转运中，预计明天送达，请您耐心等待。\n客户先生：好的，谢谢！",
+    text: dialogueLines.map(line => `${line.speaker}：${line.text}`).join("\n"),
+    isDialogue: true,
   },
 ];
 
@@ -40,69 +53,96 @@ const TextToSpeechTab = () => {
   const [activeCase, setActiveCase] = useState("case1");
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioCache, setAudioCache] = useState<Record<string, string>>({});
+  const [dialogueAudioCache, setDialogueAudioCache] = useState<string[]>([]);
   const [loadingCache, setLoadingCache] = useState<Record<string, boolean>>({});
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const dialogueIndexRef = useRef(0);
   const currentCase = cases.find((c) => c.id === activeCase) || cases[0];
+
+  const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+  // Fetch audio for a single text/voice
+  const fetchAudio = async (text: string, voice: string, signal?: AbortSignal): Promise<string | null> => {
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/step-tts`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ text, voice }),
+          signal,
+        });
+
+        if (response.ok) {
+          const audioBlob = await response.blob();
+          return URL.createObjectURL(audioBlob);
+        }
+
+        if (response.status === 429) {
+          retries -= 1;
+          await sleep(1500);
+          continue;
+        }
+        break;
+      } catch (error) {
+        if ((error as { name?: string } | null)?.name === "AbortError") {
+          return null;
+        }
+        console.error("Fetch audio error:", error);
+        break;
+      }
+    }
+    return null;
+  };
 
   // Preload audio sequentially to avoid rate limits
   useEffect(() => {
     const abortController = new AbortController();
     let cancelled = false;
 
-    const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
-
     const loadAudioSequentially = async () => {
-      for (const caseItem of cases) {
+      // Load case1 and case2 (single voice)
+      for (const caseItem of cases.filter(c => !c.isDialogue)) {
         if (cancelled) return;
 
         setLoadingCache((prev) => ({ ...prev, [caseItem.id]: true }));
 
-        try {
-          let retries = 3;
-
-          while (!cancelled && retries > 0) {
-            const response = await fetch(`${SUPABASE_URL}/functions/v1/step-tts`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                apikey: SUPABASE_ANON_KEY,
-                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-              },
-              body: JSON.stringify({ text: caseItem.text, voice: caseItem.voice }),
-              signal: abortController.signal,
-            });
-
-            if (response.ok) {
-              const audioBlob = await response.blob();
-              const audioUrl = URL.createObjectURL(audioBlob);
-              setAudioCache((prev) => ({ ...prev, [caseItem.id]: audioUrl }));
-              break;
-            }
-
-            if (response.status === 429) {
-              retries -= 1;
-              await sleep(1200);
-              continue;
-            }
-
-            break;
-          }
-        } catch (error) {
-          // Ignore aborts (React StrictMode remount, tab switch, etc.)
-          if ((error as { name?: string } | null)?.name !== "AbortError") {
-            console.error("Preload error:", error);
-          }
-        } finally {
-          if (!cancelled) {
-            setLoadingCache((prev) => ({ ...prev, [caseItem.id]: false }));
-          }
+        const audioUrl = await fetchAudio(caseItem.text, caseItem.voice, abortController.signal);
+        if (audioUrl && !cancelled) {
+          setAudioCache((prev) => ({ ...prev, [caseItem.id]: audioUrl }));
         }
 
-        await sleep(350);
+        if (!cancelled) {
+          setLoadingCache((prev) => ({ ...prev, [caseItem.id]: false }));
+        }
+
+        await sleep(500);
+      }
+
+      // Load case3 dialogue (multiple voices)
+      if (cancelled) return;
+      setLoadingCache((prev) => ({ ...prev, case3: true }));
+
+      const dialogueAudios: string[] = [];
+      for (const line of dialogueLines) {
+        if (cancelled) return;
+        const audioUrl = await fetchAudio(line.text, line.voice, abortController.signal);
+        if (audioUrl) {
+          dialogueAudios.push(audioUrl);
+        }
+        await sleep(800); // Longer delay between dialogue lines to avoid rate limits
+      }
+
+      if (!cancelled) {
+        setDialogueAudioCache(dialogueAudios);
+        setLoadingCache((prev) => ({ ...prev, case3: false }));
       }
     };
 
-    // Defer start so StrictMode's mount/unmount cycle won't create overlapping requests
     const t = window.setTimeout(() => {
       void loadAudioSequentially();
     }, 0);
@@ -114,10 +154,45 @@ const TextToSpeechTab = () => {
     };
   }, []);
 
+  // Play dialogue lines sequentially
+  const playDialogue = () => {
+    if (dialogueAudioCache.length === 0) {
+      toast.error("音频加载中，请稍候");
+      return;
+    }
+
+    dialogueIndexRef.current = 0;
+    setIsPlaying(true);
+
+    const playNext = () => {
+      if (dialogueIndexRef.current >= dialogueAudioCache.length) {
+        setIsPlaying(false);
+        audioRef.current = null;
+        return;
+      }
+
+      const audio = new Audio(dialogueAudioCache[dialogueIndexRef.current]);
+      audioRef.current = audio;
+
+      audio.onended = () => {
+        dialogueIndexRef.current += 1;
+        playNext();
+      };
+
+      audio.onerror = () => {
+        setIsPlaying(false);
+        audioRef.current = null;
+        toast.error("音频播放失败");
+      };
+
+      audio.play();
+    };
+
+    playNext();
+  };
+
   const handlePlayPause = () => {
-    const cachedUrl = audioCache[activeCase];
-    
-    // If already playing this audio, toggle pause/play
+    // If already playing, toggle pause/play
     if (audioRef.current && isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
@@ -130,6 +205,14 @@ const TextToSpeechTab = () => {
       return;
     }
 
+    // Handle dialogue case specially
+    if (currentCase.isDialogue) {
+      playDialogue();
+      return;
+    }
+
+    // Handle single voice cases
+    const cachedUrl = audioCache[activeCase];
     if (!cachedUrl) {
       toast.error("音频加载中，请稍候");
       return;
@@ -137,12 +220,12 @@ const TextToSpeechTab = () => {
 
     const audio = new Audio(cachedUrl);
     audioRef.current = audio;
-    
+
     audio.onended = () => {
       setIsPlaying(false);
       audioRef.current = null;
     };
-    
+
     audio.onerror = () => {
       setIsPlaying(false);
       audioRef.current = null;
@@ -160,6 +243,7 @@ const TextToSpeechTab = () => {
       audioRef.current = null;
     }
     setIsPlaying(false);
+    dialogueIndexRef.current = 0;
     setActiveCase(caseId);
   };
 
