@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, MessageSquareText, Copy, Wand2, Phone, Play, Pause, RotateCcw, Download, RefreshCw } from "lucide-react";
+import { ChevronDown, MessageSquareText, Copy, Wand2, Phone, Play, Pause, RotateCcw, Download, RefreshCw, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -160,6 +160,17 @@ const Playground = () => {
     }
   };
 
+  const handleClear = () => {
+    setText("");
+    setAudioUrl(null);
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navbar */}
@@ -242,12 +253,20 @@ const Playground = () => {
           <div className="max-w-4xl">
             {/* Text Input Area */}
             <div className="bg-accent/30 border border-border rounded-xl p-1 mb-6 relative">
+              {text.length > 0 && (
+                <button
+                  onClick={handleClear}
+                  className="absolute top-3 right-3 p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors z-10"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
               <Textarea
                 placeholder="点此输入您想要生成音频的文本..."
                 value={text}
                 onChange={handleTextChange}
                 maxLength={10000}
-                className="min-h-[300px] bg-transparent border-0 resize-none focus-visible:ring-0 text-foreground placeholder:text-muted-foreground pb-8"
+                className="min-h-[300px] bg-transparent border-0 resize-none focus-visible:ring-0 text-foreground placeholder:text-muted-foreground pb-8 pr-10"
               />
               <div className="absolute bottom-3 right-4 text-sm text-muted-foreground">
                 {text.length}/10000字符
@@ -334,25 +353,26 @@ const Playground = () => {
               </div>
             )}
 
-            {/* Case Samples */}
-            <div>
-              <p className="text-sm text-muted-foreground mb-3">可以使用以下case</p>
-              <div className="grid grid-cols-3 gap-3">
-                {caseSamples.map((sample, i) => (
-                  <Button
-                    key={i}
-                    variant="outline"
-                    disabled={isGenerating}
-                    className={`h-auto py-3 px-4 text-sm font-normal justify-start ${
-                      text === sample ? "bg-primary/10 border-primary text-primary" : ""
-                    }`}
-                    onClick={() => handleCaseClick(sample)}
-                  >
-                    case{i + 1}
-                  </Button>
-                ))}
+            {/* Case Samples - Hide when generating or has audio */}
+            {!audioUrl && !isGenerating && (
+              <div>
+                <p className="text-sm text-muted-foreground mb-3">可以使用以下case</p>
+                <div className="grid grid-cols-3 gap-3">
+                  {caseSamples.map((sample, i) => (
+                    <Button
+                      key={i}
+                      variant="outline"
+                      className={`h-auto py-3 px-4 text-sm font-normal justify-start ${
+                        text === sample ? "bg-primary/10 border-primary text-primary" : ""
+                      }`}
+                      onClick={() => handleCaseClick(sample)}
+                    >
+                      case{i + 1}
+                    </Button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </main>
 
