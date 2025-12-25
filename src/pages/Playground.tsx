@@ -497,89 +497,91 @@ const Playground = () => {
           </div>
         </main>
 
-        {/* Right Sidebar - Controls */}
-        <aside className="w-64 min-h-[calc(100vh-56px)] border-l border-border bg-card/50 p-6">
-          <div className="space-y-6">
-            {/* Voice Select */}
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">voice</label>
-              <Select value={voice} onValueChange={setVoice}>
-                <SelectTrigger className="w-full bg-background">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-popover">
-                  <SelectGroup>
-                    <SelectLabel className="text-xs text-muted-foreground">系统音色</SelectLabel>
-                    {voiceOptions.map((option) => (
+        {/* Right Sidebar - Controls (only for TTS tab) */}
+        {activeTab === "tts" && (
+          <aside className="w-64 min-h-[calc(100vh-56px)] border-l border-border bg-card/50 p-6">
+            <div className="space-y-6">
+              {/* Voice Select */}
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">voice</label>
+                <Select value={voice} onValueChange={setVoice}>
+                  <SelectTrigger className="w-full bg-background">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover">
+                    <SelectGroup>
+                      <SelectLabel className="text-xs text-muted-foreground">系统音色</SelectLabel>
+                      {voiceOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    {customVoices.length > 0 && (
+                      <SelectGroup>
+                        <SelectLabel className="text-xs text-muted-foreground">我的音色</SelectLabel>
+                        {customVoices.map((cv) => (
+                          <SelectItem key={cv.id} value={cv.id}>
+                            {cv.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Speed Slider */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-foreground">speed</label>
+                  <span className="text-sm text-muted-foreground">{speed[0]}</span>
+                </div>
+                <Slider
+                  value={speed}
+                  onValueChange={setSpeed}
+                  min={0.5}
+                  max={2}
+                  step={0.1}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Volume Slider */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-foreground">volume</label>
+                  <span className="text-sm text-muted-foreground">{volume[0]}</span>
+                </div>
+                <Slider
+                  value={volume}
+                  onValueChange={setVolume}
+                  min={0}
+                  max={1}
+                  step={0.1}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Format Select */}
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">format</label>
+                <Select value={format} onValueChange={setFormat}>
+                  <SelectTrigger className="w-full bg-background">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {formatOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
                       </SelectItem>
                     ))}
-                  </SelectGroup>
-                  {customVoices.length > 0 && (
-                    <SelectGroup>
-                      <SelectLabel className="text-xs text-muted-foreground">我的音色</SelectLabel>
-                      {customVoices.map((cv) => (
-                        <SelectItem key={cv.id} value={cv.id}>
-                          {cv.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Speed Slider */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-foreground">speed</label>
-                <span className="text-sm text-muted-foreground">{speed[0]}</span>
+                  </SelectContent>
+                </Select>
               </div>
-              <Slider
-                value={speed}
-                onValueChange={setSpeed}
-                min={0.5}
-                max={2}
-                step={0.1}
-                className="w-full"
-              />
             </div>
-
-            {/* Volume Slider */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-foreground">volume</label>
-                <span className="text-sm text-muted-foreground">{volume[0]}</span>
-              </div>
-              <Slider
-                value={volume}
-                onValueChange={setVolume}
-                min={0}
-                max={1}
-                step={0.1}
-                className="w-full"
-              />
-            </div>
-
-            {/* Format Select */}
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">format</label>
-              <Select value={format} onValueChange={setFormat}>
-                <SelectTrigger className="w-full bg-background">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {formatOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </aside>
+          </aside>
+        )}
       </div>
     </div>
   );
