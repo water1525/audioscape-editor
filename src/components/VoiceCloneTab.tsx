@@ -91,15 +91,21 @@ const VoiceCloneTab = () => {
         items.push({ key: `${profile.id}-cloned`, text: profile.clonedText, voice: profile.voice });
       }
 
-      for (const item of items) {
-        if (cancelled) return;
-        const audioUrl = await fetchAudio(item.text, item.voice, abortController.signal);
-        if (cancelled) return;
-        if (audioUrl) {
-          setAudioCache((prev) => ({ ...prev, [item.key]: audioUrl }));
-        }
-        await sleep(1000);
+      // Load all audio in parallel for faster loading
+      const results = await Promise.all(
+        items.map(async (item) => {
+          const audioUrl = await fetchAudio(item.text, item.voice, abortController.signal);
+          return { key: item.key, audioUrl };
+        })
+      );
+
+      if (cancelled) return;
+
+      const newCache: Record<string, string> = {};
+      for (const { key, audioUrl } of results) {
+        if (audioUrl) newCache[key] = audioUrl;
       }
+      setAudioCache((prev) => ({ ...prev, ...newCache }));
     };
 
     void loadAllAudio();
