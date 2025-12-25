@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { MessageSquareText, Mic2, Wand2 } from "lucide-react";
 import TextToSpeechTab from "@/components/TextToSpeechTab";
-import VoiceCloneTab from "@/components/VoiceCloneTab";
-import VoiceEditTab from "@/components/VoiceEditTab";
+import HomeVoiceCloneTab from "@/components/home/HomeVoiceCloneTab";
+import HomeVoiceEditTab from "@/components/home/HomeVoiceEditTab";
 
 const tabs = [
   { id: "tts", label: "文本转语音", icon: MessageSquareText },
@@ -20,9 +20,9 @@ const VoicePlatformSection = () => {
       case "tts":
         return <TextToSpeechTab />;
       case "clone":
-        return <VoiceCloneTab />;
+        return <HomeVoiceCloneTab />;
       case "edit":
-        return <VoiceEditTab />;
+        return <HomeVoiceEditTab />;
       default:
         return <TextToSpeechTab />;
     }
