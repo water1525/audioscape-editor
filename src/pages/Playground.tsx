@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, MessageSquareText, Copy, Wand2, Phone, Play, Pause, RotateCcw, Download, RefreshCw, X, Bot, Cloud, BookOpen, Cpu, Headphones, Package } from "lucide-react";
+import { ChevronDown, MessageSquareText, Copy, Wand2, Phone, Play, Pause, RotateCcw, Download, RefreshCw, X, BookOpen, Cpu, Headphones } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -36,57 +36,30 @@ const formatOptions = [
 const caseSamples = [
   {
     id: 1,
-    title: "智能助手",
-    description: "AI欢迎语",
-    icon: Bot,
-    iconColor: "text-violet-500",
-    bgColor: "bg-violet-500/10",
-    text: "欢迎来到阶跃星辰开放平台，我是您的智能语音助手。今天我将为您展示最先进的语音合成技术，让您体验自然流畅的人工智能语音。",
-  },
-  {
-    id: 2,
-    title: "天气播报",
-    description: "新闻资讯",
-    icon: Cloud,
-    iconColor: "text-sky-500",
-    bgColor: "bg-sky-500/10",
-    text: "各位听众朋友们，大家好！今天的天气预报显示，北京地区晴转多云，最高气温28度，最低气温18度，空气质量优良，适宜户外活动。",
-  },
-  {
-    id: 3,
-    title: "故事讲述",
-    description: "有声读物",
-    icon: BookOpen,
-    iconColor: "text-amber-500",
-    bgColor: "bg-amber-500/10",
-    text: "从前有一座高山，山上住着一位老爷爷。他每天都会给村里的孩子们讲故事，那些故事里有勇敢的少年、神奇的宝物，还有善良的小动物们。",
-  },
-  {
-    id: 4,
-    title: "科技资讯",
-    description: "专业解读",
+    title: "新闻播报",
+    description: "Step 3模型发布",
     icon: Cpu,
     iconColor: "text-emerald-500",
     bgColor: "bg-emerald-500/10",
-    text: "人工智能技术正在深刻改变我们的生活方式。从智能家居到自动驾驶，从语音助手到医疗诊断，AI的应用场景越来越广泛。",
+    text: "各位观众朋友们，大家好！欢迎收看今日科技快讯。今天我们要报道一则重磅消息：阶跃星辰正式发布了全新的Step 3大语言模型，该模型在多项基准测试中取得了突破性成绩，在逻辑推理、代码生成和多语言理解等核心能力上均达到了业界领先水平，标志着国产大模型迈入了新的里程碑。",
   },
   {
-    id: 5,
-    title: "客服语音",
-    description: "电话导航",
+    id: 2,
+    title: "有声读物",
+    description: "悬疑故事",
+    icon: BookOpen,
+    iconColor: "text-amber-500",
+    bgColor: "bg-amber-500/10",
+    text: "午夜时分，老宅的钟声敲响了十二下。李探长站在书房门前，手中的手电筒微微颤抖。书架后面传来奇怪的响动，像是有人在翻动书页。他深吸一口气，推开了那扇尘封已久的暗门。眼前的景象让他倒吸一口凉气——墙上挂满了泛黄的照片，每一张都是同一个人，而那个人，三十年前就已经失踪了。",
+  },
+  {
+    id: 3,
+    title: "客服助手",
+    description: "智能客服对话",
     icon: Headphones,
     iconColor: "text-rose-500",
     bgColor: "bg-rose-500/10",
-    text: "您好，感谢致电客户服务中心。您的满意是我们最大的追求，如需帮助请按1，查询订单请按2，人工服务请按0。",
-  },
-  {
-    id: 6,
-    title: "快递通知",
-    description: "生活提醒",
-    icon: Package,
-    iconColor: "text-orange-500",
-    bgColor: "bg-orange-500/10",
-    text: "亲爱的用户，您的快递已经到达，请凭取件码到智能柜取件。祝您生活愉快，期待您的下次使用！",
+    text: "您好，欢迎致电阶跃星辰客户服务中心，我是您的智能语音助理小星。很高兴为您服务！请问有什么可以帮助您的吗？您可以咨询产品功能、技术支持、账户问题或商务合作等事宜。我会尽我所能为您提供专业、高效的解答。如果需要转接人工客服，请随时告诉我。",
   },
 ];
 
