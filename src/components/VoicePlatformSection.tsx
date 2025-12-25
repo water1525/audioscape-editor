@@ -22,7 +22,7 @@ const VoicePlatformSection = () => {
       case "clone":
         return <HomeVoiceCloneTab />;
       case "edit":
-        return <HomeVoiceEditTab />;
+        return <HomeVoiceEditTab key="home-voice-edit" />;
       default:
         return <TextToSpeechTab />;
     }
