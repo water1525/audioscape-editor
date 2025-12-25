@@ -10,17 +10,25 @@ const cases = [
   {
     id: "case1",
     label: "新闻播报",
-    summary: "英伟达芯片获批",
+    description: "英伟达芯片获批",
+    icon: "📰",
+    gradient: "from-blue-400 to-cyan-400",
     text: "最新消息：美国总统特朗普批准英伟达向中国出售先进人工智能芯片H200。这一决定标志着中美科技关系的重大转变，将对全球AI产业格局产生深远影响。",
   },
   {
     id: "case2",
     label: "有声读物",
+    description: "讲述一个故事",
+    icon: "📖",
+    gradient: "from-purple-400 to-pink-400",
     text: "夜幕降临，月光洒落在宁静的小镇上。远处传来阵阵虫鸣，微风轻轻拂过树梢，带来一丝凉意。这是一个适合讲故事的夜晚。",
   },
   {
     id: "case3",
     label: "客服助手",
+    description: "提供客户支持",
+    icon: "🎧",
+    gradient: "from-green-400 to-emerald-400",
     text: "您好，欢迎致电智能客服中心。我是您的AI助手小星，很高兴为您服务。请问有什么可以帮助您的吗？",
   },
 ];
@@ -164,17 +172,29 @@ const TextToSpeechTab = () => {
       </div>
 
       {/* Case Selector */}
-      <div className="flex items-center gap-2 mb-6">
+      <div className="flex flex-wrap items-center gap-3 mb-6">
         {cases.map((caseItem) => (
-          <Button
+          <button
             key={caseItem.id}
-            variant={activeCase === caseItem.id ? "caseActive" : "case"}
-            size="sm"
             onClick={() => handleCaseChange(caseItem.id)}
-            className="min-w-[70px] transition-all duration-200"
+            className={`
+              flex items-center gap-2.5 px-4 py-2.5 rounded-full border transition-all duration-200
+              ${activeCase === caseItem.id 
+                ? 'bg-primary/10 border-primary/50 shadow-md shadow-primary/10' 
+                : 'bg-card/50 border-border/50 hover:bg-card hover:border-border'
+              }
+            `}
           >
-            {caseItem.label}
-          </Button>
+            <span className={`
+              w-6 h-6 rounded-full bg-gradient-to-br ${caseItem.gradient} 
+              flex items-center justify-center text-xs shadow-sm
+            `}>
+              {caseItem.icon}
+            </span>
+            <span className="text-sm font-medium text-foreground">{caseItem.label}</span>
+            <span className="text-muted-foreground/50">|</span>
+            <span className="text-sm text-muted-foreground">{caseItem.description}</span>
+          </button>
         ))}
       </div>
 
