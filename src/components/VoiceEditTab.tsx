@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Play, ArrowRight, X } from "lucide-react";
 
@@ -119,10 +120,10 @@ const VoiceEditTab = () => {
         编辑原音频的情绪、风格、速度
       </p>
 
-      {/* Edit Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
-          <div className="bg-card border border-border rounded-xl p-6 w-full max-w-lg shadow-elevated animate-scale-in">
+      {/* Edit Modal - Using Portal to prevent clipping */}
+      {showModal && createPortal(
+        <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm flex items-center justify-center z-[9999] animate-fade-in">
+          <div className="bg-card border border-border rounded-xl p-6 w-full max-w-lg shadow-elevated animate-scale-in mx-4">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-lg font-semibold text-foreground">
@@ -237,7 +238,8 @@ const VoiceEditTab = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
