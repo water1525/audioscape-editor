@@ -39,64 +39,78 @@ const VoiceCloneTab = () => {
 
   // Preload audio sequentially to avoid rate limits
   useEffect(() => {
+    const abortController = new AbortController();
+    let cancelled = false;
+
+    const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
     const loadAudioSequentially = async () => {
       for (const profile of voiceProfiles) {
-        const types = ['original', 'cloned'] as const;
+        const types = ["original", "cloned"] as const;
+
         for (const type of types) {
+          if (cancelled) return;
+
           const cacheKey = `${profile.id}-${type}`;
-          if (audioCache[cacheKey]) continue;
-          
-          setLoadingCache(prev => ({ ...prev, [cacheKey]: true }));
+          setLoadingCache((prev) => ({ ...prev, [cacheKey]: true }));
+
           try {
-            // Retry logic for rate limits
             let retries = 3;
-            let response: Response | null = null;
-            
-            while (retries > 0) {
-              response = await fetch(
-                `${SUPABASE_URL}/functions/v1/step-tts`,
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    "apikey": SUPABASE_ANON_KEY,
-                    "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-                  },
-                  body: JSON.stringify({ 
-                    text: profile.sampleText,
-                    voice: profile.voice,
-                  }),
-                }
-              );
+
+            while (!cancelled && retries > 0) {
+              const response = await fetch(`${SUPABASE_URL}/functions/v1/step-tts`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  apikey: SUPABASE_ANON_KEY,
+                  Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+                },
+                body: JSON.stringify({
+                  text: profile.sampleText,
+                  voice: profile.voice,
+                }),
+                signal: abortController.signal,
+              });
 
               if (response.ok) {
-                break;
-              } else if (response.status === 429) {
-                retries--;
-                await new Promise(r => setTimeout(r, 1500)); // Wait before retry
-              } else {
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                setAudioCache((prev) => ({ ...prev, [cacheKey]: audioUrl }));
                 break;
               }
-            }
 
-            if (response?.ok) {
-              const audioBlob = await response.blob();
-              const audioUrl = URL.createObjectURL(audioBlob);
-              setAudioCache(prev => ({ ...prev, [cacheKey]: audioUrl }));
+              if (response.status === 429) {
+                retries -= 1;
+                await sleep(1200);
+                continue;
+              }
+
+              break;
             }
           } catch (error) {
-            console.error("Preload error:", error);
+            if ((error as { name?: string } | null)?.name !== "AbortError") {
+              console.error("Preload error:", error);
+            }
           } finally {
-            setLoadingCache(prev => ({ ...prev, [cacheKey]: false }));
+            if (!cancelled) {
+              setLoadingCache((prev) => ({ ...prev, [cacheKey]: false }));
+            }
           }
-          
-          // Small delay between requests to avoid rate limits
-          await new Promise(r => setTimeout(r, 500));
+
+          await sleep(350);
         }
       }
     };
-    
-    loadAudioSequentially();
+
+    const t = window.setTimeout(() => {
+      void loadAudioSequentially();
+    }, 0);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t);
+      abortController.abort();
+    };
   }, []);
 
   const handlePlayPause = (profileId: string, type: 'original' | 'cloned') => {
