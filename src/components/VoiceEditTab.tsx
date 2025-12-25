@@ -590,7 +590,7 @@ const VoiceEditTab = () => {
               <div>
                 <h3 className="text-lg font-semibold text-foreground">参数设置</h3>
                 <p className="text-sm text-muted-foreground">
-                  选择您想要的音色特征，当前只支持单选
+                  选择您想要的音色特征
                 </p>
               </div>
               <Button
