@@ -6,8 +6,11 @@ import { useGlobalAudio } from "@/hooks/useGlobalAudio";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const emotionTags = ["电台", "纪录", "亲密", "稳健", "大气", "沉稳", "月亮", "阳光", "磁性"];
-const styleTags = ["严厉", "抒情", "共鸣", "清亮", "质朴", "快速"];
+// 参数设置分类
+const ganLianTags = ["电台", "纪录", "亲密", "稳健", "大气", "沉稳", "月亮", "阳光", "磁性"];
+const fengGeTags = ["严厉", "抒情", "共鸣", "清亮", "质朴", "李庄", "快速"];
+const gengDuoTags = ["严肃", "膨胀", "儿童", "平静", "可等", "呼呼", "吹唱", "请读"];
+const changYongTags = ["迷人", "法语", "风雨", "浏河", "法语", "中老年", "特别女"];
 
 const HomeVoiceEditTab = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -16,7 +19,6 @@ const HomeVoiceEditTab = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [editedAudioUrl, setEditedAudioUrl] = useState<string | null>(null);
-  const [audioDuration, setAudioDuration] = useState<string>("--:--");
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const editedAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -28,20 +30,6 @@ const HomeVoiceEditTab = () => {
     const { data } = supabase.storage.from("audio").getPublicUrl(audioFile);
     return data.publicUrl;
   };
-
-  // Load and calculate audio duration
-  useEffect(() => {
-    const audio = new Audio(getAudioUrl());
-    audio.addEventListener("loadedmetadata", () => {
-      const duration = audio.duration;
-      const minutes = Math.floor(duration / 60);
-      const seconds = Math.floor(duration % 60);
-      setAudioDuration(`${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`);
-    });
-    audio.addEventListener("error", () => {
-      setAudioDuration("--:--");
-    });
-  }, []);
 
   const handlePlayPause = () => {
     if (isPlaying && audioRef.current) {
@@ -184,35 +172,75 @@ const HomeVoiceEditTab = () => {
     };
   }, []);
 
+  const renderTagSection = (title: string, tags: string[]) => (
+    <div>
+      <p className="text-sm font-medium text-foreground mb-2">{title}</p>
+      <div className="flex flex-wrap gap-2">
+        {tags.map((tag, index) => (
+          <button
+            key={`${tag}-${index}`}
+            onClick={() => toggleTag(tag)}
+            disabled={isGenerating}
+            className={`
+              px-3 py-1.5 text-sm rounded-full border transition-all
+              ${selectedTags.includes(tag)
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+              }
+            `}
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="animate-fade-in space-y-4">
-      <p className="text-sm text-muted-foreground">原始音频</p>
+      {/* 原始音频标签 */}
+      <div className="flex items-center gap-2">
+        <span className="w-2 h-2 rounded-full bg-muted-foreground" />
+        <p className="text-sm text-muted-foreground">原始音频</p>
+      </div>
 
+      {/* 原始音频卡片 */}
       <div className="bg-card border border-border/50 rounded-xl p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={handlePlayPause}
-            className="w-10 h-10 rounded-full bg-muted flex items-center justify-center transition-colors hover:bg-muted/80"
+            className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center transition-colors hover:bg-primary/20"
             aria-label={isPlaying ? "暂停" : "播放"}
           >
             {isPlaying ? (
-              <Pause className="h-4 w-4 text-foreground" />
+              <Pause className="h-5 w-5 text-primary" />
             ) : (
-              <Play className="h-4 w-4 text-foreground ml-0.5" />
+              <Play className="h-5 w-5 text-primary ml-0.5" />
             )}
           </button>
 
-          <div>
+          {/* 音频波形占位 */}
+          <div className="flex items-center gap-0.5 h-8">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="w-1 bg-muted-foreground/40 rounded-full"
+                style={{ height: `${12 + Math.random() * 16}px` }}
+              />
+            ))}
+          </div>
+
+          <div className="ml-2">
             <p className="text-sm font-medium text-foreground">星星人冒险.wav</p>
-            <p className="text-xs text-muted-foreground">{audioDuration}</p>
+            <p className="text-xs text-muted-foreground">时长 00:10</p>
           </div>
         </div>
 
         <Button 
           variant="outline" 
           size="sm" 
-          className="h-9 rounded-full gap-1 px-4"
+          className="h-9 rounded-full gap-1.5 px-4"
           onClick={() => setShowModal(true)}
         >
           <ArrowRight className="h-3.5 w-3.5" />
@@ -220,39 +248,61 @@ const HomeVoiceEditTab = () => {
         </Button>
       </div>
 
-      {/* Edited Audio */}
-      {editedAudioUrl && (
-        <>
-          <p className="text-sm text-muted-foreground">编辑后音频</p>
-          <div className="bg-primary/5 border border-primary/30 rounded-xl p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={handlePlayEditedPause}
-                className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center transition-colors hover:bg-primary/30"
-                aria-label={isPlayingEdited ? "暂停" : "播放"}
-              >
-                {isPlayingEdited ? (
-                  <Pause className="h-4 w-4 text-primary" />
-                ) : (
-                  <Play className="h-4 w-4 text-primary ml-0.5" />
-                )}
-              </button>
+      {/* 编辑后的音频标签 */}
+      <div className="flex items-center gap-2">
+        <span className="w-2 h-2 rounded-full bg-primary" />
+        <p className="text-sm text-muted-foreground">编辑后的音频</p>
+      </div>
 
-              <div>
-                <p className="text-sm font-medium text-foreground">星星人冒险_edited.wav</p>
-                <p className="text-xs text-primary">已应用风格编辑</p>
-              </div>
+      {/* 编辑后的音频卡片 */}
+      <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handlePlayEditedPause}
+            disabled={!editedAudioUrl}
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
+              editedAudioUrl 
+                ? "bg-primary/20 hover:bg-primary/30" 
+                : "bg-muted cursor-not-allowed"
+            }`}
+            aria-label={isPlayingEdited ? "暂停" : "播放"}
+          >
+            {isPlayingEdited ? (
+              <Pause className="h-5 w-5 text-primary" />
+            ) : (
+              <Play className="h-5 w-5 text-primary ml-0.5" />
+            )}
+          </button>
+
+          {/* 音频波形占位 */}
+          <div className="flex items-center gap-0.5 h-8">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="w-1 bg-primary/40 rounded-full"
+                style={{ height: `${12 + Math.random() * 16}px` }}
+              />
+            ))}
+          </div>
+
+          <div className="ml-2">
+            <p className="text-sm font-medium text-foreground">星星人冒险_edited.wav</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-muted-foreground">时长 00:10</p>
+              {editedAudioUrl && (
+                <span className="text-xs text-primary font-medium">已编辑</span>
+              )}
             </div>
           </div>
-        </>
-      )}
+        </div>
+      </div>
 
       <p className="text-sm text-muted-foreground">
         <span className="text-foreground font-medium">@Step-tts-edit</span> 编辑原音频的情绪、风格、速度
       </p>
 
-      {/* Edit Modal */}
+      {/* 参数设置弹窗 */}
       {showModal && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div 
@@ -260,8 +310,9 @@ const HomeVoiceEditTab = () => {
             onClick={() => !isGenerating && setShowModal(false)}
           />
           <div className="relative bg-card border border-border rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-foreground">选择编辑参数</h3>
+            {/* 标题 */}
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-semibold text-foreground">参数设置</h3>
               <button
                 onClick={() => !isGenerating && setShowModal(false)}
                 className="text-muted-foreground hover:text-foreground transition-colors"
@@ -271,61 +322,26 @@ const HomeVoiceEditTab = () => {
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">情绪</p>
-                <div className="flex flex-wrap gap-2">
-                  {emotionTags.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => toggleTag(tag)}
-                      disabled={isGenerating}
-                      className={`
-                        px-3 py-1.5 text-sm rounded-full border transition-all
-                        ${selectedTags.includes(tag)
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "bg-card border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                        }
-                      `}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            {/* 副标题 */}
+            <p className="text-sm text-muted-foreground mb-6">
+              通配只影响风格标识符，请尽量下载任意风格
+            </p>
 
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">风格</p>
-                <div className="flex flex-wrap gap-2">
-                  {styleTags.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => toggleTag(tag)}
-                      disabled={isGenerating}
-                      className={`
-                        px-3 py-1.5 text-sm rounded-full border transition-all
-                        ${selectedTags.includes(tag)
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "bg-card border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                        }
-                      `}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {selectedTags.length > 0 && (
-                <div className="pt-2">
-                  <p className="text-xs text-muted-foreground">
-                    已选择: {selectedTags.join(", ")}
-                  </p>
-                </div>
-              )}
+            {/* 标签分类 */}
+            <div className="space-y-4 max-h-[300px] overflow-y-auto">
+              {renderTagSection("干练", ganLianTags)}
+              {renderTagSection("风格", fengGeTags)}
+              {renderTagSection("更多", gengDuoTags)}
+              {renderTagSection("常用标签", changYongTags)}
             </div>
 
-            <div className="flex gap-3 mt-6">
+            {/* 已选择数量 */}
+            <p className="text-sm text-muted-foreground mt-4">
+              已选择 {selectedTags.length} 个标签
+            </p>
+
+            {/* 按钮 */}
+            <div className="flex gap-3 mt-4">
               <Button
                 variant="outline"
                 className="flex-1"
@@ -337,7 +353,7 @@ const HomeVoiceEditTab = () => {
               <Button
                 className="flex-1"
                 onClick={handleConfirm}
-                disabled={isGenerating || selectedTags.length === 0}
+                disabled={isGenerating}
               >
                 {isGenerating ? (
                   <>
