@@ -321,8 +321,21 @@ const Playground = () => {
               </div>
             </div>
 
-            {/* Audio Player */}
-            {(audioUrl || isGenerating) && (
+            {/* Generating State */}
+            {isGenerating && (
+              <div className="mb-6">
+                <Button
+                  disabled
+                  className="w-full gap-2 h-12"
+                >
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  正在生成...
+                </Button>
+              </div>
+            )}
+
+            {/* Audio Player - Only show when audio is ready */}
+            {audioUrl && !isGenerating && (
               <div className="mb-6">
                 <div className="flex justify-end mb-2">
                   <Button
@@ -332,27 +345,24 @@ const Playground = () => {
                     disabled={isGenerating || !text.trim()}
                     className="gap-2"
                   >
-                    <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                    <RefreshCw className="w-4 h-4" />
                     重新生成
                   </Button>
                 </div>
                 
                 <div className="bg-primary/10 rounded-xl p-4">
-                  {audioUrl && (
-                    <audio
-                      ref={audioRef}
-                      src={audioUrl}
-                      onTimeUpdate={handleTimeUpdate}
-                      onLoadedMetadata={handleLoadedMetadata}
-                      onEnded={() => setIsPlaying(false)}
-                    />
-                  )}
+                  <audio
+                    ref={audioRef}
+                    src={audioUrl}
+                    onTimeUpdate={handleTimeUpdate}
+                    onLoadedMetadata={handleLoadedMetadata}
+                    onEnded={() => setIsPlaying(false)}
+                  />
                   
                   <div className="flex items-center gap-4">
                     <button
                       onClick={togglePlayPause}
-                      disabled={!audioUrl}
-                      className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center hover:bg-foreground/90 transition-colors disabled:opacity-50"
+                      className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center hover:bg-foreground/90 transition-colors"
                     >
                       {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
                     </button>
@@ -364,7 +374,6 @@ const Playground = () => {
                         max={duration || 100}
                         value={currentTime}
                         onChange={handleSeek}
-                        disabled={!audioUrl}
                         className="w-full h-2 bg-primary/30 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
                       />
                     </div>
@@ -376,22 +385,19 @@ const Playground = () => {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => skipTime(-5)}
-                        disabled={!audioUrl}
-                        className="p-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                        className="p-2 text-muted-foreground hover:text-foreground transition-colors"
                       >
                         <RotateCcw className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => skipTime(5)}
-                        disabled={!audioUrl}
-                        className="p-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                        className="p-2 text-muted-foreground hover:text-foreground transition-colors"
                       >
                         <RotateCcw className="w-5 h-5 scale-x-[-1]" />
                       </button>
                       <button
                         onClick={handleDownload}
-                        disabled={!audioUrl}
-                        className="p-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                        className="p-2 text-muted-foreground hover:text-foreground transition-colors"
                       >
                         <Download className="w-5 h-5" />
                       </button>
@@ -408,16 +414,11 @@ const Playground = () => {
                 <div className="grid grid-cols-3 gap-4">
                   {caseSamples.map((sample) => {
                     const IconComponent = sample.icon;
-                    const isSelected = text === sample.text;
                     return (
                       <button
                         key={sample.id}
                         onClick={() => handleCaseClick(sample.text)}
-                        className={`group relative p-4 rounded-xl border transition-all duration-300 text-left hover:shadow-lg hover:-translate-y-0.5 ${
-                          isSelected 
-                            ? "border-primary bg-primary/5 shadow-md" 
-                            : "border-border bg-card hover:border-primary/50 hover:bg-accent/50"
-                        }`}
+                        className="group relative p-4 rounded-xl border transition-all duration-300 text-left hover:shadow-lg hover:-translate-y-0.5 border-border bg-card hover:border-primary/50 hover:bg-accent/50"
                       >
                         <div className={`w-10 h-10 rounded-lg ${sample.bgColor} flex items-center justify-center mb-3`}>
                           <IconComponent className={`w-5 h-5 ${sample.iconColor}`} />
@@ -426,9 +427,7 @@ const Playground = () => {
                         <p className="text-xs text-muted-foreground">{sample.description}</p>
                         
                         {/* Hover indicator */}
-                        <div className={`absolute top-3 right-3 w-2 h-2 rounded-full transition-all duration-300 ${
-                          isSelected ? "bg-primary" : "bg-transparent group-hover:bg-primary/50"
-                        }`} />
+                        <div className="absolute top-3 right-3 w-2 h-2 rounded-full transition-all duration-300 bg-transparent group-hover:bg-primary/50" />
                       </button>
                     );
                   })}
