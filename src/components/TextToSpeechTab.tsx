@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, RefreshCw, Loader2 } from "lucide-react";
+import { Play, Pause, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -171,7 +171,7 @@ const TextToSpeechTab = () => {
     playNext();
   };
 
-  const handlePlayPause = () => {
+  const handlePlayPause = async () => {
     if (audioRef.current && isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
@@ -185,13 +185,19 @@ const TextToSpeechTab = () => {
     }
 
     if (currentCase.isDialogue) {
+      // Check if dialogue audio is ready, if not generate first
+      if (dialogueUrls.length === 0 || dialogueUrls.some(u => !u)) {
+        await regenerateAudio();
+        return;
+      }
       playDialogue();
       return;
     }
 
+    // Check if audio is ready, if not generate first
     const cachedUrl = audioUrls[activeCase];
     if (!cachedUrl) {
-      toast.error("音频未就绪");
+      await regenerateAudio();
       return;
     }
 
@@ -222,10 +228,6 @@ const TextToSpeechTab = () => {
     dialogueIndexRef.current = 0;
     setActiveCase(caseId);
   };
-
-  const isCurrentReady = currentCase.isDialogue
-    ? dialogueUrls.length > 0 && dialogueUrls.every(u => u !== "")
-    : !!audioUrls[activeCase];
 
   return (
     <div className="animate-fade-in">
@@ -269,28 +271,20 @@ const TextToSpeechTab = () => {
           <span className="text-foreground font-medium">@Step-tts-2</span>{" "}
           生成效具有人感、拥有丰富情绪、风格的语音
         </p>
-        <div className="flex items-center gap-2">
-          {!isCurrentReady && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={regenerateAudio}
-              disabled={isRegenerating}
-              className="gap-2"
-            >
-              {isRegenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-              {isRegenerating ? "生成中..." : "生成音频"}
-            </Button>
+        <Button 
+          className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
+          onClick={handlePlayPause}
+          disabled={isRegenerating}
+        >
+          {isRegenerating ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : isPlaying ? (
+            <Pause className="h-4 w-4" />
+          ) : (
+            <Play className="h-4 w-4" />
           )}
-          <Button 
-            className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
-            onClick={handlePlayPause}
-            disabled={!isCurrentReady || isRegenerating}
-          >
-            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-            {isPlaying ? "暂停" : "播放"}
-          </Button>
-        </div>
+          {isRegenerating ? "生成中..." : isPlaying ? "暂停" : "播放"}
+        </Button>
       </div>
     </div>
   );
