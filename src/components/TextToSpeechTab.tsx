@@ -59,24 +59,30 @@ const TextToSpeechTab = () => {
   const dialogueIndexRef = useRef(0);
   const currentCase = cases.find((c) => c.id === activeCase) || cases[0];
 
-  // Check if audio files exist in storage and have content
+  // Check if audio files exist in storage with valid content
   const checkAudioFiles = async () => {
     const urls: Record<string, string> = {};
     const dialogues: string[] = [];
 
-    // Check case1 and case2
+    // Check case1 and case2 - use range request to verify content exists
     for (const caseItem of cases.filter(c => !c.isDialogue)) {
       if (!caseItem.file) continue;
       const { data } = supabase.storage.from("audio").getPublicUrl(caseItem.file);
       try {
-        const response = await fetch(data.publicUrl, { method: "HEAD" });
-        const contentLength = response.headers.get("content-length");
-        // Only mark as valid if file exists AND has content (> 1000 bytes)
-        if (response.ok && contentLength && parseInt(contentLength) > 1000) {
-          urls[caseItem.id] = data.publicUrl;
+        // Use range request to fetch first few bytes - more reliable than HEAD
+        const response = await fetch(data.publicUrl, { 
+          method: "GET",
+          headers: { "Range": "bytes=0-100" }
+        });
+        // 206 = partial content (file exists with content), 200 = full file returned
+        if ((response.status === 206 || response.status === 200)) {
+          const blob = await response.blob();
+          if (blob.size > 50) {
+            urls[caseItem.id] = data.publicUrl;
+          }
         }
       } catch {
-        // File doesn't exist
+        // File doesn't exist or error
       }
     }
 
@@ -84,10 +90,17 @@ const TextToSpeechTab = () => {
     for (const line of dialogueLines) {
       const { data } = supabase.storage.from("audio").getPublicUrl(line.file);
       try {
-        const response = await fetch(data.publicUrl, { method: "HEAD" });
-        const contentLength = response.headers.get("content-length");
-        if (response.ok && contentLength && parseInt(contentLength) > 1000) {
-          dialogues.push(data.publicUrl);
+        const response = await fetch(data.publicUrl, { 
+          method: "GET",
+          headers: { "Range": "bytes=0-100" }
+        });
+        if ((response.status === 206 || response.status === 200)) {
+          const blob = await response.blob();
+          if (blob.size > 50) {
+            dialogues.push(data.publicUrl);
+          } else {
+            dialogues.push("");
+          }
         } else {
           dialogues.push("");
         }
