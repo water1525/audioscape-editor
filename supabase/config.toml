@@ -2,3 +2,6 @@ project_id = "vixczylcdviqivlziovw"
 
 [functions.step-tts]
 verify_jwt = false
+
+[functions.generate-voice-audio]
+verify_jwt = false
