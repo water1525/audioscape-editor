@@ -13,15 +13,17 @@ const cases = [
     description: "Step 3模型发布",
     icon: "📰",
     gradient: "from-blue-400 to-cyan-400",
+    voice: "cixingnansheng",
     text: "阶跃星辰近日正式发布新一代基础大模型Step 3，兼顾智能与效率，面向推理时代打造最适合应用的模型。Step 3将面向全球企业和开发者开源，为开源世界贡献最强多模态推理模型。",
   },
   {
     id: "case2",
     label: "有声读物",
-    description: "讲述一个故事",
+    description: "悬疑故事",
     icon: "📖",
     gradient: "from-purple-400 to-pink-400",
-    text: "夜幕降临，月光洒落在宁静的小镇上。远处传来阵阵虫鸣，微风轻轻拂过树梢，带来一丝凉意。这是一个适合讲故事的夜晚。",
+    voice: "tianmeinvsheng",
+    text: "深夜，老宅的钟敲响十二下。她推开尘封的阁楼门，发现一封泛黄的信——收件人竟是自己的名字，落款日期却是明天。信上只有一句话：不要回头。",
   },
   {
     id: "case3",
@@ -29,6 +31,7 @@ const cases = [
     description: "提供客户支持",
     icon: "🎧",
     gradient: "from-green-400 to-emerald-400",
+    voice: "cixingnansheng",
     text: "您好，欢迎致电智能客服中心。我是您的AI助手小星，很高兴为您服务。请问有什么可以帮助您的吗？",
   },
 ];
@@ -65,7 +68,7 @@ const TextToSpeechTab = () => {
                 apikey: SUPABASE_ANON_KEY,
                 Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
               },
-              body: JSON.stringify({ text: caseItem.text }),
+              body: JSON.stringify({ text: caseItem.text, voice: caseItem.voice }),
               signal: abortController.signal,
             });
 
