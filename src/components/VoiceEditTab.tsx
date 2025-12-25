@@ -354,9 +354,33 @@ const VoiceEditTab = () => {
       {audioSource === "none" && !isRecording && (
         <div className="bg-primary/5 border border-primary/20 rounded-lg p-8">
           <div className="flex flex-col items-center gap-4">
-            <div className="flex items-center gap-2 text-primary">
-              <Mic className="h-8 w-8" />
-              <Upload className="h-6 w-6" />
+            {/* Stylized Icon Design */}
+            <div className="relative flex items-center justify-center">
+              {/* Microphone with waveform design */}
+              <div className="relative">
+                <Mic className="h-10 w-10 text-primary" />
+                {/* Decorative curved lines */}
+                <svg 
+                  className="absolute -right-3 top-1/2 -translate-y-1/2 text-primary/60" 
+                  width="20" 
+                  height="24" 
+                  viewBox="0 0 20 24" 
+                  fill="none"
+                >
+                  <path 
+                    d="M2 6C6 6 6 18 2 18" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round"
+                  />
+                  <path 
+                    d="M8 3C14 3 14 21 8 21" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
             </div>
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
