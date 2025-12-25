@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Upload, Mic, RefreshCw, Trash2, X, Loader2 } from "lucide-react";
+import { Play, Pause, Upload, Mic, RefreshCw, Trash2, X, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 // Sample texts for recording (25-30 characters each)
@@ -475,7 +475,7 @@ const VoiceEditTab = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                className="h-8 w-8 text-destructive/60 hover:text-destructive hover:bg-destructive/10"
                 onClick={deleteAudio}
               >
                 <Trash2 className="h-4 w-4" />
@@ -486,10 +486,10 @@ const VoiceEditTab = () => {
           {/* Edit Button - Below original audio */}
           <div className="flex justify-center">
             <Button
-              variant="outline"
               onClick={() => setShowModal(true)}
-              className="min-w-[120px]"
+              className="min-w-[140px] gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-md hover:shadow-lg transition-all duration-300"
             >
+              <Sparkles className="h-4 w-4" />
               编辑
             </Button>
           </div>
