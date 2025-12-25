@@ -4,9 +4,6 @@ import { Play, Pause } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
 const dialogueLines = [
   { speaker: "客服小美", text: "您好，欢迎致电智能客服中心，请问有什么可以帮您？", file: "tts/dialogue-0.mp3" },
   { speaker: "客户先生", text: "你好，我昨天下的订单显示已发货，但物流信息一直没更新。", file: "tts/dialogue-1.mp3" },
@@ -54,8 +51,6 @@ const TextToSpeechTab = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioUrls, setAudioUrls] = useState<Record<string, string>>({});
   const [dialogueUrls, setDialogueUrls] = useState<string[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [audioReady, setAudioReady] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const dialogueIndexRef = useRef(0);
   const currentCase = cases.find((c) => c.id === activeCase) || cases[0];
@@ -64,7 +59,6 @@ const TextToSpeechTab = () => {
   const checkAudioFiles = async () => {
     const urls: Record<string, string> = {};
     const dialogues: string[] = [];
-    let allExist = true;
 
     // Check case1 and case2
     for (const caseItem of cases.filter(c => !c.isDialogue)) {
@@ -74,11 +68,9 @@ const TextToSpeechTab = () => {
         const response = await fetch(data.publicUrl, { method: "HEAD" });
         if (response.ok) {
           urls[caseItem.id] = data.publicUrl;
-        } else {
-          allExist = false;
         }
       } catch {
-        allExist = false;
+        // File doesn't exist
       }
     }
 
@@ -90,54 +82,20 @@ const TextToSpeechTab = () => {
         if (response.ok) {
           dialogues.push(data.publicUrl);
         } else {
-          allExist = false;
           dialogues.push("");
         }
       } catch {
-        allExist = false;
         dialogues.push("");
       }
     }
 
     setAudioUrls(urls);
     setDialogueUrls(dialogues);
-    setAudioReady(allExist && Object.keys(urls).length === 2 && dialogues.every(u => u !== ""));
   };
 
   useEffect(() => {
     checkAudioFiles();
   }, []);
-
-  const generateAudio = async () => {
-    setIsGenerating(true);
-    toast.info("正在生成音频文件，请稍候（约30秒）...");
-
-    try {
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-tts-audio`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        },
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        toast.success("音频生成完成！");
-        await checkAudioFiles();
-      } else {
-        toast.error(`部分音频生成失败: ${result.message}`);
-        await checkAudioFiles();
-      }
-    } catch (error) {
-      toast.error("音频生成失败");
-      console.error(error);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
 
   const playDialogue = () => {
     if (dialogueUrls.length === 0 || dialogueUrls.some(u => !u)) {
@@ -195,7 +153,7 @@ const TextToSpeechTab = () => {
 
     const cachedUrl = audioUrls[activeCase];
     if (!cachedUrl) {
-      toast.error("音频未就绪，请先点击生成音频");
+      toast.error("音频未就绪");
       return;
     }
 
@@ -276,7 +234,7 @@ const TextToSpeechTab = () => {
         <Button 
           className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
           onClick={handlePlayPause}
-          disabled={!isCurrentReady && !isGenerating}
+          disabled={!isCurrentReady}
         >
           {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
           {isPlaying ? "暂停" : "播放"}

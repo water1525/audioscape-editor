@@ -6,9 +6,6 @@ import avatarFemale from "@/assets/avatar-female.png";
 import avatarMale from "@/assets/avatar-male.png";
 import { supabase } from "@/integrations/supabase/client";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-
 const voiceProfiles = [
   {
     id: "cila",
@@ -35,14 +32,11 @@ const voiceProfiles = [
 const VoiceCloneTab = () => {
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [audioUrls, setAudioUrls] = useState<Record<string, string>>({});
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [audioReady, setAudioReady] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Check if audio files exist in storage
   const checkAudioFiles = async () => {
     const urls: Record<string, string> = {};
-    let allExist = true;
 
     for (const profile of voiceProfiles) {
       for (const type of ["original", "cloned"] as const) {
@@ -51,58 +45,23 @@ const VoiceCloneTab = () => {
 
         const { data } = supabase.storage.from("audio").getPublicUrl(file);
 
-        // Check if file actually exists by trying to fetch headers
         try {
           const response = await fetch(data.publicUrl, { method: "HEAD" });
           if (response.ok) {
             urls[key] = data.publicUrl;
-          } else {
-            allExist = false;
           }
         } catch {
-          allExist = false;
+          // File doesn't exist
         }
       }
     }
 
     setAudioUrls(urls);
-    setAudioReady(allExist && Object.keys(urls).length === 4);
   };
 
   useEffect(() => {
     checkAudioFiles();
   }, []);
-
-  const generateAudio = async () => {
-    setIsGenerating(true);
-    toast.info("正在生成音频文件，请稍候...");
-
-    try {
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-voice-audio`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        },
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        toast.success("音频生成完成！");
-        await checkAudioFiles();
-      } else {
-        toast.error(`部分音频生成失败: ${result.message}`);
-        await checkAudioFiles();
-      }
-    } catch (error) {
-      toast.error("音频生成失败");
-      console.error(error);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
 
   const handlePlayPause = (profileId: string, type: "original" | "cloned") => {
     const buttonId = `${profileId}-${type}`;
@@ -121,7 +80,7 @@ const VoiceCloneTab = () => {
 
     const audioUrl = audioUrls[buttonId];
     if (!audioUrl) {
-      toast.error("音频未就绪，请先点击生成音频");
+      toast.error("音频未就绪");
       return;
     }
 
