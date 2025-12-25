@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, MessageSquareText, Copy, Wand2, Phone, Play, Pause, RotateCcw, Download, RefreshCw, X } from "lucide-react";
+import { ChevronDown, MessageSquareText, Copy, Wand2, Phone, Play, Pause, RotateCcw, Download, RefreshCw, X, Bot, Cloud, BookOpen, Cpu, Headphones, Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -34,12 +34,60 @@ const formatOptions = [
 ];
 
 const caseSamples = [
-  "欢迎来到阶跃星辰开放平台，我是您的智能语音助手。今天我将为您展示最先进的语音合成技术，让您体验自然流畅的人工智能语音。",
-  "各位听众朋友们，大家好！今天的天气预报显示，北京地区晴转多云，最高气温28度，最低气温18度，空气质量优良，适宜户外活动。",
-  "从前有一座高山，山上住着一位老爷爷。他每天都会给村里的孩子们讲故事，那些故事里有勇敢的少年、神奇的宝物，还有善良的小动物们。",
-  "人工智能技术正在深刻改变我们的生活方式。从智能家居到自动驾驶，从语音助手到医疗诊断，AI的应用场景越来越广泛。",
-  "您好，感谢致电客户服务中心。您的满意是我们最大的追求，如需帮助请按1，查询订单请按2，人工服务请按0。",
-  "亲爱的用户，您的快递已经到达，请凭取件码到智能柜取件。祝您生活愉快，期待您的下次使用！",
+  {
+    id: 1,
+    title: "智能助手",
+    description: "AI欢迎语",
+    icon: Bot,
+    iconColor: "text-violet-500",
+    bgColor: "bg-violet-500/10",
+    text: "欢迎来到阶跃星辰开放平台，我是您的智能语音助手。今天我将为您展示最先进的语音合成技术，让您体验自然流畅的人工智能语音。",
+  },
+  {
+    id: 2,
+    title: "天气播报",
+    description: "新闻资讯",
+    icon: Cloud,
+    iconColor: "text-sky-500",
+    bgColor: "bg-sky-500/10",
+    text: "各位听众朋友们，大家好！今天的天气预报显示，北京地区晴转多云，最高气温28度，最低气温18度，空气质量优良，适宜户外活动。",
+  },
+  {
+    id: 3,
+    title: "故事讲述",
+    description: "有声读物",
+    icon: BookOpen,
+    iconColor: "text-amber-500",
+    bgColor: "bg-amber-500/10",
+    text: "从前有一座高山，山上住着一位老爷爷。他每天都会给村里的孩子们讲故事，那些故事里有勇敢的少年、神奇的宝物，还有善良的小动物们。",
+  },
+  {
+    id: 4,
+    title: "科技资讯",
+    description: "专业解读",
+    icon: Cpu,
+    iconColor: "text-emerald-500",
+    bgColor: "bg-emerald-500/10",
+    text: "人工智能技术正在深刻改变我们的生活方式。从智能家居到自动驾驶，从语音助手到医疗诊断，AI的应用场景越来越广泛。",
+  },
+  {
+    id: 5,
+    title: "客服语音",
+    description: "电话导航",
+    icon: Headphones,
+    iconColor: "text-rose-500",
+    bgColor: "bg-rose-500/10",
+    text: "您好，感谢致电客户服务中心。您的满意是我们最大的追求，如需帮助请按1，查询订单请按2，人工服务请按0。",
+  },
+  {
+    id: 6,
+    title: "快递通知",
+    description: "生活提醒",
+    icon: Package,
+    iconColor: "text-orange-500",
+    bgColor: "bg-orange-500/10",
+    text: "亲爱的用户，您的快递已经到达，请凭取件码到智能柜取件。祝您生活愉快，期待您的下次使用！",
+  },
 ];
 
 const Playground = () => {
@@ -356,20 +404,34 @@ const Playground = () => {
             {/* Case Samples - Hide when generating or has audio */}
             {!audioUrl && !isGenerating && (
               <div>
-                <p className="text-sm text-muted-foreground mb-3">可以使用以下case</p>
-                <div className="grid grid-cols-3 gap-3">
-                  {caseSamples.map((sample, i) => (
-                    <Button
-                      key={i}
-                      variant="outline"
-                      className={`h-auto py-3 px-4 text-sm font-normal justify-start ${
-                        text === sample ? "bg-primary/10 border-primary text-primary" : ""
-                      }`}
-                      onClick={() => handleCaseClick(sample)}
-                    >
-                      case{i + 1}
-                    </Button>
-                  ))}
+                <p className="text-sm text-muted-foreground mb-4">选择一个场景案例体验语音合成</p>
+                <div className="grid grid-cols-3 gap-4">
+                  {caseSamples.map((sample) => {
+                    const IconComponent = sample.icon;
+                    const isSelected = text === sample.text;
+                    return (
+                      <button
+                        key={sample.id}
+                        onClick={() => handleCaseClick(sample.text)}
+                        className={`group relative p-4 rounded-xl border transition-all duration-300 text-left hover:shadow-lg hover:-translate-y-0.5 ${
+                          isSelected 
+                            ? "border-primary bg-primary/5 shadow-md" 
+                            : "border-border bg-card hover:border-primary/50 hover:bg-accent/50"
+                        }`}
+                      >
+                        <div className={`w-10 h-10 rounded-lg ${sample.bgColor} flex items-center justify-center mb-3`}>
+                          <IconComponent className={`w-5 h-5 ${sample.iconColor}`} />
+                        </div>
+                        <h3 className="font-medium text-foreground mb-1">{sample.title}</h3>
+                        <p className="text-xs text-muted-foreground">{sample.description}</p>
+                        
+                        {/* Hover indicator */}
+                        <div className={`absolute top-3 right-3 w-2 h-2 rounded-full transition-all duration-300 ${
+                          isSelected ? "bg-primary" : "bg-transparent group-hover:bg-primary/50"
+                        }`} />
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
