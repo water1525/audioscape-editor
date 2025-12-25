@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, MessageSquareText, Copy, Wand2, Phone, Play, Pause, RotateCcw, Download, RefreshCw, X, Bot, Cloud, BookOpen, Cpu, Headphones, Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -102,7 +102,22 @@ const Playground = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [waveformHeights, setWaveformHeights] = useState<number[]>(Array(20).fill(20));
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Animate waveform when playing
+  useEffect(() => {
+    if (!isPlaying) {
+      setWaveformHeights(Array(20).fill(20));
+      return;
+    }
+    
+    const interval = setInterval(() => {
+      setWaveformHeights(prev => prev.map(() => Math.random() * 80 + 20));
+    }, 100);
+    
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
   const generateAudio = async (inputText: string) => {
     if (!inputText.trim()) return;
@@ -323,10 +338,10 @@ const Playground = () => {
 
             {/* Generate Button - Show when text is entered but no audio yet */}
             {text.trim() && !audioUrl && !isGenerating && (
-              <div className="mb-6">
+              <div className="mb-6 flex justify-center">
                 <Button
                   onClick={handleGenerateClick}
-                  className="w-full gap-2 h-12"
+                  className="gap-2 h-11 px-12"
                 >
                   生成音频
                 </Button>
@@ -335,10 +350,10 @@ const Playground = () => {
 
             {/* Generating State */}
             {isGenerating && (
-              <div className="mb-6">
+              <div className="mb-6 flex justify-center">
                 <Button
                   disabled
-                  className="w-full gap-2 h-12"
+                  className="gap-2 h-11 px-12"
                 >
                   <RefreshCw className="w-4 h-4 animate-spin" />
                   正在生成...
@@ -378,6 +393,20 @@ const Playground = () => {
                     >
                       {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
                     </button>
+                    
+                    {/* Waveform Animation */}
+                    <div className="flex items-center gap-[3px] h-8">
+                      {waveformHeights.map((height, i) => (
+                        <div
+                          key={i}
+                          className="w-[3px] rounded-full bg-primary transition-all duration-100"
+                          style={{
+                            height: `${height}%`,
+                            opacity: isPlaying ? 0.8 : 0.4,
+                          }}
+                        />
+                      ))}
+                    </div>
                     
                     <div className="flex-1">
                       <input
@@ -419,27 +448,32 @@ const Playground = () => {
               </div>
             )}
 
-            {/* Case Samples - Hide when text is entered */}
+            {/* Case Samples - Horizontal elegant bars */}
             {!text.trim() && (
               <div>
                 <p className="text-sm text-muted-foreground mb-4">选择一个场景案例体验语音合成</p>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-3">
                   {caseSamples.map((sample) => {
                     const IconComponent = sample.icon;
                     return (
                       <button
                         key={sample.id}
                         onClick={() => handleCaseClick(sample.text)}
-                        className="group relative p-4 rounded-xl border transition-all duration-300 text-left hover:shadow-lg hover:-translate-y-0.5 border-border bg-card hover:border-primary/50 hover:bg-accent/50"
+                        className="group w-full flex items-center gap-4 p-4 rounded-xl border border-border bg-card/50 hover:bg-accent/50 hover:border-primary/30 transition-all duration-300 text-left"
                       >
-                        <div className={`w-10 h-10 rounded-lg ${sample.bgColor} flex items-center justify-center mb-3`}>
+                        <div className={`w-10 h-10 rounded-lg ${sample.bgColor} flex items-center justify-center shrink-0`}>
                           <IconComponent className={`w-5 h-5 ${sample.iconColor}`} />
                         </div>
-                        <h3 className="font-medium text-foreground mb-1">{sample.title}</h3>
-                        <p className="text-xs text-muted-foreground">{sample.description}</p>
-                        
-                        {/* Hover indicator */}
-                        <div className="absolute top-3 right-3 w-2 h-2 rounded-full transition-all duration-300 bg-transparent group-hover:bg-primary/50" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium text-foreground">{sample.title}</h3>
+                            <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full bg-muted">{sample.description}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground truncate mt-1">{sample.text}</p>
+                        </div>
+                        <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Play className="w-4 h-4 text-primary ml-0.5" />
+                        </div>
                       </button>
                     );
                   })}
