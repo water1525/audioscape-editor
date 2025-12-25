@@ -44,7 +44,7 @@ const VoicePlatformSection = () => {
       <div className="max-w-4xl mx-auto">
         <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl shadow-xl">
           {/* Top Tabs */}
-          <div className="border-b border-border/30 bg-gradient-to-r from-secondary/30 via-secondary/10 to-secondary/30">
+          <div className="border-b border-border/30 bg-card/40 backdrop-blur-sm">
             <div className="flex items-center">
               {tabs.map((tab, index) => {
                 const IconComponent = tab.icon;
@@ -76,14 +76,13 @@ const VoicePlatformSection = () => {
                     </div>
                     
                     {/* Active indicator line */}
-                    <div className={`
-                      absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 rounded-full
-                      transition-all duration-300 ease-out
-                      ${isActive 
-                        ? 'w-12 bg-gradient-to-r from-primary/80 via-primary to-primary/80 shadow-[0_0_8px_rgba(59,130,246,0.5)]' 
-                        : 'w-0 bg-transparent'
-                      }
-                    `} />
+                    <div
+                      className={`
+                        absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 rounded-full
+                        transition-all duration-300 ease-out
+                        ${isActive ? "w-10 bg-primary" : "w-0 bg-transparent"}
+                      `}
+                    />
                     
                     {/* Separator */}
                     {index < tabs.length - 1 && (
