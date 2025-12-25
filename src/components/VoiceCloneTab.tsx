@@ -146,7 +146,7 @@ const VoiceCloneTab = () => {
     }
   };
 
-  // Clone voice using TTS
+  // Clone voice using Step TTS Mini
   const cloneVoice = async () => {
     if (!recordedAudio || !targetText.trim()) {
       toast.error("请先录制音频并输入目标文本");
@@ -155,9 +155,18 @@ const VoiceCloneTab = () => {
 
     setIsCloning(true);
     try {
-      // Use fetch to get binary audio data directly
+      // Convert recorded audio blob to base64
+      const arrayBuffer = await recordedAudio.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      let binary = '';
+      for (let i = 0; i < uint8Array.length; i++) {
+        binary += String.fromCharCode(uint8Array[i]);
+      }
+      const audioBase64 = btoa(binary);
+
+      // Call the clone-voice edge function
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/clone-voice`,
         {
           method: "POST",
           headers: {
@@ -166,23 +175,25 @@ const VoiceCloneTab = () => {
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
           body: JSON.stringify({
-            text: targetText,
-            voice: "tianmeinvsheng", // Default voice for demo
+            audioBase64,
+            sampleText, // The text that was spoken during recording
+            targetText, // The text to generate with the cloned voice
           }),
         }
       );
 
       if (!response.ok) {
-        throw new Error("生成音频失败");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "音色复刻失败");
       }
 
       const audioBlob = await response.blob();
       const url = URL.createObjectURL(audioBlob);
       setClonedAudioUrl(url);
-      toast.success("音色复刻成功！");
+      toast.success("音色复刻成功！使用您的声音生成了音频");
     } catch (error) {
       console.error("Voice cloning error:", error);
-      toast.error("音色复刻失败，请重试");
+      toast.error(error instanceof Error ? error.message : "音色复刻失败，请重试");
     } finally {
       setIsCloning(false);
     }
