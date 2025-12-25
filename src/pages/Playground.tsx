@@ -448,32 +448,25 @@ const Playground = () => {
               </div>
             )}
 
-            {/* Case Samples - Horizontal elegant bars */}
+            {/* Case Samples - Compact horizontal tags */}
             {!text.trim() && (
               <div>
                 <p className="text-sm text-muted-foreground mb-4">选择一个场景案例体验语音合成</p>
-                <div className="space-y-3">
+                <div className="flex flex-wrap gap-3">
                   {caseSamples.map((sample) => {
                     const IconComponent = sample.icon;
                     return (
                       <button
                         key={sample.id}
                         onClick={() => handleCaseClick(sample.text)}
-                        className="group w-full flex items-center gap-4 p-4 rounded-xl border border-border bg-card/50 hover:bg-accent/50 hover:border-primary/30 transition-all duration-300 text-left"
+                        className="group flex items-center gap-2 px-4 py-2.5 rounded-full border border-border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200"
                       >
-                        <div className={`w-10 h-10 rounded-lg ${sample.bgColor} flex items-center justify-center shrink-0`}>
-                          <IconComponent className={`w-5 h-5 ${sample.iconColor}`} />
+                        <div className={`w-6 h-6 rounded-md ${sample.bgColor} flex items-center justify-center shrink-0`}>
+                          <IconComponent className={`w-3.5 h-3.5 ${sample.iconColor}`} />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-medium text-foreground">{sample.title}</h3>
-                            <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full bg-muted">{sample.description}</span>
-                          </div>
-                          <p className="text-sm text-muted-foreground truncate mt-1">{sample.text}</p>
-                        </div>
-                        <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Play className="w-4 h-4 text-primary ml-0.5" />
-                        </div>
+                        <span className="font-medium text-sm text-foreground">{sample.title}</span>
+                        <span className="text-muted-foreground">|</span>
+                        <span className="text-sm text-muted-foreground">{sample.description}</span>
                       </button>
                     );
                   })}
