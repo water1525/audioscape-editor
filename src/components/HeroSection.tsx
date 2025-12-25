@@ -4,23 +4,23 @@ const tags = ["Hyper-realism", "Emotional mastery", "Instant cloning"];
 
 // Animated waveform component for hero section
 const HeroWaveform = () => {
-  const bars = 32;
+  const bars = 48;
   
   return (
-    <div className="flex items-center justify-center gap-[2px] h-16">
+    <div className="flex items-center justify-center gap-[3px] h-32">
       {[...Array(bars)].map((_, i) => {
         // Create a wave pattern - higher in the middle, lower at edges
         const distanceFromCenter = Math.abs(i - bars / 2);
-        const baseHeight = Math.max(8, 40 - distanceFromCenter * 2);
+        const baseHeight = Math.max(12, 80 - distanceFromCenter * 3);
         
         return (
           <div
             key={i}
-            className="w-[2px] rounded-full bg-[hsl(var(--hero-accent))] waveform-bar"
+            className="w-[3px] rounded-full bg-[hsl(var(--hero-accent))] waveform-bar"
             style={{
               height: `${baseHeight}px`,
-              animationDelay: `${i * 0.05}s`,
-              boxShadow: '0 0 4px hsl(195 100% 50% / 0.6)',
+              animationDelay: `${i * 0.04}s`,
+              boxShadow: '0 0 8px hsl(195 100% 50% / 0.7), 0 0 16px hsl(195 100% 50% / 0.4)',
             }}
           />
         );
