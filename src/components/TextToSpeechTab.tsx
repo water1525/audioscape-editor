@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Loader2, Newspaper, BookOpen, Headphones } from "lucide-react";
+import { Play, Pause, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const SUPABASE_URL = "https://vixczylcdviqivlziovw.supabase.co";
@@ -10,19 +10,25 @@ const cases = [
   {
     id: "case1",
     label: "新闻播报",
-    icon: Newspaper,
+    description: "Step 3模型发布",
+    icon: "📰",
+    gradient: "from-blue-400 to-cyan-400",
     text: "阶跃星辰近日正式发布新一代基础大模型Step 3，兼顾智能与效率，面向推理时代打造最适合应用的模型。Step 3将面向全球企业和开发者开源，为开源世界贡献最强多模态推理模型。",
   },
   {
     id: "case2",
     label: "有声读物",
-    icon: BookOpen,
+    description: "讲述一个故事",
+    icon: "📖",
+    gradient: "from-purple-400 to-pink-400",
     text: "夜幕降临，月光洒落在宁静的小镇上。远处传来阵阵虫鸣，微风轻轻拂过树梢，带来一丝凉意。这是一个适合讲故事的夜晚。",
   },
   {
     id: "case3",
     label: "客服助手",
-    icon: Headphones,
+    description: "提供客户支持",
+    icon: "🎧",
+    gradient: "from-green-400 to-emerald-400",
     text: "您好，欢迎致电智能客服中心。我是您的AI助手小星，很高兴为您服务。请问有什么可以帮助您的吗？",
   },
 ];
@@ -167,25 +173,29 @@ const TextToSpeechTab = () => {
 
       {/* Case Selector */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        {cases.map((caseItem) => {
-          const IconComponent = caseItem.icon;
-          return (
-            <button
-              key={caseItem.id}
-              onClick={() => handleCaseChange(caseItem.id)}
-              className={`
-                flex items-center gap-2 px-3 py-2 rounded-lg border transition-all duration-200
-                ${activeCase === caseItem.id 
-                  ? 'bg-primary/10 border-primary/50 shadow-sm' 
-                  : 'bg-card/50 border-border/50 hover:bg-card hover:border-border'
-                }
-              `}
-            >
-              <IconComponent className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-foreground">{caseItem.label}</span>
-            </button>
-          );
-        })}
+        {cases.map((caseItem) => (
+          <button
+            key={caseItem.id}
+            onClick={() => handleCaseChange(caseItem.id)}
+            className={`
+              flex items-center gap-2.5 px-4 py-2.5 rounded-lg border transition-all duration-200
+              ${activeCase === caseItem.id 
+                ? 'bg-primary/10 border-primary/50 shadow-md shadow-primary/10' 
+                : 'bg-card/50 border-border/50 hover:bg-card hover:border-border'
+              }
+            `}
+          >
+            <span className={`
+              w-6 h-6 rounded-full bg-gradient-to-br ${caseItem.gradient} 
+              flex items-center justify-center text-xs shadow-sm
+            `}>
+              {caseItem.icon}
+            </span>
+            <span className="text-sm font-medium text-foreground">{caseItem.label}</span>
+            <span className="text-muted-foreground/50">|</span>
+            <span className="text-sm text-muted-foreground">{caseItem.description}</span>
+          </button>
+        ))}
       </div>
 
       {/* Description and Play */}
