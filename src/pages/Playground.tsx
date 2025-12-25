@@ -11,10 +11,13 @@ import { Slider } from "@/components/ui/slider";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useCustomVoices } from "@/hooks/useCustomVoices";
 
 const sidebarTabs = [
   { id: "tts", label: "文本转语音", icon: MessageSquareText },
@@ -93,6 +96,8 @@ const caseSamples = [
 ];
 
 const Playground = () => {
+  const { customVoices, refreshVoices } = useCustomVoices();
+  
   const [activeTab, setActiveTab] = useState("tts");
   const [text, setText] = useState("");
   const [voice, setVoice] = useState("tianmeinvsheng");
@@ -106,6 +111,13 @@ const Playground = () => {
   const [duration, setDuration] = useState(0);
   const [waveformHeights, setWaveformHeights] = useState<number[]>(Array(20).fill(20));
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Refresh custom voices when switching to TTS tab
+  useEffect(() => {
+    if (activeTab === "tts") {
+      refreshVoices();
+    }
+  }, [activeTab, refreshVoices]);
 
   // Animate waveform when playing
   useEffect(() => {
@@ -495,12 +507,25 @@ const Playground = () => {
                 <SelectTrigger className="w-full bg-background">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
-                  {voiceOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
+                <SelectContent className="bg-popover">
+                  <SelectGroup>
+                    <SelectLabel className="text-xs text-muted-foreground">系统音色</SelectLabel>
+                    {voiceOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                  {customVoices.length > 0 && (
+                    <SelectGroup>
+                      <SelectLabel className="text-xs text-muted-foreground">我的音色</SelectLabel>
+                      {customVoices.map((cv) => (
+                        <SelectItem key={cv.id} value={cv.id}>
+                          {cv.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  )}
                 </SelectContent>
               </Select>
             </div>

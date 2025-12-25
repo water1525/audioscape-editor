@@ -1,9 +1,18 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Play, Pause, RefreshCw, Trash2, Download, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { useCustomVoices } from "@/hooks/useCustomVoices";
 
 // Sample texts for recording
 const sampleTexts = [
@@ -15,6 +24,9 @@ const sampleTexts = [
 ];
 
 const VoiceCloneTab = () => {
+  // Custom voices hook
+  const { saveVoice } = useCustomVoices();
+
   // Step 1: Recording state
   const [sampleText, setSampleText] = useState(sampleTexts[0]);
   const [isRecording, setIsRecording] = useState(false);
@@ -32,6 +44,11 @@ const VoiceCloneTab = () => {
   const [isPlayingCloned, setIsPlayingCloned] = useState(false);
   const [clonedDuration, setClonedDuration] = useState(0);
   const [clonedCurrentTime, setClonedCurrentTime] = useState(0);
+
+  // Save voice dialog state
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [voiceName, setVoiceName] = useState("");
+  const [voiceNameError, setVoiceNameError] = useState("");
   
   // Refs
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -245,6 +262,33 @@ const VoiceCloneTab = () => {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
+  // Open save dialog
+  const openSaveDialog = () => {
+    setVoiceName("");
+    setVoiceNameError("");
+    setIsSaveDialogOpen(true);
+  };
+
+  // Validate and save voice
+  const handleSaveVoice = () => {
+    const trimmedName = voiceName.trim();
+    
+    if (trimmedName.length < 5) {
+      setVoiceNameError("音色名称至少需要5个字符");
+      return;
+    }
+    
+    if (trimmedName.length > 15) {
+      setVoiceNameError("音色名称不能超过15个字符");
+      return;
+    }
+
+    saveVoice(trimmedName);
+    setIsSaveDialogOpen(false);
+    setVoiceName("");
+    toast.success(`音色"${trimmedName}"保存成功！`);
+  };
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -423,7 +467,7 @@ const VoiceCloneTab = () => {
               </Button>
             </div>
 
-            <Button variant="outline" className="min-w-[100px]">
+            <Button variant="outline" className="min-w-[100px]" onClick={openSaveDialog}>
               保存音色
             </Button>
           </div>
@@ -433,6 +477,45 @@ const VoiceCloneTab = () => {
       <p className="text-sm text-muted-foreground">
         <span className="text-foreground font-medium">@Step-tts-2</span> 生成与原声音一模一样的语音复刻品
       </p>
+
+      {/* Save Voice Dialog */}
+      <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>保存音色</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                音色名称
+              </label>
+              <Input
+                placeholder="请输入音色名称（5-15个字符）"
+                value={voiceName}
+                onChange={(e) => {
+                  setVoiceName(e.target.value);
+                  setVoiceNameError("");
+                }}
+                maxLength={15}
+              />
+              {voiceNameError && (
+                <p className="text-sm text-destructive">{voiceNameError}</p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                {voiceName.length}/15 字符
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsSaveDialogOpen(false)}>
+              取消
+            </Button>
+            <Button onClick={handleSaveVoice}>
+              保存
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
