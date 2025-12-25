@@ -374,27 +374,21 @@ const VoiceEditTab = () => {
                 />
               </svg>
               {/* Edit pencil icon */}
-              <div className="absolute -top-1 -right-2 bg-background rounded-full p-1">
+              <div className="absolute -top-2 -right-4">
                 <svg 
-                  width="20" 
-                  height="20" 
+                  width="24" 
+                  height="24" 
                   viewBox="0 0 24 24" 
                   fill="none"
                   className="text-primary"
                 >
                   <path 
-                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" 
+                    d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" 
                     stroke="currentColor" 
                     strokeWidth="2" 
                     strokeLinecap="round" 
                     strokeLinejoin="round"
-                  />
-                  <path 
-                    d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round"
+                    fill="hsl(var(--primary) / 0.1)"
                   />
                 </svg>
               </div>
