@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, MessageSquareText, Copy, Wand2, Phone } from "lucide-react";
+import { ChevronDown, MessageSquareText, Copy, Wand2, Phone, Play, Pause, RotateCcw, Download, RefreshCw } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
@@ -43,13 +45,119 @@ const caseSamples = [
 const Playground = () => {
   const [activeTab, setActiveTab] = useState("tts");
   const [text, setText] = useState("");
-  const [voice, setVoice] = useState("qingchunshaoniu");
+  const [voice, setVoice] = useState("tianmeinvsheng");
   const [speed, setSpeed] = useState([1]);
   const [volume, setVolume] = useState([1]);
   const [format, setFormat] = useState("mp3");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const handleCaseClick = (sample: string) => {
+  const generateAudio = async (inputText: string) => {
+    if (!inputText.trim()) return;
+    
+    setIsGenerating(true);
+    setAudioUrl(null);
+    
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ text: inputText, voice }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("生成音频失败");
+      }
+
+      const audioBlob = await response.blob();
+      const url = URL.createObjectURL(audioBlob);
+      setAudioUrl(url);
+    } catch (error) {
+      console.error("TTS error:", error);
+      toast.error("音频生成失败，请重试");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleCaseClick = async (sample: string) => {
     setText(sample);
+    await generateAudio(sample);
+  };
+
+  const handleGenerateClick = () => {
+    if (text.trim()) {
+      generateAudio(text);
+    }
+  };
+
+  const togglePlayPause = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+    }
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = parseFloat(e.target.value);
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
+      setCurrentTime(time);
+    }
+  };
+
+  const skipTime = (seconds: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.max(0, Math.min(audioRef.current.currentTime + seconds, duration));
+    }
+  };
+
+  const handleDownload = () => {
+    if (audioUrl) {
+      const a = document.createElement("a");
+      a.href = audioUrl;
+      a.download = `audio.${format}`;
+      a.click();
+    }
+  };
+
+  const formatTime = (time: number) => {
+    const mins = Math.floor(time / 60);
+    const secs = Math.floor(time % 60);
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    if (value.length <= 10000) {
+      setText(value);
+    }
   };
 
   return (
@@ -133,14 +241,98 @@ const Playground = () => {
         <main className="flex-1 p-6">
           <div className="max-w-4xl">
             {/* Text Input Area */}
-            <div className="bg-accent/30 border border-border rounded-xl p-1 mb-6">
+            <div className="bg-accent/30 border border-border rounded-xl p-1 mb-6 relative">
               <Textarea
                 placeholder="点此输入您想要生成音频的文本..."
                 value={text}
-                onChange={(e) => setText(e.target.value)}
-                className="min-h-[300px] bg-transparent border-0 resize-none focus-visible:ring-0 text-foreground placeholder:text-muted-foreground"
+                onChange={handleTextChange}
+                maxLength={10000}
+                className="min-h-[300px] bg-transparent border-0 resize-none focus-visible:ring-0 text-foreground placeholder:text-muted-foreground pb-8"
               />
+              <div className="absolute bottom-3 right-4 text-sm text-muted-foreground">
+                {text.length}/10000字符
+              </div>
             </div>
+
+            {/* Audio Player */}
+            {(audioUrl || isGenerating) && (
+              <div className="mb-6">
+                <div className="flex justify-end mb-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateClick}
+                    disabled={isGenerating || !text.trim()}
+                    className="gap-2"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+                    重新生成
+                  </Button>
+                </div>
+                
+                <div className="bg-primary/10 rounded-xl p-4">
+                  {audioUrl && (
+                    <audio
+                      ref={audioRef}
+                      src={audioUrl}
+                      onTimeUpdate={handleTimeUpdate}
+                      onLoadedMetadata={handleLoadedMetadata}
+                      onEnded={() => setIsPlaying(false)}
+                    />
+                  )}
+                  
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={togglePlayPause}
+                      disabled={!audioUrl}
+                      className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center hover:bg-foreground/90 transition-colors disabled:opacity-50"
+                    >
+                      {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
+                    </button>
+                    
+                    <div className="flex-1">
+                      <input
+                        type="range"
+                        min={0}
+                        max={duration || 100}
+                        value={currentTime}
+                        onChange={handleSeek}
+                        disabled={!audioUrl}
+                        className="w-full h-2 bg-primary/30 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
+                      />
+                    </div>
+                    
+                    <span className="text-sm text-muted-foreground min-w-[100px]">
+                      {formatTime(currentTime)}/{formatTime(duration)}
+                    </span>
+                    
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => skipTime(-5)}
+                        disabled={!audioUrl}
+                        className="p-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                      >
+                        <RotateCcw className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => skipTime(5)}
+                        disabled={!audioUrl}
+                        className="p-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                      >
+                        <RotateCcw className="w-5 h-5 scale-x-[-1]" />
+                      </button>
+                      <button
+                        onClick={handleDownload}
+                        disabled={!audioUrl}
+                        className="p-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                      >
+                        <Download className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Case Samples */}
             <div>
@@ -150,6 +342,7 @@ const Playground = () => {
                   <Button
                     key={i}
                     variant="outline"
+                    disabled={isGenerating}
                     className={`h-auto py-3 px-4 text-sm font-normal justify-start ${
                       text === sample ? "bg-primary/10 border-primary text-primary" : ""
                     }`}
@@ -233,8 +426,12 @@ const Playground = () => {
             </div>
 
             {/* Generate Button */}
-            <Button className="w-full mt-4">
-              生成音频
+            <Button 
+              className="w-full mt-4" 
+              onClick={handleGenerateClick}
+              disabled={isGenerating || !text.trim()}
+            >
+              {isGenerating ? "生成中..." : "生成音频"}
             </Button>
           </div>
         </aside>
