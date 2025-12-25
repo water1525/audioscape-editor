@@ -111,13 +111,18 @@ const HomeVoiceEditTab = () => {
     );
   };
 
-  const handleConfirm = async () => {
+const handleConfirm = async () => {
     if (selectedTags.length === 0) {
       toast.error("请至少选择一个编辑参数");
       return;
     }
     
+    // 立即关闭弹窗并显示生成中状态
+    setShowModal(false);
     setIsGenerating(true);
+    const tagsCount = selectedTags.length;
+    setSelectedTags([]);
+    
     try {
       // 星星人冒险的文案
       const text = "在遥远的星空中，住着一群可爱的星星人。他们每天都在银河里冒险，寻找神秘的星尘宝藏。今天，小星星决定踏上一段全新的旅程，去探索那片从未有人到达过的星云深处。";
@@ -151,10 +156,8 @@ const HomeVoiceEditTab = () => {
       }
       
       setEditedAudioUrl(url);
-      setShowModal(false);
-      setSelectedTags([]);
       
-      toast.success(`音频编辑成功，已应用 ${selectedTags.length} 个风格标签`);
+      toast.success(`音频编辑成功，已应用 ${tagsCount} 个风格标签`);
     } catch (error) {
       console.error("Error generating edited audio:", error);
       toast.error("音频编辑失败，请重试");
@@ -242,9 +245,19 @@ const HomeVoiceEditTab = () => {
           size="sm" 
           className="h-9 rounded-full gap-1.5 px-4"
           onClick={() => setShowModal(true)}
+          disabled={isGenerating}
         >
-          <ArrowRight className="h-3.5 w-3.5" />
-          编辑
+          {isGenerating ? (
+            <>
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              生成中
+            </>
+          ) : (
+            <>
+              <ArrowRight className="h-3.5 w-3.5" />
+              编辑
+            </>
+          )}
         </Button>
       </div>
 

@@ -262,7 +262,12 @@ const VoiceEditTab = () => {
       return;
     }
     
+    // 立即关闭弹窗并显示生成中状态
+    setShowModal(false);
     setIsGenerating(true);
+    const tagsCount = selectedTags.length;
+    setSelectedTags([]);
+    
     try {
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
@@ -291,10 +296,8 @@ const VoiceEditTab = () => {
       const newFileName = `${baseFileName}_v${editNumber}.wav`;
       
       setEditedAudios(prev => [...prev, { url, fileName: newFileName }]);
-      setShowModal(false);
-      setSelectedTags([]);
       
-      toast.success(`音频编辑成功，已应用 ${selectedTags.length} 个风格标签`);
+      toast.success(`音频编辑成功，已应用 ${tagsCount} 个风格标签`);
     } catch (error) {
       console.error("Error generating edited audio:", error);
       toast.error("音频编辑失败，请重试");
@@ -522,10 +525,20 @@ const VoiceEditTab = () => {
           <div className="flex justify-center">
             <Button
               onClick={() => setShowModal(true)}
+              disabled={isGenerating}
               className="min-w-[140px] gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-md hover:shadow-lg transition-all duration-300"
             >
-              <Sparkles className="h-4 w-4" />
-              编辑
+              {isGenerating ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  生成中
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" />
+                  编辑
+                </>
+              )}
             </Button>
           </div>
         </div>
