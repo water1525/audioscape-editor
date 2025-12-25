@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, MessageSquareText, Copy, Wand2, Phone, Play, Pause, RotateCcw, Download, RefreshCw, X, BookOpen, Cpu, Headphones, Mic, GraduationCap, Sparkles, Mail } from "lucide-react";
+import { ChevronDown, MessageSquareText, Copy, Wand2, Play, Pause, RotateCcw, Download, RefreshCw, X, BookOpen, Cpu, Headphones, Mic, GraduationCap, Sparkles, Mail, HeadphonesIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -327,7 +327,7 @@ const Playground = () => {
           <HoverCard openDelay={100} closeDelay={200}>
             <HoverCardTrigger asChild>
               <Button variant="outline" className="mt-auto gap-2 cursor-pointer">
-                <Phone className="w-4 h-4" />
+                <HeadphonesIcon className="w-4 h-4" />
                 联系我们
               </Button>
             </HoverCardTrigger>
