@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Loader2 } from "lucide-react";
+import { Play, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useGlobalAudio } from "@/hooks/useGlobalAudio";
@@ -9,13 +9,25 @@ import WaveformAnimation from "@/components/ui/WaveformAnimation";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
+// Voice configurations for each case
+const voiceConfigs: Record<string, { voice: string; text: string }> = {
+  case1: {
+    voice: "cixingnansheng",
+    text: "阶跃星辰近日正式发布新一代基础大模型Step 3，兼顾智能与效率，面向推理时代打造最适合应用的模型。Step 3将面向全球企业和开发者开源，为开源世界贡献最强多模态推理模型。",
+  },
+  case2: {
+    voice: "tianmeinvsheng", 
+    text: "深夜，老宅的钟敲响十二下。她推开尘封的阁楼门，发现一封泛黄的信——收件人竟是自己的名字，落款日期却是明天。信上只有一句话：不要回头。她的心跳骤然加速，身后传来轻微的脚步声。她屏住呼吸，缓缓转身，却只看见空荡荡的走廊和一面落满灰尘的镜子。镜中的自己正微笑着，但她此刻分明没有笑。",
+  },
+};
+
 const dialogueLines = [
-  { speaker: "客服小美", text: "您好，欢迎致电智能客服中心，请问有什么可以帮您？", file: "tts/dialogue-0.mp3" },
-  { speaker: "客户先生", text: "你好，我昨天下的订单显示已发货，但物流信息一直没更新。", file: "tts/dialogue-1.mp3" },
-  { speaker: "客服小美", text: "好的，请您提供一下订单号，我帮您查询。", file: "tts/dialogue-2.mp3" },
-  { speaker: "客户先生", text: "订单号是202412250001。", file: "tts/dialogue-3.mp3" },
-  { speaker: "客服小美", text: "已查到，您的包裹目前在转运中，预计明天送达，请您耐心等待。", file: "tts/dialogue-4.mp3" },
-  { speaker: "客户先生", text: "好的，谢谢！", file: "tts/dialogue-5.mp3" },
+  { speaker: "客服小美", text: "您好，欢迎致电智能客服中心，请问有什么可以帮您？", voice: "tianmeinvsheng" },
+  { speaker: "客户先生", text: "你好，我昨天下的订单显示已发货，但物流信息一直没更新。", voice: "cixingnansheng" },
+  { speaker: "客服小美", text: "好的，请您提供一下订单号，我帮您查询。", voice: "tianmeinvsheng" },
+  { speaker: "客户先生", text: "订单号是202412250001。", voice: "cixingnansheng" },
+  { speaker: "客服小美", text: "已查到，您的包裹目前在转运中，预计明天送达，请您耐心等待。", voice: "tianmeinvsheng" },
+  { speaker: "客户先生", text: "好的，谢谢！", voice: "cixingnansheng" },
 ];
 
 const cases = [
@@ -25,8 +37,7 @@ const cases = [
     description: "Step 3模型发布",
     icon: "📰",
     gradient: "from-blue-400 to-cyan-400",
-    file: "tts/case1.mp3",
-    text: "阶跃星辰近日正式发布新一代基础大模型Step 3，兼顾智能与效率，面向推理时代打造最适合应用的模型。Step 3将面向全球企业和开发者开源，为开源世界贡献最强多模态推理模型。",
+    text: voiceConfigs.case1.text,
     isDialogue: false,
   },
   {
@@ -35,8 +46,7 @@ const cases = [
     description: "悬疑故事",
     icon: "📖",
     gradient: "from-purple-400 to-pink-400",
-    file: "tts/case2.mp3",
-    text: "深夜，老宅的钟敲响十二下。她推开尘封的阁楼门，发现一封泛黄的信——收件人竟是自己的名字，落款日期却是明天。信上只有一句话：不要回头。她的心跳骤然加速，身后传来轻微的脚步声。她屏住呼吸，缓缓转身，却只看见空荡荡的走廊和一面落满灰尘的镜子。镜中的自己正微笑着，但她此刻分明没有笑。",
+    text: voiceConfigs.case2.text,
     isDialogue: false,
   },
   {
@@ -45,7 +55,6 @@ const cases = [
     description: "智能客服对话",
     icon: "🎧",
     gradient: "from-green-400 to-emerald-400",
-    file: null,
     text: dialogueLines.map(line => `${line.speaker}：${line.text}`).join("\n"),
     isDialogue: true,
   },
@@ -54,174 +63,62 @@ const cases = [
 const TextToSpeechTab = () => {
   const [activeCase, setActiveCase] = useState("case1");
   const [isPlaying, setIsPlaying] = useState(false);
-  const [audioUrls, setAudioUrls] = useState<Record<string, string>>({});
-  const [dialogueUrls, setDialogueUrls] = useState<string[]>([]);
-  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [cachedAudioUrls, setCachedAudioUrls] = useState<Record<string, string>>({});
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const dialogueIndexRef = useRef(0);
   const currentCase = cases.find((c) => c.id === activeCase) || cases[0];
   const { playAudio, stopGlobalAudio } = useGlobalAudio();
 
-  // Check if audio files exist in storage with valid content
-  const checkAudioFiles = async () => {
-    const urls: Record<string, string> = {};
-    const dialogues: string[] = [];
-
-    // Check case1 and case2 - use range request to verify content exists
-    for (const caseItem of cases.filter(c => !c.isDialogue)) {
-      if (!caseItem.file) continue;
-      const { data } = supabase.storage.from("audio").getPublicUrl(caseItem.file);
-      try {
-        // Use range request to fetch first few bytes - more reliable than HEAD
-        const response = await fetch(data.publicUrl, { 
-          method: "GET",
-          headers: { "Range": "bytes=0-100" }
-        });
-        // 206 = partial content (file exists with content), 200 = full file returned
-        if ((response.status === 206 || response.status === 200)) {
-          const blob = await response.blob();
-          if (blob.size > 50) {
-            urls[caseItem.id] = data.publicUrl;
-          }
-        }
-      } catch {
-        // File doesn't exist or error
-      }
-    }
-
-    // Check dialogue files
-    for (const line of dialogueLines) {
-      const { data } = supabase.storage.from("audio").getPublicUrl(line.file);
-      try {
-        const response = await fetch(data.publicUrl, { 
-          method: "GET",
-          headers: { "Range": "bytes=0-100" }
-        });
-        if ((response.status === 206 || response.status === 200)) {
-          const blob = await response.blob();
-          if (blob.size > 50) {
-            dialogues.push(data.publicUrl);
-          } else {
-            dialogues.push("");
-          }
-        } else {
-          dialogues.push("");
-        }
-      } catch {
-        dialogues.push("");
-      }
-    }
-
-    setAudioUrls(urls);
-    setDialogueUrls(dialogues);
-  };
-
-  useEffect(() => {
-    checkAudioFiles();
-  }, []);
-
-  const regenerateAudio = async () => {
-    setIsRegenerating(true);
-    toast.info("正在重新生成音频...");
-
+  // Generate single audio on demand
+  const generateSingleAudio = async (text: string, voice: string): Promise<string | null> => {
     try {
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-tts-audio`, {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/step-tts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           apikey: SUPABASE_ANON_KEY,
           Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         },
+        body: JSON.stringify({ text, voice }),
       });
 
-      const result = await response.json();
-
-      if (result.success) {
-        toast.success("音频生成完成！");
-        await checkAudioFiles();
-      } else {
-        toast.error("部分音频生成失败，请重试");
-        await checkAudioFiles();
+      if (!response.ok) {
+        throw new Error("Failed to generate audio");
       }
+
+      const audioBlob = await response.blob();
+      return URL.createObjectURL(audioBlob);
     } catch (error) {
-      toast.error("音频生成失败");
-      console.error(error);
-    } finally {
-      setIsRegenerating(false);
+      console.error("Error generating audio:", error);
+      return null;
     }
   };
 
-  const playDialogue = () => {
-    if (dialogueUrls.length === 0 || dialogueUrls.some(u => !u)) {
-      toast.error("对话音频未就绪");
-      return;
-    }
+  // Play single case audio
+  const playSingleAudio = async () => {
+    const config = voiceConfigs[activeCase];
+    if (!config) return;
 
-    dialogueIndexRef.current = 0;
-    setIsPlaying(true);
-
-    const playNext = () => {
-      if (dialogueIndexRef.current >= dialogueUrls.length) {
-        setIsPlaying(false);
-        audioRef.current = null;
+    // Check cache first
+    let audioUrl = cachedAudioUrls[activeCase];
+    
+    if (!audioUrl) {
+      setIsGenerating(true);
+      toast.info("正在生成音频...");
+      audioUrl = await generateSingleAudio(config.text, config.voice);
+      setIsGenerating(false);
+      
+      if (!audioUrl) {
+        toast.error("音频生成失败");
         return;
       }
-
-      const audio = new Audio(dialogueUrls[dialogueIndexRef.current]);
-      audioRef.current = audio;
-      playAudio(audio, () => {
-        setIsPlaying(false);
-        audioRef.current = null;
-      });
-
-      audio.onended = () => {
-        dialogueIndexRef.current += 1;
-        playNext();
-      };
-
-      audio.onerror = () => {
-        setIsPlaying(false);
-        audioRef.current = null;
-        toast.error("音频播放失败");
-      };
-
-      audio.play();
-    };
-
-    playNext();
-  };
-
-  const handlePlayPause = async () => {
-    if (audioRef.current && isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-      return;
+      
+      // Cache the URL
+      setCachedAudioUrls(prev => ({ ...prev, [activeCase]: audioUrl! }));
     }
 
-    if (audioRef.current && !isPlaying) {
-      audioRef.current.play();
-      setIsPlaying(true);
-      return;
-    }
-
-    if (currentCase.isDialogue) {
-      // Check if dialogue audio is ready, if not generate first
-      if (dialogueUrls.length === 0 || dialogueUrls.some(u => !u)) {
-        await regenerateAudio();
-        return;
-      }
-      playDialogue();
-      return;
-    }
-
-    // Check if audio is ready, if not generate first
-    const cachedUrl = audioUrls[activeCase];
-    if (!cachedUrl) {
-      await regenerateAudio();
-      return;
-    }
-
-    const audio = new Audio(cachedUrl);
+    const audio = new Audio(audioUrl);
     audioRef.current = audio;
     playAudio(audio, () => {
       setIsPlaying(false);
@@ -241,6 +138,85 @@ const TextToSpeechTab = () => {
 
     audio.play();
     setIsPlaying(true);
+  };
+
+  // Play dialogue sequentially
+  const playDialogue = async () => {
+    dialogueIndexRef.current = 0;
+    setIsPlaying(true);
+    setIsGenerating(true);
+    toast.info("正在生成对话音频...");
+
+    const playNext = async () => {
+      if (dialogueIndexRef.current >= dialogueLines.length) {
+        setIsPlaying(false);
+        audioRef.current = null;
+        return;
+      }
+
+      const line = dialogueLines[dialogueIndexRef.current];
+      const cacheKey = `dialogue-${dialogueIndexRef.current}`;
+      
+      let audioUrl = cachedAudioUrls[cacheKey];
+      if (!audioUrl) {
+        audioUrl = await generateSingleAudio(line.text, line.voice);
+        if (!audioUrl) {
+          toast.error("对话音频生成失败");
+          setIsPlaying(false);
+          setIsGenerating(false);
+          return;
+        }
+        setCachedAudioUrls(prev => ({ ...prev, [cacheKey]: audioUrl! }));
+      }
+      
+      setIsGenerating(false);
+
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+      playAudio(audio, () => {
+        setIsPlaying(false);
+        audioRef.current = null;
+      });
+
+      audio.onended = async () => {
+        dialogueIndexRef.current += 1;
+        if (dialogueIndexRef.current < dialogueLines.length) {
+          setIsGenerating(true);
+        }
+        await playNext();
+      };
+
+      audio.onerror = () => {
+        setIsPlaying(false);
+        audioRef.current = null;
+        toast.error("音频播放失败");
+      };
+
+      audio.play();
+    };
+
+    await playNext();
+  };
+
+  const handlePlayPause = async () => {
+    if (audioRef.current && isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+      return;
+    }
+
+    if (audioRef.current && !isPlaying) {
+      audioRef.current.play();
+      setIsPlaying(true);
+      return;
+    }
+
+    if (currentCase.isDialogue) {
+      await playDialogue();
+      return;
+    }
+
+    await playSingleAudio();
   };
 
   const handleCaseChange = (caseId: string) => {
@@ -296,16 +272,16 @@ const TextToSpeechTab = () => {
         <Button 
           className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
           onClick={handlePlayPause}
-          disabled={isRegenerating}
+          disabled={isGenerating}
         >
-          {isRegenerating ? (
+          {isGenerating ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : isPlaying ? (
             <WaveformAnimation isPlaying={true} variant="small" barCount={4} className="text-primary-foreground [&>div]:bg-primary-foreground" />
           ) : (
             <Play className="h-4 w-4" />
           )}
-          {isRegenerating ? "生成中..." : isPlaying ? "播放中" : "播放"}
+          {isGenerating ? "生成中..." : isPlaying ? "播放中" : "播放"}
         </Button>
       </div>
     </div>
