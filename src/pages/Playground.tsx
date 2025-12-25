@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, MessageSquareText, Copy, Wand2, Phone, Play, Pause, RotateCcw, Download, RefreshCw, X, BookOpen, Cpu, Headphones } from "lucide-react";
+import { ChevronDown, MessageSquareText, Copy, Wand2, Phone, Play, Pause, RotateCcw, Download, RefreshCw, X, BookOpen, Cpu, Headphones, Mic, GraduationCap, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -60,6 +60,33 @@ const caseSamples = [
     iconColor: "text-rose-500",
     bgColor: "bg-rose-500/10",
     text: "您好，欢迎致电阶跃星辰客户服务中心，我是您的智能语音助理小星。很高兴为您服务！请问有什么可以帮助您的吗？您可以咨询产品功能、技术支持、账户问题或商务合作等事宜。我会尽我所能为您提供专业、高效的解答。如果需要转接人工客服，请随时告诉我。",
+  },
+  {
+    id: 4,
+    title: "广告配音",
+    description: "品牌宣传片",
+    icon: Mic,
+    iconColor: "text-violet-500",
+    bgColor: "bg-violet-500/10",
+    text: "在这个瞬息万变的时代，我们始终相信科技的力量。阶跃星辰，以创新为引擎，以梦想为翼，致力于打造最前沿的人工智能技术。从语音合成到智能对话，从文本理解到多模态交互，我们用技术连接未来，让每一次交流都充满温度。阶跃星辰，与您一起，跨越星辰大海。",
+  },
+  {
+    id: 5,
+    title: "教育朗读",
+    description: "古诗词赏析",
+    icon: GraduationCap,
+    iconColor: "text-sky-500",
+    bgColor: "bg-sky-500/10",
+    text: "床前明月光，疑是地上霜。举头望明月，低头思故乡。这首《静夜思》是唐代诗人李白创作的一首脍炙人口的五言绝句。诗人通过描绘月夜思乡的场景，以简洁而深刻的语言，表达了游子对故乡的深切思念之情。全诗意境清幽，情感真挚，千百年来感动了无数漂泊在外的游子。",
+  },
+  {
+    id: 6,
+    title: "情感电台",
+    description: "深夜治愈",
+    icon: Sparkles,
+    iconColor: "text-pink-500",
+    bgColor: "bg-pink-500/10",
+    text: "亲爱的听众朋友，欢迎来到星辰夜话。在这个安静的夜晚，让我陪伴你度过这段温柔的时光。生活或许不总是一帆风顺，但请相信，每一个黎明都会带来新的希望。无论今天经历了什么，都请记得对自己温柔一些。闭上眼睛，深呼吸，让我的声音伴你入眠，祝你好梦。",
   },
 ];
 
