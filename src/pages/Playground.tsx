@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import VoiceCloneTab from "@/components/VoiceCloneTab";
+import VoiceEditTab from "@/components/VoiceEditTab";
 import { Slider } from "@/components/ui/slider";
 import {
   Select,
@@ -314,165 +316,172 @@ const Playground = () => {
         {/* Main Content */}
         <main className="flex-1 p-6">
           <div className="max-w-4xl">
-            {/* Text Input Area */}
-            <div className="bg-accent/30 border border-border rounded-xl p-1 mb-6 relative">
-              {text.length > 0 && (
-                <button
-                  onClick={handleClear}
-                  className="absolute top-3 right-3 p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors z-10"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-              <Textarea
-                placeholder="点此输入您想要生成音频的文本..."
-                value={text}
-                onChange={handleTextChange}
-                maxLength={10000}
-                className="min-h-[300px] bg-transparent border-0 resize-none focus-visible:ring-0 text-foreground placeholder:text-muted-foreground pb-8 pr-10"
-              />
-              <div className="absolute bottom-3 right-4 text-sm text-muted-foreground">
-                {text.length}/10000字符
-              </div>
-            </div>
-
-            {/* Generate Button - Show when text is entered but no audio yet */}
-            {text.trim() && !audioUrl && !isGenerating && (
-              <div className="mb-6 flex justify-center">
-                <Button
-                  onClick={handleGenerateClick}
-                  className="gap-2 h-11 px-12"
-                >
-                  生成音频
-                </Button>
-              </div>
-            )}
-
-            {/* Generating State */}
-            {isGenerating && (
-              <div className="mb-6 flex justify-center">
-                <Button
-                  disabled
-                  className="gap-2 h-11 px-12"
-                >
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  正在生成...
-                </Button>
-              </div>
-            )}
-
-            {/* Audio Player - Only show when audio is ready */}
-            {audioUrl && !isGenerating && (
-              <div className="mb-6">
-                <div className="flex justify-end mb-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleGenerateClick}
-                    disabled={isGenerating || !text.trim()}
-                    className="gap-2"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    重新生成
-                  </Button>
-                </div>
-                
-                <div className="bg-primary/10 rounded-xl p-4">
-                  <audio
-                    ref={audioRef}
-                    src={audioUrl}
-                    onTimeUpdate={handleTimeUpdate}
-                    onLoadedMetadata={handleLoadedMetadata}
-                    onEnded={() => setIsPlaying(false)}
-                  />
-                  
-                  <div className="flex items-center gap-4">
+            {activeTab === "tts" && (
+              <>
+                {/* Text Input Area */}
+                <div className="bg-accent/30 border border-border rounded-xl p-1 mb-6 relative">
+                  {text.length > 0 && (
                     <button
-                      onClick={togglePlayPause}
-                      className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center hover:bg-foreground/90 transition-colors"
+                      onClick={handleClear}
+                      className="absolute top-3 right-3 p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors z-10"
                     >
-                      {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
+                      <X className="w-4 h-4" />
                     </button>
-                    
-                    {/* Waveform Animation */}
-                    <div className="flex items-center gap-[3px] h-8">
-                      {waveformHeights.map((height, i) => (
-                        <div
-                          key={i}
-                          className="w-[3px] rounded-full bg-primary transition-all duration-100"
-                          style={{
-                            height: `${height}%`,
-                            opacity: isPlaying ? 0.8 : 0.4,
-                          }}
-                        />
-                      ))}
-                    </div>
-                    
-                    <div className="flex-1">
-                      <input
-                        type="range"
-                        min={0}
-                        max={duration || 100}
-                        value={currentTime}
-                        onChange={handleSeek}
-                        className="w-full h-2 bg-primary/30 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
-                      />
-                    </div>
-                    
-                    <span className="text-sm text-muted-foreground min-w-[100px]">
-                      {formatTime(currentTime)}/{formatTime(duration)}
-                    </span>
-                    
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => skipTime(-5)}
-                        className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <RotateCcw className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => skipTime(5)}
-                        className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <RotateCcw className="w-5 h-5 scale-x-[-1]" />
-                      </button>
-                      <button
-                        onClick={handleDownload}
-                        className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <Download className="w-5 h-5" />
-                      </button>
-                    </div>
+                  )}
+                  <Textarea
+                    placeholder="点此输入您想要生成音频的文本..."
+                    value={text}
+                    onChange={handleTextChange}
+                    maxLength={10000}
+                    className="min-h-[300px] bg-transparent border-0 resize-none focus-visible:ring-0 text-foreground placeholder:text-muted-foreground pb-8 pr-10"
+                  />
+                  <div className="absolute bottom-3 right-4 text-sm text-muted-foreground">
+                    {text.length}/10000字符
                   </div>
                 </div>
-              </div>
+
+                {/* Generate Button - Show when text is entered but no audio yet */}
+                {text.trim() && !audioUrl && !isGenerating && (
+                  <div className="mb-6 flex justify-center">
+                    <Button
+                      onClick={handleGenerateClick}
+                      className="gap-2 h-11 px-12"
+                    >
+                      生成音频
+                    </Button>
+                  </div>
+                )}
+
+                {/* Generating State */}
+                {isGenerating && (
+                  <div className="mb-6 flex justify-center">
+                    <Button
+                      disabled
+                      className="gap-2 h-11 px-12"
+                    >
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      正在生成...
+                    </Button>
+                  </div>
+                )}
+
+                {/* Audio Player - Only show when audio is ready */}
+                {audioUrl && !isGenerating && (
+                  <div className="mb-6">
+                    <div className="flex justify-end mb-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleGenerateClick}
+                        disabled={isGenerating || !text.trim()}
+                        className="gap-2"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                        重新生成
+                      </Button>
+                    </div>
+                    
+                    <div className="bg-primary/10 rounded-xl p-4">
+                      <audio
+                        ref={audioRef}
+                        src={audioUrl}
+                        onTimeUpdate={handleTimeUpdate}
+                        onLoadedMetadata={handleLoadedMetadata}
+                        onEnded={() => setIsPlaying(false)}
+                      />
+                      
+                      <div className="flex items-center gap-4">
+                        <button
+                          onClick={togglePlayPause}
+                          className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center hover:bg-foreground/90 transition-colors"
+                        >
+                          {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
+                        </button>
+                        
+                        {/* Waveform Animation */}
+                        <div className="flex items-center gap-[3px] h-8">
+                          {waveformHeights.map((height, i) => (
+                            <div
+                              key={i}
+                              className="w-[3px] rounded-full bg-primary transition-all duration-100"
+                              style={{
+                                height: `${height}%`,
+                                opacity: isPlaying ? 0.8 : 0.4,
+                              }}
+                            />
+                          ))}
+                        </div>
+                        
+                        <div className="flex-1">
+                          <input
+                            type="range"
+                            min={0}
+                            max={duration || 100}
+                            value={currentTime}
+                            onChange={handleSeek}
+                            className="w-full h-2 bg-primary/30 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
+                          />
+                        </div>
+                        
+                        <span className="text-sm text-muted-foreground min-w-[100px]">
+                          {formatTime(currentTime)}/{formatTime(duration)}
+                        </span>
+                        
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => skipTime(-5)}
+                            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <RotateCcw className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => skipTime(5)}
+                            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <RotateCcw className="w-5 h-5 scale-x-[-1]" />
+                          </button>
+                          <button
+                            onClick={handleDownload}
+                            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <Download className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Case Samples - Compact horizontal tags */}
+                {!text.trim() && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-4">选择一个场景案例体验语音合成</p>
+                    <div className="flex flex-wrap gap-3">
+                      {caseSamples.map((sample) => {
+                        const IconComponent = sample.icon;
+                        return (
+                          <button
+                            key={sample.id}
+                            onClick={() => handleCaseClick(sample.text)}
+                            className="group flex items-center gap-2 px-4 py-2.5 rounded-full border border-border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200"
+                          >
+                            <div className={`w-6 h-6 rounded-md ${sample.bgColor} flex items-center justify-center shrink-0`}>
+                              <IconComponent className={`w-3.5 h-3.5 ${sample.iconColor}`} />
+                            </div>
+                            <span className="font-medium text-sm text-foreground">{sample.title}</span>
+                            <span className="text-muted-foreground">|</span>
+                            <span className="text-sm text-muted-foreground">{sample.description}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
-            {/* Case Samples - Compact horizontal tags */}
-            {!text.trim() && (
-              <div>
-                <p className="text-sm text-muted-foreground mb-4">选择一个场景案例体验语音合成</p>
-                <div className="flex flex-wrap gap-3">
-                  {caseSamples.map((sample) => {
-                    const IconComponent = sample.icon;
-                    return (
-                      <button
-                        key={sample.id}
-                        onClick={() => handleCaseClick(sample.text)}
-                        className="group flex items-center gap-2 px-4 py-2.5 rounded-full border border-border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200"
-                      >
-                        <div className={`w-6 h-6 rounded-md ${sample.bgColor} flex items-center justify-center shrink-0`}>
-                          <IconComponent className={`w-3.5 h-3.5 ${sample.iconColor}`} />
-                        </div>
-                        <span className="font-medium text-sm text-foreground">{sample.title}</span>
-                        <span className="text-muted-foreground">|</span>
-                        <span className="text-sm text-muted-foreground">{sample.description}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+            {activeTab === "clone" && <VoiceCloneTab />}
+            {activeTab === "edit" && <VoiceEditTab />}
           </div>
         </main>
 
