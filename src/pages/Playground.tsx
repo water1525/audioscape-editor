@@ -321,6 +321,18 @@ const Playground = () => {
               </div>
             </div>
 
+            {/* Generate Button - Show when text is entered but no audio yet */}
+            {text.trim() && !audioUrl && !isGenerating && (
+              <div className="mb-6">
+                <Button
+                  onClick={handleGenerateClick}
+                  className="w-full gap-2 h-12"
+                >
+                  生成音频
+                </Button>
+              </div>
+            )}
+
             {/* Generating State */}
             {isGenerating && (
               <div className="mb-6">
@@ -407,8 +419,8 @@ const Playground = () => {
               </div>
             )}
 
-            {/* Case Samples - Hide when generating or has audio */}
-            {!audioUrl && !isGenerating && (
+            {/* Case Samples - Hide when text is entered */}
+            {!text.trim() && (
               <div>
                 <p className="text-sm text-muted-foreground mb-4">选择一个场景案例体验语音合成</p>
                 <div className="grid grid-cols-3 gap-4">
