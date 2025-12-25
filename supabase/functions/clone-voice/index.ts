@@ -67,6 +67,8 @@ serve(async (req) => {
     console.log("File uploaded successfully, file_id:", fileId);
 
     // Step 2: Create cloned voice
+    // Note: We don't pass the 'text' parameter to let the API use its built-in ASR
+    // This is more forgiving when users don't read the exact sample text
     console.log("Step 2: Creating cloned voice with step-tts-mini...");
     
     const voiceResponse = await fetch("https://api.stepfun.com/v1/audio/voices", {
@@ -78,7 +80,7 @@ serve(async (req) => {
       body: JSON.stringify({
         file_id: fileId,
         model: "step-tts-mini",
-        text: sampleText || undefined, // The text that was spoken in the recording
+        // Omit 'text' to let API use ASR for better tolerance
       }),
     });
 
