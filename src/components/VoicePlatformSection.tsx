@@ -42,33 +42,60 @@ const VoicePlatformSection = () => {
       {/* Main Content */}
       <div className="max-w-4xl mx-auto">
         <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl shadow-xl overflow-hidden">
-          <div className="flex flex-col md:flex-row">
-            {/* Sidebar Tabs */}
-            <div className="md:w-[140px] p-2 md:border-r border-border/30 bg-gradient-to-b from-secondary/40 to-secondary/20 flex md:flex-col gap-1.5">
-              {tabs.map((tab) => {
+          {/* Top Tabs */}
+          <div className="border-b border-border/30 bg-gradient-to-r from-secondary/30 via-secondary/10 to-secondary/30">
+            <div className="flex items-center">
+              {tabs.map((tab, index) => {
                 const IconComponent = tab.icon;
+                const isActive = activeTab === tab.id;
                 return (
-                  <Button
+                  <div
                     key={tab.id}
-                    variant={activeTab === tab.id ? "tabActive" : "tab"}
-                    size="sm"
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full justify-start gap-2 text-xs px-2.5 py-2 h-auto transition-all duration-300 ${
-                      activeTab === tab.id 
-                        ? "bg-primary/20 text-primary border-primary/30 shadow-[0_0_12px_rgba(59,130,246,0.3)]" 
-                        : "hover:bg-secondary/60 hover:text-foreground"
-                    }`}
+                    className="relative flex-1 group cursor-pointer"
                   >
-                    <IconComponent className="w-3.5 h-3.5 text-muted-foreground" />
-                    {tab.label}
-                  </Button>
+                    <div className={`
+                      flex items-center justify-center gap-2.5 py-4 px-4
+                      transition-all duration-300
+                      ${isActive 
+                        ? 'text-foreground' 
+                        : 'text-muted-foreground hover:text-foreground/80'
+                      }
+                    `}>
+                      <IconComponent className={`
+                        w-4 h-4 transition-all duration-300
+                        ${isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground/60'}
+                      `} />
+                      <span className={`
+                        text-sm tracking-wide transition-all duration-300
+                        ${isActive ? 'font-medium' : 'font-normal'}
+                      `}>
+                        {tab.label}
+                      </span>
+                    </div>
+                    
+                    {/* Active indicator line */}
+                    <div className={`
+                      absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 rounded-full
+                      transition-all duration-300 ease-out
+                      ${isActive 
+                        ? 'w-12 bg-gradient-to-r from-primary/80 via-primary to-primary/80 shadow-[0_0_8px_rgba(59,130,246,0.5)]' 
+                        : 'w-0 bg-transparent'
+                      }
+                    `} />
+                    
+                    {/* Separator */}
+                    {index < tabs.length - 1 && (
+                      <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-border/30" />
+                    )}
+                  </div>
                 );
               })}
             </div>
-
-            {/* Content Area */}
-            <div className="flex-1 p-6 md:p-8">{renderTabContent()}</div>
           </div>
+
+          {/* Content Area */}
+          <div className="p-6 md:p-8">{renderTabContent()}</div>
         </div>
 
         {/* Footer CTA */}
