@@ -41,7 +41,7 @@ const VoicePlatformSection = () => {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto">
-        <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl shadow-xl">
           {/* Top Tabs */}
           <div className="border-b border-border/30 bg-gradient-to-r from-secondary/30 via-secondary/10 to-secondary/30">
             <div className="flex items-center">
