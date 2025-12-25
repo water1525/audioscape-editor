@@ -2,11 +2,21 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Pause, Play } from "lucide-react";
 import { useGlobalAudio } from "@/hooks/useGlobalAudio";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const HomeVoiceEditTab = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { playAudio, stopGlobalAudio } = useGlobalAudio();
+
+  // Use one of the existing audio files as demo for voice edit
+  const audioFile = "tts/case2.mp3";
+
+  const getAudioUrl = () => {
+    const { data } = supabase.storage.from("audio").getPublicUrl(audioFile);
+    return data.publicUrl;
+  };
 
   const handlePlayPause = () => {
     if (isPlaying && audioRef.current) {
@@ -19,14 +29,32 @@ const HomeVoiceEditTab = () => {
     // Stop any global audio first
     stopGlobalAudio();
     
-    // For demo purposes, just toggle the state
-    // In real implementation, you would play actual audio here
-    setIsPlaying(true);
+    // Play actual audio
+    const audio = new Audio(getAudioUrl());
+    audioRef.current = audio;
     
-    // Simulate audio ending after a few seconds (demo)
-    setTimeout(() => {
+    playAudio(audio, () => {
       setIsPlaying(false);
-    }, 3000);
+      audioRef.current = null;
+    });
+
+    audio.onended = () => {
+      setIsPlaying(false);
+      audioRef.current = null;
+    };
+
+    audio.onerror = () => {
+      setIsPlaying(false);
+      audioRef.current = null;
+      toast.error("音频播放失败");
+    };
+
+    audio.play().catch(() => {
+      setIsPlaying(false);
+      toast.error("音频播放失败");
+    });
+    
+    setIsPlaying(true);
   };
 
   return (
