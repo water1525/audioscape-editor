@@ -44,7 +44,7 @@ const VoicePlatformSection = () => {
         <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl shadow-xl overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Sidebar Tabs */}
-            <div className="md:w-[140px] p-2 md:border-r border-border/30 bg-gradient-to-b from-secondary/40 to-secondary/20 flex md:flex-col gap-1.5">
+            <div className="md:w-[140px] p-2 md:border-r border-border/30 bg-gradient-to-b from-secondary/40 to-secondary/20 flex md:flex-col justify-center gap-1.5">
               {tabs.map((tab) => {
                 const IconComponent = tab.icon;
                 return (
