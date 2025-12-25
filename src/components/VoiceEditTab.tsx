@@ -191,65 +191,98 @@ const VoiceEditTab = () => {
       )}
 
       {/* Original Audio Section */}
-      <div className="mb-4">
-        <p className="text-sm text-muted-foreground mb-3">原始音频</p>
-        <div className="bg-card border border-border rounded-lg p-4 shadow-soft flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="play" 
-              size="iconSm"
-              onClick={togglePlayOriginal}
-              disabled={isLoadingOriginal || !originalAudioUrl}
-            >
-              {isLoadingOriginal ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : isPlayingOriginal ? (
-                <Pause className="h-4 w-4" />
-              ) : (
-                <Play className="h-4 w-4" />
-              )}
-            </Button>
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                星星人冒险.wav
-              </p>
-              <p className="text-xs text-muted-foreground">00:10</p>
-            </div>
+      <div className="mb-5">
+        <p className="text-sm text-muted-foreground mb-3 flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50" />
+          原始音频
+        </p>
+        <div className="relative group bg-gradient-to-br from-secondary via-secondary/80 to-secondary rounded-xl p-4 border border-border/50 shadow-[var(--shadow-audio)] hover:shadow-md transition-all duration-300">
+          {/* Decorative wave pattern */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none overflow-hidden rounded-xl">
+            <svg className="w-full h-full" viewBox="0 0 400 100" preserveAspectRatio="none">
+              <path d="M0,50 Q100,20 200,50 T400,50" stroke="currentColor" strokeWidth="2" fill="none" className="text-foreground" />
+              <path d="M0,60 Q100,30 200,60 T400,60" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-foreground" />
+              <path d="M0,40 Q100,70 200,40 T400,40" stroke="currentColor" strokeWidth="1" fill="none" className="text-foreground" />
+            </svg>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleEdit}
-            className="gap-2"
-          >
-            <ArrowRight className="h-3 w-3" />
-            编辑
-          </Button>
+          
+          <div className="relative flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="audioSquare" 
+                size="icon"
+                onClick={togglePlayOriginal}
+                disabled={isLoadingOriginal || !originalAudioUrl}
+                className="w-12 h-12"
+              >
+                {isLoadingOriginal ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : isPlayingOriginal ? (
+                  <Pause className="h-5 w-5" />
+                ) : (
+                  <Play className="h-5 w-5 ml-0.5" />
+                )}
+              </Button>
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  星星人冒险.wav
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">时长 00:10</p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleEdit}
+              className="gap-2 bg-background/80 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200"
+            >
+              <ArrowRight className="h-3.5 w-3.5" />
+              编辑
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Edited Audio Section */}
       {isEdited && (
-        <div className="mb-4 animate-slide-up">
-          <p className="text-sm text-muted-foreground mb-3">编辑后的音频</p>
-          <div className="bg-accent border border-primary/30 rounded-lg p-4 shadow-soft flex items-center gap-3">
-            <Button 
-              variant="play" 
-              size="iconSm"
-              onClick={togglePlayEdited}
-              disabled={!editedAudioUrl}
-            >
-              {isPlayingEdited ? (
-                <Pause className="h-4 w-4" />
-              ) : (
-                <Play className="h-4 w-4" />
-              )}
-            </Button>
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                星星人冒险_edited.wav
-              </p>
-              <p className="text-xs text-muted-foreground">00:10</p>
+        <div className="mb-5 animate-slide-up">
+          <p className="text-sm text-muted-foreground mb-3 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+            编辑后的音频
+          </p>
+          <div className="relative group bg-gradient-to-br from-accent via-primary/5 to-accent rounded-xl p-4 border border-primary/20 shadow-[var(--shadow-audio)] hover:shadow-md hover:shadow-primary/10 transition-all duration-300">
+            {/* Decorative wave pattern - animated */}
+            <div className="absolute inset-0 opacity-[0.05] pointer-events-none overflow-hidden rounded-xl">
+              <svg className="w-full h-full" viewBox="0 0 400 100" preserveAspectRatio="none">
+                <path d="M0,50 Q100,20 200,50 T400,50" stroke="currentColor" strokeWidth="2" fill="none" className="text-primary" />
+                <path d="M0,60 Q100,30 200,60 T400,60" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-primary" />
+                <path d="M0,40 Q100,70 200,40 T400,40" stroke="currentColor" strokeWidth="1" fill="none" className="text-primary" />
+              </svg>
+            </div>
+            
+            <div className="relative flex items-center gap-4">
+              <Button 
+                variant="audioSquare" 
+                size="icon"
+                onClick={togglePlayEdited}
+                disabled={!editedAudioUrl}
+                className="w-12 h-12"
+              >
+                {isPlayingEdited ? (
+                  <Pause className="h-5 w-5" />
+                ) : (
+                  <Play className="h-5 w-5 ml-0.5" />
+                )}
+              </Button>
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  星星人冒险_edited.wav
+                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-xs text-muted-foreground">时长 00:10</p>
+                  <span className="text-xs text-primary font-medium px-1.5 py-0.5 bg-primary/10 rounded">已编辑</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
