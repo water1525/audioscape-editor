@@ -505,15 +505,6 @@ const Playground = () => {
                 </SelectContent>
               </Select>
             </div>
-
-            {/* Generate Button */}
-            <Button 
-              className="w-full mt-4" 
-              onClick={handleGenerateClick}
-              disabled={isGenerating || !text.trim()}
-            >
-              {isGenerating ? "生成中..." : "生成音频"}
-            </Button>
           </div>
         </aside>
       </div>
