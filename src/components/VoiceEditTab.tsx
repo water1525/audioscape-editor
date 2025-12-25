@@ -15,8 +15,7 @@ const otherTags = [
   "迷人", "法语", "风雨", "浏河", "法语", "中老年", "特别女",
 ];
 
-const ORIGINAL_TEXT = "在遥远的星际中，星星人踏上了一段奇妙的冒险旅程。他们穿越星云，探索未知的宇宙奥秘。";
-const EDITED_TEXT = "星星人勇敢地面对宇宙中的挑战，他们的冒险故事激励着每一个仰望星空的人。";
+const AUDIO_TEXT = "在遥远的星际中，星星人踏上了一段奇妙的冒险旅程。他们穿越星云，探索未知的宇宙奥秘。";
 
 const VoiceEditTab = () => {
   const { toast } = useToast();
@@ -53,7 +52,7 @@ const VoiceEditTab = () => {
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
           body: JSON.stringify({
-            text: ORIGINAL_TEXT,
+            text: AUDIO_TEXT,
             voice: "cixingnansheng",
           }),
         }
@@ -108,7 +107,7 @@ const VoiceEditTab = () => {
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
           body: JSON.stringify({
-            text: EDITED_TEXT,
+            text: AUDIO_TEXT,
             voice: "tianmeinvsheng",
           }),
         }
