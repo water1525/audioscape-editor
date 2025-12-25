@@ -106,13 +106,13 @@ const TextToSpeechTab = () => {
     return null;
   };
 
-  // Preload audio sequentially to avoid rate limits (6 RPM, 1 concurrent)
+  // Preload audio sequentially
   useEffect(() => {
     const abortController = new AbortController();
     let cancelled = false;
 
     const loadAudioSequentially = async () => {
-      console.log("Starting audio preload (strict rate limiting: 1 request per 12s)...");
+      console.log("Starting audio preload...");
       
       // Collect all items to load
       const allItems: Array<{ id: string; text: string; voice: string; isDialogueLine: boolean; lineIndex?: number }> = [];
@@ -154,10 +154,9 @@ const TextToSpeechTab = () => {
           console.error(`✗ Failed to load ${item.id}`);
         }
 
-        // Wait 12 seconds between requests to stay under 6 RPM (5 requests per minute max)
+        // Short delay between requests
         if (i < allItems.length - 1) {
-          console.log(`Waiting 12s before next request...`);
-          await sleep(12000);
+          await sleep(1000);
         }
       }
 
