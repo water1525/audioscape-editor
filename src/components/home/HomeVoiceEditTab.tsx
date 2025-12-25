@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Pause, Play, X, Loader2 } from "lucide-react";
+import { ArrowRight, Pause, Play, X, Loader2, Trash2 } from "lucide-react";
 import { useGlobalAudio } from "@/hooks/useGlobalAudio";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -255,7 +255,7 @@ const HomeVoiceEditTab = () => {
       </div>
 
       {/* 编辑后的音频卡片 */}
-      <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center">
+      <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -296,6 +296,26 @@ const HomeVoiceEditTab = () => {
             </div>
           </div>
         </div>
+
+        {editedAudioUrl && (
+          <button
+            type="button"
+            onClick={() => {
+              if (editedAudioRef.current) {
+                stopGlobalAudio();
+                editedAudioRef.current = null;
+                setIsPlayingEdited(false);
+              }
+              URL.revokeObjectURL(editedAudioUrl);
+              setEditedAudioUrl(null);
+              toast.success("已删除编辑后的音频");
+            }}
+            className="p-2 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+            aria-label="删除"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       <p className="text-sm text-muted-foreground">
