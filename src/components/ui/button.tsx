@@ -19,7 +19,8 @@ const buttonVariants = cva(
         tabActive: "bg-primary text-primary-foreground shadow-soft",
         case: "bg-card text-muted-foreground border border-border hover:border-primary hover:text-foreground",
         caseActive: "bg-accent text-accent-foreground border border-primary",
-        play: "bg-card text-foreground border border-border hover:bg-accent hover:border-primary rounded-full",
+        play: "bg-primary/10 text-primary border border-primary/30 hover:bg-primary hover:text-primary-foreground rounded-md transition-all duration-200",
+        audioSquare: "bg-gradient-to-br from-primary/20 to-primary/5 text-primary border border-primary/20 hover:from-primary hover:to-primary/80 hover:text-primary-foreground rounded-lg shadow-sm hover:shadow-md hover:shadow-primary/20 transition-all duration-300",
       },
       size: {
         default: "h-10 px-4 py-2",
