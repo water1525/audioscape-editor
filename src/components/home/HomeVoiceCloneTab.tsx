@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Play, Pause } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useGlobalAudio } from "@/hooks/useGlobalAudio";
 import avatarFemale from "@/assets/avatar-female.png";
 import avatarMale from "@/assets/avatar-male.png";
 
@@ -36,6 +37,7 @@ const voiceSamples: VoiceSample[] = [
 const HomeVoiceCloneTab = () => {
   const [playingId, setPlayingId] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { playAudio, stopGlobalAudio } = useGlobalAudio();
 
   const getAudioUrl = (filePath: string) => {
     const { data } = supabase.storage.from("audio").getPublicUrl(filePath);
@@ -47,15 +49,14 @@ const HomeVoiceCloneTab = () => {
     
     // If already playing this, pause it
     if (playingId === playId && audioRef.current) {
-      audioRef.current.pause();
+      stopGlobalAudio();
+      audioRef.current = null;
       setPlayingId(null);
       return;
     }
 
-    // Stop any current audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
+    // Stop any global audio
+    stopGlobalAudio();
 
     // Find the sample and play
     const sample = voiceSamples.find(s => s.id === sampleId);
@@ -64,6 +65,12 @@ const HomeVoiceCloneTab = () => {
     const filePath = type === "original" ? sample.originalFile : sample.clonedFile;
     const audio = new Audio(getAudioUrl(filePath));
     audioRef.current = audio;
+    
+    // Register with global audio manager
+    playAudio(audio, () => {
+      setPlayingId(null);
+      audioRef.current = null;
+    });
 
     audio.onended = () => {
       setPlayingId(null);

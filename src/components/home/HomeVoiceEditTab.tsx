@@ -1,9 +1,33 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Pause, Play } from "lucide-react";
+import { useGlobalAudio } from "@/hooks/useGlobalAudio";
 
 const HomeVoiceEditTab = () => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { playAudio, stopGlobalAudio } = useGlobalAudio();
+
+  const handlePlayPause = () => {
+    if (isPlaying && audioRef.current) {
+      stopGlobalAudio();
+      audioRef.current = null;
+      setIsPlaying(false);
+      return;
+    }
+
+    // Stop any global audio first
+    stopGlobalAudio();
+    
+    // For demo purposes, just toggle the state
+    // In real implementation, you would play actual audio here
+    setIsPlaying(true);
+    
+    // Simulate audio ending after a few seconds (demo)
+    setTimeout(() => {
+      setIsPlaying(false);
+    }, 3000);
+  };
 
   return (
     <div className="animate-fade-in space-y-4">
@@ -13,7 +37,7 @@ const HomeVoiceEditTab = () => {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => setIsPlaying((v) => !v)}
+            onClick={handlePlayPause}
             className="w-10 h-10 rounded-full bg-muted flex items-center justify-center transition-colors hover:bg-muted/80"
             aria-label={isPlaying ? "暂停" : "播放"}
           >

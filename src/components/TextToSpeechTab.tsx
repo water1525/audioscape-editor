@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Play, Pause, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useGlobalAudio } from "@/hooks/useGlobalAudio";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -58,6 +59,7 @@ const TextToSpeechTab = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const dialogueIndexRef = useRef(0);
   const currentCase = cases.find((c) => c.id === activeCase) || cases[0];
+  const { playAudio, stopGlobalAudio } = useGlobalAudio();
 
   // Check if audio files exist in storage with valid content
   const checkAudioFiles = async () => {
@@ -166,6 +168,10 @@ const TextToSpeechTab = () => {
 
       const audio = new Audio(dialogueUrls[dialogueIndexRef.current]);
       audioRef.current = audio;
+      playAudio(audio, () => {
+        setIsPlaying(false);
+        audioRef.current = null;
+      });
 
       audio.onended = () => {
         dialogueIndexRef.current += 1;
@@ -216,6 +222,10 @@ const TextToSpeechTab = () => {
 
     const audio = new Audio(cachedUrl);
     audioRef.current = audio;
+    playAudio(audio, () => {
+      setIsPlaying(false);
+      audioRef.current = null;
+    });
 
     audio.onended = () => {
       setIsPlaying(false);
@@ -233,10 +243,8 @@ const TextToSpeechTab = () => {
   };
 
   const handleCaseChange = (caseId: string) => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
+    stopGlobalAudio();
+    audioRef.current = null;
     setIsPlaying(false);
     dialogueIndexRef.current = 0;
     setActiveCase(caseId);
