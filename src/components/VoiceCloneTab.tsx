@@ -16,7 +16,10 @@ const voiceProfiles = [
     avatar: avatarFemale,
     original: "Cila 原声",
     cloned: "Cila 声音复刻",
-    sampleText: "大家好，我是Cila，很高兴认识你。今天天气真不错，希望你有愉快的一天！",
+    // 原声使用预下载的音频文件
+    originalAudioUrl: "/audio/cila-original.mp3",
+    // 声音复刻使用不同的文本
+    clonedText: "欢迎使用阶跃星辰语音合成平台，我是Cila，这是通过AI技术复刻我声音生成的语音。",
     voice: "tianmeinvsheng",
   },
   {
@@ -26,7 +29,10 @@ const voiceProfiles = [
     avatar: avatarMale,
     original: "John 原声",
     cloned: "John 声音复刻",
-    sampleText: "你好，我是John，欢迎来到我们的语音平台。让我为你展示一下语音合成的魅力。",
+    // 原声使用预下载的音频文件
+    originalAudioUrl: "/audio/john-original.mp3",
+    // 声音复刻使用不同的文本
+    clonedText: "你好，这是通过Step-tts-2模型复刻我的声音生成的语音，听起来和原声一样自然。",
     voice: "cixingnansheng",
   },
 ];
@@ -37,73 +43,75 @@ const VoiceCloneTab = () => {
   const [loadingCache, setLoadingCache] = useState<Record<string, boolean>>({});
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Preload audio sequentially to avoid rate limits
+  const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+  // Preload cloned audio via API (original audio uses static files)
   useEffect(() => {
     const abortController = new AbortController();
     let cancelled = false;
 
-    const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
-
-    const loadAudioSequentially = async () => {
+    const loadClonedAudio = async () => {
       for (const profile of voiceProfiles) {
-        const types = ["original", "cloned"] as const;
+        if (cancelled) return;
 
-        for (const type of types) {
-          if (cancelled) return;
+        const cacheKey = `${profile.id}-cloned`;
+        setLoadingCache((prev) => ({ ...prev, [cacheKey]: true }));
 
-          const cacheKey = `${profile.id}-${type}`;
-          setLoadingCache((prev) => ({ ...prev, [cacheKey]: true }));
+        try {
+          let retries = 5;
+          let delay = 2000;
 
-          try {
-            let retries = 3;
+          while (!cancelled && retries > 0) {
+            const response = await fetch(`${SUPABASE_URL}/functions/v1/step-tts`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                apikey: SUPABASE_ANON_KEY,
+                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              },
+              body: JSON.stringify({
+                text: profile.clonedText,
+                voice: profile.voice,
+              }),
+              signal: abortController.signal,
+            });
 
-            while (!cancelled && retries > 0) {
-              const response = await fetch(`${SUPABASE_URL}/functions/v1/step-tts`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  apikey: SUPABASE_ANON_KEY,
-                  Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-                },
-                body: JSON.stringify({
-                  text: profile.sampleText,
-                  voice: profile.voice,
-                }),
-                signal: abortController.signal,
-              });
-
-              if (response.ok) {
-                const audioBlob = await response.blob();
-                const audioUrl = URL.createObjectURL(audioBlob);
-                setAudioCache((prev) => ({ ...prev, [cacheKey]: audioUrl }));
-                break;
-              }
-
-              if (response.status === 429) {
-                retries -= 1;
-                await sleep(1200);
-                continue;
-              }
-
+            if (response.ok) {
+              const audioBlob = await response.blob();
+              const audioUrl = URL.createObjectURL(audioBlob);
+              setAudioCache((prev) => ({ ...prev, [cacheKey]: audioUrl }));
+              console.log(`✓ ${cacheKey} loaded successfully`);
               break;
             }
-          } catch (error) {
-            if ((error as { name?: string } | null)?.name !== "AbortError") {
-              console.error("Preload error:", error);
-            }
-          } finally {
-            if (!cancelled) {
-              setLoadingCache((prev) => ({ ...prev, [cacheKey]: false }));
-            }
-          }
 
-          await sleep(350);
+            if (response.status === 429) {
+              console.log(`Rate limited for ${cacheKey}, retrying in ${delay}ms...`);
+              retries -= 1;
+              await sleep(delay);
+              delay = Math.min(delay * 1.5, 10000);
+              continue;
+            }
+
+            console.error(`Failed to load ${cacheKey}:`, response.status);
+            break;
+          }
+        } catch (error) {
+          if ((error as { name?: string } | null)?.name !== "AbortError") {
+            console.error("Preload error:", error);
+          }
+        } finally {
+          if (!cancelled) {
+            setLoadingCache((prev) => ({ ...prev, [cacheKey]: false }));
+          }
         }
+
+        // Wait between requests
+        await sleep(1500);
       }
     };
 
     const t = window.setTimeout(() => {
-      void loadAudioSequentially();
+      void loadClonedAudio();
     }, 0);
 
     return () => {
@@ -115,7 +123,9 @@ const VoiceCloneTab = () => {
 
   const handlePlayPause = (profileId: string, type: 'original' | 'cloned') => {
     const buttonId = `${profileId}-${type}`;
-    const cachedUrl = audioCache[buttonId];
+    const profile = voiceProfiles.find(p => p.id === profileId);
+    
+    if (!profile) return;
     
     // If this button is playing, pause it
     if (playingId === buttonId && audioRef.current) {
@@ -131,12 +141,22 @@ const VoiceCloneTab = () => {
       setPlayingId(null);
     }
 
-    if (!cachedUrl) {
+    // Get audio URL based on type
+    let audioUrl: string | undefined;
+    if (type === 'original') {
+      // Use static file for original
+      audioUrl = profile.originalAudioUrl;
+    } else {
+      // Use cached API response for cloned
+      audioUrl = audioCache[buttonId];
+    }
+
+    if (!audioUrl) {
       toast.error("音频加载中，请稍候");
       return;
     }
 
-    const audio = new Audio(cachedUrl);
+    const audio = new Audio(audioUrl);
     audioRef.current = audio;
     
     audio.onended = () => {
@@ -147,10 +167,14 @@ const VoiceCloneTab = () => {
     audio.onerror = () => {
       setPlayingId(null);
       audioRef.current = null;
-      toast.error("音频播放失败");
+      toast.error("音频播放失败，请检查音频文件是否存在");
     };
 
-    audio.play();
+    audio.play().catch(() => {
+      setPlayingId(null);
+      audioRef.current = null;
+      toast.error("音频播放失败");
+    });
     setPlayingId(buttonId);
   };
 
@@ -185,11 +209,8 @@ const VoiceCloneTab = () => {
                 size="sm"
                 className="justify-start gap-2 text-xs"
                 onClick={() => handlePlayPause(profile.id, 'original')}
-                disabled={loadingCache[`${profile.id}-original`]}
               >
-                {loadingCache[`${profile.id}-original`] ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : playingId === `${profile.id}-original` ? (
+                {playingId === `${profile.id}-original` ? (
                   <Pause className="h-3 w-3" />
                 ) : (
                   <Play className="h-3 w-3" />
