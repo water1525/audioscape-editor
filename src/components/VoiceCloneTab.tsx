@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Play, Pause, RefreshCw, Trash2, Download, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { Slider } from "@/components/ui/slider";
 
 // Sample texts for recording
@@ -145,23 +144,31 @@ const VoiceCloneTab = () => {
 
     setIsCloning(true);
     try {
-      // For now, we'll use the step-tts API to generate audio
-      // In a real implementation, you would upload the recorded audio for voice cloning
-      const { data, error } = await supabase.functions.invoke("step-tts", {
-        body: {
-          text: targetText,
-          voice: "tianmeinvsheng", // Default voice for demo
-        },
-      });
+      // Use fetch to get binary audio data directly
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            text: targetText,
+            voice: "tianmeinvsheng", // Default voice for demo
+          }),
+        }
+      );
 
-      if (error) throw error;
-
-      if (data?.audioContent) {
-        const audioBlob = base64ToBlob(data.audioContent, "audio/mpeg");
-        const url = URL.createObjectURL(audioBlob);
-        setClonedAudioUrl(url);
-        toast.success("音色复刻成功！");
+      if (!response.ok) {
+        throw new Error("生成音频失败");
       }
+
+      const audioBlob = await response.blob();
+      const url = URL.createObjectURL(audioBlob);
+      setClonedAudioUrl(url);
+      toast.success("音色复刻成功！");
     } catch (error) {
       console.error("Voice cloning error:", error);
       toast.error("音色复刻失败，请重试");
