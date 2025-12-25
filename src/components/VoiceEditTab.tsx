@@ -13,16 +13,15 @@ const sampleTexts = [
   "夜空中繁星闪烁，诉说着宇宙无尽的神秘故事。",
 ];
 
-const emotionTags = [
-  "电台", "纪录", "亲密", "稳健", "大气", "沉稳", "月亮", "阳光", "磁性",
-];
+const emotionTags = ["高兴", "愤怒", "悲伤", "幽默", "困惑", "厌恶", "共情", "尴尬", "恐惧", "惊讶", "兴奋", "沮丧", "冷漠", "钦佩"];
 const styleTags = [
-  "严厉", "抒情", "共鸣", "清亮", "质朴", "孝庄", "快速",
+  "严肃", "傲慢", "儿童", "单纯", "夸张", "少女", "御姐", "朗诵",
+  "甜美", "空灵", "豪爽", "撒娇", "温暖", "害羞", "安慰", "权威",
+  "闲聊", "电台", "深情", "温柔", "磁性", "中老年", "悄悄话",
+  "气泡音", "讲故事", "绘声绘色", "节目主持", "新闻播报", "广告营销",
+  "娱乐八卦", "吼叫", "小声", "大声", "低沉", "高亢"
 ];
-const ageTags = ["严肃", "膨胀", "儿童", "平静", "可等", "呼呼", "吹嘘", "请谅"];
-const otherTags = [
-  "迷人", "法语", "风雨", "浏河", "法语", "中老年", "特别女",
-];
+const speedTags = ["快速", "慢速", "更快", "更慢"];
 
 // Waveform animation component
 const WaveformAnimation = ({ isPlaying, variant = "default" }: { isPlaying: boolean; variant?: "default" | "primary" }) => {
@@ -587,15 +586,11 @@ const VoiceEditTab = () => {
       {showModal && createPortal(
         <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm flex items-center justify-center z-[9999] animate-fade-in">
           <div className="bg-card border border-border rounded-xl p-6 w-full max-w-lg shadow-elevated animate-scale-in mx-4">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  参数设置
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {editedAudios.length > 0 
-                    ? `基于第 ${editedAudios.length} 次编辑继续调整` 
-                    : "选择编辑参数来调整音频风格"}
+                <h3 className="text-lg font-semibold text-foreground">参数设置</h3>
+                <p className="text-sm text-muted-foreground">
+                  选择您想要的音色特征，当前只支持单选
                 </p>
               </div>
               <Button
@@ -608,9 +603,9 @@ const VoiceEditTab = () => {
             </div>
 
             {/* Tags Section */}
-            <div className="space-y-4 mb-6">
+            <div className="space-y-4 mb-6 max-h-[400px] overflow-y-auto pr-2">
               <div>
-                <p className="text-sm font-medium text-foreground mb-2">情感</p>
+                <p className="text-sm font-medium text-foreground mb-2">情绪</p>
                 <div className="flex flex-wrap gap-2">
                   {emotionTags.map((tag, i) => (
                     <span
@@ -648,28 +643,9 @@ const VoiceEditTab = () => {
               </div>
 
               <div>
-                <p className="text-sm font-medium text-foreground mb-2">年龄</p>
+                <p className="text-sm font-medium text-foreground mb-2">速度控制</p>
                 <div className="flex flex-wrap gap-2">
-                  {ageTags.map((tag, i) => (
-                    <span
-                      key={i}
-                      onClick={() => toggleTag(tag)}
-                      className={`px-3 py-1 text-xs rounded-full cursor-pointer transition-colors ${
-                        selectedTags.includes(tag)
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
-                      }`}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <p className="text-sm font-medium text-foreground mb-2">其他</p>
-                <div className="flex flex-wrap gap-2">
-                  {otherTags.map((tag, i) => (
+                  {speedTags.map((tag, i) => (
                     <span
                       key={i}
                       onClick={() => toggleTag(tag)}
@@ -687,23 +663,18 @@ const VoiceEditTab = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">
-                已选择 {selectedTags.length} 个标签
-              </p>
-              <div className="flex items-center gap-3">
-                <Button variant="outline" onClick={() => { setShowModal(false); setSelectedTags([]); }}>
-                  取消
-                </Button>
-                <Button onClick={handleConfirm} disabled={isGenerating}>
-                  {isGenerating ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      生成中...
-                    </>
-                  ) : "确认"}
-                </Button>
-              </div>
+            <div className="flex items-center justify-end gap-3">
+              <Button variant="outline" onClick={() => { setShowModal(false); setSelectedTags([]); }}>
+                取消
+              </Button>
+              <Button onClick={handleConfirm} disabled={isGenerating}>
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    生成中...
+                  </>
+                ) : "确认"}
+              </Button>
             </div>
           </div>
         </div>,
