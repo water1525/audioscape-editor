@@ -60,15 +60,54 @@ const cases = [
   },
 ];
 
+// Storage file paths for pre-generated audio
+const storageFiles: Record<string, string> = {
+  case1: "tts/case1.mp3",
+  case2: "tts/case2.mp3",
+  "dialogue-0": "tts/dialogue-0.mp3",
+  "dialogue-1": "tts/dialogue-1.mp3",
+  "dialogue-2": "tts/dialogue-2.mp3",
+  "dialogue-3": "tts/dialogue-3.mp3",
+  "dialogue-4": "tts/dialogue-4.mp3",
+  "dialogue-5": "tts/dialogue-5.mp3",
+};
+
 const TextToSpeechTab = () => {
   const [activeCase, setActiveCase] = useState("case1");
   const [isPlaying, setIsPlaying] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [cachedAudioUrls, setCachedAudioUrls] = useState<Record<string, string>>({});
+  const [storageUrls, setStorageUrls] = useState<Record<string, string>>({});
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const dialogueIndexRef = useRef(0);
   const currentCase = cases.find((c) => c.id === activeCase) || cases[0];
   const { playAudio, stopGlobalAudio } = useGlobalAudio();
+
+  // Check storage for pre-generated audio on mount
+  useEffect(() => {
+    const checkStorageFiles = async () => {
+      const urls: Record<string, string> = {};
+      
+      for (const [caseId, filePath] of Object.entries(storageFiles)) {
+        const { data } = supabase.storage.from("audio").getPublicUrl(filePath);
+        try {
+          // Quick check if file exists with valid content
+          const response = await fetch(data.publicUrl, { 
+            method: "HEAD",
+          });
+          if (response.ok) {
+            urls[caseId] = data.publicUrl;
+          }
+        } catch {
+          // File doesn't exist
+        }
+      }
+      
+      setStorageUrls(urls);
+    };
+    
+    checkStorageFiles();
+  }, []);
 
   // Generate single audio on demand
   const generateSingleAudio = async (text: string, voice: string): Promise<string | null> => {
@@ -100,8 +139,8 @@ const TextToSpeechTab = () => {
     const config = voiceConfigs[activeCase];
     if (!config) return;
 
-    // Check cache first
-    let audioUrl = cachedAudioUrls[activeCase];
+    // Priority: 1. Memory cache, 2. Storage, 3. Generate
+    let audioUrl = cachedAudioUrls[activeCase] || storageUrls[activeCase];
     
     if (!audioUrl) {
       setIsGenerating(true);
@@ -157,7 +196,8 @@ const TextToSpeechTab = () => {
       const line = dialogueLines[dialogueIndexRef.current];
       const cacheKey = `dialogue-${dialogueIndexRef.current}`;
       
-      let audioUrl = cachedAudioUrls[cacheKey];
+      // Priority: 1. Memory cache, 2. Storage, 3. Generate
+      let audioUrl = cachedAudioUrls[cacheKey] || storageUrls[cacheKey];
       if (!audioUrl) {
         audioUrl = await generateSingleAudio(line.text, line.voice);
         if (!audioUrl) {
