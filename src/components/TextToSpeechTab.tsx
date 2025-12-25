@@ -1,8 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, RefreshCw, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 const dialogueLines = [
   { speaker: "客服小美", text: "您好，欢迎致电智能客服中心，请问有什么可以帮您？", file: "tts/dialogue-0.mp3" },
@@ -51,11 +54,12 @@ const TextToSpeechTab = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioUrls, setAudioUrls] = useState<Record<string, string>>({});
   const [dialogueUrls, setDialogueUrls] = useState<string[]>([]);
+  const [isRegenerating, setIsRegenerating] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const dialogueIndexRef = useRef(0);
   const currentCase = cases.find((c) => c.id === activeCase) || cases[0];
 
-  // Check if audio files exist in storage
+  // Check if audio files exist in storage and have content
   const checkAudioFiles = async () => {
     const urls: Record<string, string> = {};
     const dialogues: string[] = [];
@@ -66,7 +70,9 @@ const TextToSpeechTab = () => {
       const { data } = supabase.storage.from("audio").getPublicUrl(caseItem.file);
       try {
         const response = await fetch(data.publicUrl, { method: "HEAD" });
-        if (response.ok) {
+        const contentLength = response.headers.get("content-length");
+        // Only mark as valid if file exists AND has content (> 1000 bytes)
+        if (response.ok && contentLength && parseInt(contentLength) > 1000) {
           urls[caseItem.id] = data.publicUrl;
         }
       } catch {
@@ -79,7 +85,8 @@ const TextToSpeechTab = () => {
       const { data } = supabase.storage.from("audio").getPublicUrl(line.file);
       try {
         const response = await fetch(data.publicUrl, { method: "HEAD" });
-        if (response.ok) {
+        const contentLength = response.headers.get("content-length");
+        if (response.ok && contentLength && parseInt(contentLength) > 1000) {
           dialogues.push(data.publicUrl);
         } else {
           dialogues.push("");
@@ -96,6 +103,37 @@ const TextToSpeechTab = () => {
   useEffect(() => {
     checkAudioFiles();
   }, []);
+
+  const regenerateAudio = async () => {
+    setIsRegenerating(true);
+    toast.info("正在重新生成音频...");
+
+    try {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-tts-audio`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success("音频生成完成！");
+        await checkAudioFiles();
+      } else {
+        toast.error("部分音频生成失败，请重试");
+        await checkAudioFiles();
+      }
+    } catch (error) {
+      toast.error("音频生成失败");
+      console.error(error);
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
 
   const playDialogue = () => {
     if (dialogueUrls.length === 0 || dialogueUrls.some(u => !u)) {
@@ -231,14 +269,28 @@ const TextToSpeechTab = () => {
           <span className="text-foreground font-medium">@Step-tts-2</span>{" "}
           生成效具有人感、拥有丰富情绪、风格的语音
         </p>
-        <Button 
-          className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
-          onClick={handlePlayPause}
-          disabled={!isCurrentReady}
-        >
-          {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-          {isPlaying ? "暂停" : "播放"}
-        </Button>
+        <div className="flex items-center gap-2">
+          {!isCurrentReady && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={regenerateAudio}
+              disabled={isRegenerating}
+              className="gap-2"
+            >
+              {isRegenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+              {isRegenerating ? "生成中..." : "生成音频"}
+            </Button>
+          )}
+          <Button 
+            className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
+            onClick={handlePlayPause}
+            disabled={!isCurrentReady || isRegenerating}
+          >
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            {isPlaying ? "暂停" : "播放"}
+          </Button>
+        </div>
       </div>
     </div>
   );
