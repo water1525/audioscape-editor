@@ -5,6 +5,7 @@ import { ArrowRight, Pause, Play, X, Loader2, Trash2 } from "lucide-react";
 import { useGlobalAudio } from "@/hooks/useGlobalAudio";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import WaveformAnimation from "@/components/ui/WaveformAnimation";
 
 // 参数设置分类
 const emotionTags = ["高兴", "愤怒", "悲伤", "幽默", "困惑", "厌恶", "共情", "尴尬", "恐惧", "惊讶", "兴奋", "沮丧", "冷漠", "钦佩"];
@@ -228,16 +229,13 @@ const handleConfirm = async () => {
             )}
           </button>
 
-          {/* 音频波形占位 */}
-          <div className="flex items-center gap-0.5 h-8">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="w-1 bg-muted-foreground/40 rounded-full"
-                style={{ height: `${12 + Math.random() * 16}px` }}
-              />
-            ))}
-          </div>
+          {/* 音频波形 */}
+          <WaveformAnimation 
+            isPlaying={isPlaying} 
+            variant="default" 
+            barCount={8} 
+            className="mx-2"
+          />
 
           <div className="ml-2">
             <p className="text-sm font-medium text-foreground">星星人冒险.wav</p>
@@ -291,16 +289,13 @@ const handleConfirm = async () => {
                 )}
               </button>
 
-              {/* 音频波形占位 */}
-              <div className="flex items-center gap-0.5 h-8">
-                {[...Array(8)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-1 bg-primary/40 rounded-full"
-                    style={{ height: `${12 + Math.random() * 16}px` }}
-                  />
-                ))}
-              </div>
+            {/* 音频波形 */}
+            <WaveformAnimation 
+              isPlaying={isPlayingEdited} 
+              variant="primary" 
+              barCount={8} 
+              className="mx-2"
+            />
 
               <div className="ml-2">
                 <p className="text-sm font-medium text-foreground">星星人冒险_edited.wav</p>

@@ -4,6 +4,7 @@ import { Play, Pause, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useGlobalAudio } from "@/hooks/useGlobalAudio";
+import WaveformAnimation from "@/components/ui/WaveformAnimation";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -300,11 +301,11 @@ const TextToSpeechTab = () => {
           {isRegenerating ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : isPlaying ? (
-            <Pause className="h-4 w-4" />
+            <WaveformAnimation isPlaying={true} variant="small" barCount={4} className="text-primary-foreground [&>div]:bg-primary-foreground" />
           ) : (
             <Play className="h-4 w-4" />
           )}
-          {isRegenerating ? "生成中..." : isPlaying ? "暂停" : "播放"}
+          {isRegenerating ? "生成中..." : isPlaying ? "播放中" : "播放"}
         </Button>
       </div>
     </div>

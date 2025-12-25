@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Play, Pause } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useGlobalAudio } from "@/hooks/useGlobalAudio";
+import WaveformAnimation from "@/components/ui/WaveformAnimation";
 import avatarFemale from "@/assets/avatar-female.png";
 import avatarMale from "@/assets/avatar-male.png";
 
@@ -113,11 +114,16 @@ const HomeVoiceCloneTab = () => {
                 onClick={() => handlePlay(sample.id, "original")}
               >
                 {playingId === `${sample.id}-original` ? (
-                  <Pause className="h-4 w-4" />
+                  <>
+                    <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
+                    <span className="ml-1">{sample.name} 原声</span>
+                  </>
                 ) : (
-                  <Play className="h-4 w-4" />
+                  <>
+                    <Play className="h-4 w-4" />
+                    {sample.name} 原声
+                  </>
                 )}
-                {sample.name} 原声
               </Button>
               <Button
                 variant="outline"
@@ -125,11 +131,16 @@ const HomeVoiceCloneTab = () => {
                 onClick={() => handlePlay(sample.id, "cloned")}
               >
                 {playingId === `${sample.id}-cloned` ? (
-                  <Pause className="h-4 w-4" />
+                  <>
+                    <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
+                    <span className="ml-1">{sample.name} 声音复刻</span>
+                  </>
                 ) : (
-                  <Play className="h-4 w-4" />
+                  <>
+                    <Play className="h-4 w-4" />
+                    {sample.name} 声音复刻
+                  </>
                 )}
-                {sample.name} 声音复刻
               </Button>
             </div>
           </div>
