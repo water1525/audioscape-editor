@@ -248,75 +248,71 @@ const HomeVoiceEditTab = () => {
         </Button>
       </div>
 
-      {/* 编辑后的音频标签 */}
-      <div className="flex items-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-primary" />
-        <p className="text-sm text-muted-foreground">编辑后的音频</p>
-      </div>
-
-      {/* 编辑后的音频卡片 */}
-      <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={handlePlayEditedPause}
-            disabled={!editedAudioUrl}
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${
-              editedAudioUrl 
-                ? "bg-primary/20 hover:bg-primary/30" 
-                : "bg-muted cursor-not-allowed"
-            }`}
-            aria-label={isPlayingEdited ? "暂停" : "播放"}
-          >
-            {isPlayingEdited ? (
-              <Pause className="h-5 w-5 text-primary" />
-            ) : (
-              <Play className="h-5 w-5 text-primary ml-0.5" />
-            )}
-          </button>
-
-          {/* 音频波形占位 */}
-          <div className="flex items-center gap-0.5 h-8">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="w-1 bg-primary/40 rounded-full"
-                style={{ height: `${12 + Math.random() * 16}px` }}
-              />
-            ))}
+      {/* 编辑后的音频 - 只在有编辑音频时显示 */}
+      {editedAudioUrl && (
+        <>
+          {/* 编辑后的音频标签 */}
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-primary" />
+            <p className="text-sm text-muted-foreground">编辑后的音频</p>
           </div>
 
-          <div className="ml-2">
-            <p className="text-sm font-medium text-foreground">星星人冒险_edited.wav</p>
-            <div className="flex items-center gap-2">
-              <p className="text-xs text-muted-foreground">时长 00:10</p>
-              {editedAudioUrl && (
-                <span className="text-xs text-primary font-medium">已编辑</span>
-              )}
+          {/* 编辑后的音频卡片 */}
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handlePlayEditedPause}
+                className="w-12 h-12 rounded-full flex items-center justify-center transition-colors bg-primary/20 hover:bg-primary/30"
+                aria-label={isPlayingEdited ? "暂停" : "播放"}
+              >
+                {isPlayingEdited ? (
+                  <Pause className="h-5 w-5 text-primary" />
+                ) : (
+                  <Play className="h-5 w-5 text-primary ml-0.5" />
+                )}
+              </button>
+
+              {/* 音频波形占位 */}
+              <div className="flex items-center gap-0.5 h-8">
+                {[...Array(8)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-1 bg-primary/40 rounded-full"
+                    style={{ height: `${12 + Math.random() * 16}px` }}
+                  />
+                ))}
+              </div>
+
+              <div className="ml-2">
+                <p className="text-sm font-medium text-foreground">星星人冒险_edited.wav</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-muted-foreground">时长 00:10</p>
+                  <span className="text-xs text-primary font-medium">已编辑</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        {editedAudioUrl && (
-          <button
-            type="button"
-            onClick={() => {
-              if (editedAudioRef.current) {
-                stopGlobalAudio();
-                editedAudioRef.current = null;
-                setIsPlayingEdited(false);
-              }
-              URL.revokeObjectURL(editedAudioUrl);
-              setEditedAudioUrl(null);
-              toast.success("已删除编辑后的音频");
-            }}
-            className="p-2 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-            aria-label="删除"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-        )}
-      </div>
+            <button
+              type="button"
+              onClick={() => {
+                if (editedAudioRef.current) {
+                  stopGlobalAudio();
+                  editedAudioRef.current = null;
+                  setIsPlayingEdited(false);
+                }
+                URL.revokeObjectURL(editedAudioUrl);
+                setEditedAudioUrl(null);
+                toast.success("已删除编辑后的音频");
+              }}
+              className="p-2 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+              aria-label="删除"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        </>
+      )}
 
       <p className="text-sm text-muted-foreground">
         <span className="text-foreground font-medium">@Step-tts-edit</span> 编辑原音频的情绪、风格、速度
