@@ -61,9 +61,11 @@ const TextToSpeechTab = () => {
 
   const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
-  // Fetch audio for a single text/voice
+  // Fetch audio for a single text/voice with better retry logic
   const fetchAudio = async (text: string, voice: string, signal?: AbortSignal): Promise<string | null> => {
-    let retries = 3;
+    let retries = 5;
+    let delay = 2000;
+    
     while (retries > 0) {
       try {
         const response = await fetch(`${SUPABASE_URL}/functions/v1/step-tts`, {
@@ -83,17 +85,22 @@ const TextToSpeechTab = () => {
         }
 
         if (response.status === 429) {
+          console.log(`Rate limited, waiting ${delay}ms before retry...`);
           retries -= 1;
-          await sleep(1500);
+          await sleep(delay);
+          delay = Math.min(delay * 1.5, 10000); // Exponential backoff, max 10s
           continue;
         }
+        
+        console.error("TTS API error:", response.status);
         break;
       } catch (error) {
         if ((error as { name?: string } | null)?.name === "AbortError") {
           return null;
         }
         console.error("Fetch audio error:", error);
-        break;
+        retries -= 1;
+        await sleep(delay);
       }
     }
     return null;
@@ -105,40 +112,58 @@ const TextToSpeechTab = () => {
     let cancelled = false;
 
     const loadAudioSequentially = async () => {
+      console.log("Starting audio preload...");
+      
       // Load case1 and case2 (single voice)
       for (const caseItem of cases.filter(c => !c.isDialogue)) {
         if (cancelled) return;
 
         setLoadingCache((prev) => ({ ...prev, [caseItem.id]: true }));
+        console.log(`Loading ${caseItem.id}...`);
 
         const audioUrl = await fetchAudio(caseItem.text, caseItem.voice, abortController.signal);
         if (audioUrl && !cancelled) {
           setAudioCache((prev) => ({ ...prev, [caseItem.id]: audioUrl }));
+          console.log(`${caseItem.id} loaded successfully`);
         }
 
         if (!cancelled) {
           setLoadingCache((prev) => ({ ...prev, [caseItem.id]: false }));
         }
 
-        await sleep(500);
+        // Wait longer between requests to avoid rate limits
+        await sleep(2000);
       }
 
       // Load case3 dialogue (multiple voices)
       if (cancelled) return;
       setLoadingCache((prev) => ({ ...prev, case3: true }));
+      console.log("Loading dialogue audio...");
 
       const dialogueAudios: string[] = [];
-      for (const line of dialogueLines) {
+      for (let i = 0; i < dialogueLines.length; i++) {
         if (cancelled) return;
+        const line = dialogueLines[i];
+        console.log(`Loading dialogue line ${i + 1}/${dialogueLines.length}...`);
+        
         const audioUrl = await fetchAudio(line.text, line.voice, abortController.signal);
         if (audioUrl) {
           dialogueAudios.push(audioUrl);
+          console.log(`Dialogue line ${i + 1} loaded`);
+        } else {
+          console.error(`Failed to load dialogue line ${i + 1}`);
         }
-        await sleep(800); // Longer delay between dialogue lines to avoid rate limits
+        
+        // Wait longer between dialogue lines
+        await sleep(2500);
       }
 
-      if (!cancelled) {
+      if (!cancelled && dialogueAudios.length > 0) {
         setDialogueAudioCache(dialogueAudios);
+        console.log(`Dialogue loaded: ${dialogueAudios.length}/${dialogueLines.length} lines`);
+      }
+      
+      if (!cancelled) {
         setLoadingCache((prev) => ({ ...prev, case3: false }));
       }
     };
