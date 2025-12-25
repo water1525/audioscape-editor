@@ -474,10 +474,6 @@ const VoiceCloneTab = () => {
         </div>
       )}
 
-      <p className="text-sm text-muted-foreground">
-        <span className="text-foreground font-medium">@Step-tts-2</span> 生成与原声音一模一样的语音复刻品
-      </p>
-
       {/* Save Voice Dialog */}
       <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
         <DialogContent className="sm:max-w-md">
