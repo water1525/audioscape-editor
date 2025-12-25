@@ -354,30 +354,47 @@ const VoiceEditTab = () => {
       {audioSource === "none" && !isRecording && (
         <div className="bg-primary/5 border border-primary/20 rounded-lg p-8">
           <div className="flex flex-col items-center gap-4">
-            {/* Stylized Icon Design */}
-            <div className="relative flex items-center justify-center">
-              {/* Microphone with waveform design */}
-              <div className="relative">
-                <Mic className="h-10 w-10 text-primary" />
-                {/* Decorative curved lines */}
-                <svg 
-                  className="absolute -right-3 top-1/2 -translate-y-1/2 text-primary/60" 
-                  width="20" 
-                  height="24" 
-                  viewBox="0 0 20 24" 
+            {/* Stylized Waveform + Edit Icon Design */}
+            <div className="relative">
+              <svg 
+                width="80" 
+                height="60" 
+                viewBox="0 0 80 60" 
+                fill="none"
+                className="text-primary"
+              >
+                {/* Waveform pattern */}
+                <path 
+                  d="M5 30 L10 30 L15 20 L20 40 L25 15 L30 45 L35 10 L40 50 L45 5 L50 55 L55 20 L60 35 L65 25 L70 30 L75 30" 
+                  stroke="currentColor" 
+                  strokeWidth="2.5" 
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   fill="none"
+                />
+              </svg>
+              {/* Edit pencil icon */}
+              <div className="absolute -top-1 -right-2 bg-background rounded-full p-1">
+                <svg 
+                  width="20" 
+                  height="20" 
+                  viewBox="0 0 24 24" 
+                  fill="none"
+                  className="text-muted-foreground"
                 >
                   <path 
-                    d="M2 6C6 6 6 18 2 18" 
+                    d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" 
                     stroke="currentColor" 
                     strokeWidth="2" 
-                    strokeLinecap="round"
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
                   />
                   <path 
-                    d="M8 3C14 3 14 21 8 21" 
+                    d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" 
                     stroke="currentColor" 
                     strokeWidth="2" 
-                    strokeLinecap="round"
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
                   />
                 </svg>
               </div>
