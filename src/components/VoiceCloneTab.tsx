@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Loader2, Download } from "lucide-react";
+import { Play, Pause, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import avatarFemale from "@/assets/avatar-female.png";
 import avatarMale from "@/assets/avatar-male.png";
@@ -16,9 +16,9 @@ const voiceProfiles = [
     avatar: avatarFemale,
     original: "Cila 原声",
     cloned: "Cila 声音复刻",
-    // 原声使用预下载的音频文件
-    originalAudioUrl: "/audio/cila-original.mp3",
-    // 声音复刻使用不同的文本
+    // 原声文案
+    originalText: "大家好，我是Cila，很高兴认识你。今天天气真不错，希望你有愉快的一天！",
+    // 声音复刻文案（不同内容）
     clonedText: "欢迎使用阶跃星辰语音合成平台，我是Cila，这是通过AI技术复刻我声音生成的语音。",
     voice: "tianmeinvsheng",
   },
@@ -29,9 +29,9 @@ const voiceProfiles = [
     avatar: avatarMale,
     original: "John 原声",
     cloned: "John 声音复刻",
-    // 原声使用预下载的音频文件
-    originalAudioUrl: "/audio/john-original.mp3",
-    // 声音复刻使用不同的文本
+    // 原声文案
+    originalText: "你好，我是John，欢迎来到我们的语音平台。让我为你展示一下语音合成的魅力。",
+    // 声音复刻文案（不同内容）
     clonedText: "你好，这是通过Step-tts-2模型复刻我的声音生成的语音，听起来和原声一样自然。",
     voice: "cixingnansheng",
   },
@@ -45,82 +45,101 @@ const VoiceCloneTab = () => {
 
   const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
-  const downloadAudio = (url: string, filename: string) => {
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.rel = "noopener";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  };
-  // Preload cloned audio via API (original audio uses static files)
+  // Preload all audio via API
   useEffect(() => {
     const abortController = new AbortController();
     let cancelled = false;
 
-    const loadClonedAudio = async () => {
+    const fetchAudio = async (text: string, voice: string, signal?: AbortSignal): Promise<string | null> => {
+      let retries = 5;
+      let delay = 2000;
+
+      while (retries > 0) {
+        try {
+          const response = await fetch(`${SUPABASE_URL}/functions/v1/step-tts`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            },
+            body: JSON.stringify({ text, voice }),
+            signal,
+          });
+
+          if (response.ok) {
+            const audioBlob = await response.blob();
+            return URL.createObjectURL(audioBlob);
+          }
+
+          if (response.status === 429) {
+            retries -= 1;
+            await sleep(delay);
+            delay = Math.min(delay * 1.5, 10000);
+            continue;
+          }
+
+          break;
+        } catch (error) {
+          if ((error as { name?: string } | null)?.name === "AbortError") {
+            return null;
+          }
+          retries -= 1;
+          await sleep(delay);
+        }
+      }
+      return null;
+    };
+
+    const loadAllAudio = async () => {
+      // Collect all items to load
+      const items: Array<{ key: string; text: string; voice: string }> = [];
+
       for (const profile of voiceProfiles) {
+        items.push({
+          key: `${profile.id}-original`,
+          text: profile.originalText,
+          voice: profile.voice,
+        });
+        items.push({
+          key: `${profile.id}-cloned`,
+          text: profile.clonedText,
+          voice: profile.voice,
+        });
+      }
+
+      // Set all as loading
+      const initialLoading: Record<string, boolean> = {};
+      items.forEach((item) => {
+        initialLoading[item.key] = true;
+      });
+      setLoadingCache(initialLoading);
+
+      // Load sequentially to avoid rate limits
+      for (const item of items) {
         if (cancelled) return;
 
-        const cacheKey = `${profile.id}-cloned`;
-        setLoadingCache((prev) => ({ ...prev, [cacheKey]: true }));
+        console.log(`Loading ${item.key}...`);
+        const audioUrl = await fetchAudio(item.text, item.voice, abortController.signal);
 
-        try {
-          let retries = 5;
-          let delay = 2000;
+        if (cancelled) return;
 
-          while (!cancelled && retries > 0) {
-            const response = await fetch(`${SUPABASE_URL}/functions/v1/step-tts`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                apikey: SUPABASE_ANON_KEY,
-                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-              },
-              body: JSON.stringify({
-                text: profile.clonedText,
-                voice: profile.voice,
-              }),
-              signal: abortController.signal,
-            });
-
-            if (response.ok) {
-              const audioBlob = await response.blob();
-              const audioUrl = URL.createObjectURL(audioBlob);
-              setAudioCache((prev) => ({ ...prev, [cacheKey]: audioUrl }));
-              console.log(`✓ ${cacheKey} loaded successfully`);
-              break;
-            }
-
-            if (response.status === 429) {
-              console.log(`Rate limited for ${cacheKey}, retrying in ${delay}ms...`);
-              retries -= 1;
-              await sleep(delay);
-              delay = Math.min(delay * 1.5, 10000);
-              continue;
-            }
-
-            console.error(`Failed to load ${cacheKey}:`, response.status);
-            break;
-          }
-        } catch (error) {
-          if ((error as { name?: string } | null)?.name !== "AbortError") {
-            console.error("Preload error:", error);
-          }
-        } finally {
-          if (!cancelled) {
-            setLoadingCache((prev) => ({ ...prev, [cacheKey]: false }));
-          }
+        if (audioUrl) {
+          setAudioCache((prev) => ({ ...prev, [item.key]: audioUrl }));
+          console.log(`✓ ${item.key} loaded`);
+        } else {
+          console.error(`✗ Failed to load ${item.key}`);
         }
 
+        setLoadingCache((prev) => ({ ...prev, [item.key]: false }));
+
         // Wait between requests
-        await sleep(1500);
+        await sleep(1000);
       }
     };
 
     const t = window.setTimeout(() => {
-      void loadClonedAudio();
+      void loadAllAudio();
     }, 0);
 
     return () => {
@@ -130,12 +149,9 @@ const VoiceCloneTab = () => {
     };
   }, []);
 
-  const handlePlayPause = (profileId: string, type: 'original' | 'cloned') => {
+  const handlePlayPause = (profileId: string, type: "original" | "cloned") => {
     const buttonId = `${profileId}-${type}`;
-    const profile = voiceProfiles.find(p => p.id === profileId);
-    
-    if (!profile) return;
-    
+
     // If this button is playing, pause it
     if (playingId === buttonId && audioRef.current) {
       audioRef.current.pause();
@@ -150,18 +166,10 @@ const VoiceCloneTab = () => {
       setPlayingId(null);
     }
 
-    // Get audio URL based on type
-    let audioUrl: string | undefined;
-    if (type === 'original') {
-      // Use static file for original
-      audioUrl = profile.originalAudioUrl;
-    } else {
-      // Use cached API response for cloned
-      audioUrl = audioCache[buttonId];
-    }
+    const audioUrl = audioCache[buttonId];
 
     if (!audioUrl) {
-      toast.error(type === "original" ? "原声音频未就绪" : "复刻音频生成中，请稍候");
+      toast.error("音频加载中，请稍候");
       return;
     }
 
@@ -176,11 +184,7 @@ const VoiceCloneTab = () => {
     audio.onerror = () => {
       setPlayingId(null);
       audioRef.current = null;
-      if (type === "original") {
-        toast.error("原声音频文件不存在：请上传 cila-original.mp3 / john-original.mp3");
-      } else {
-        toast.error("音频播放失败");
-      }
+      toast.error("音频播放失败");
     };
 
     audio.play().catch(() => {
@@ -203,8 +207,8 @@ const VoiceCloneTab = () => {
             {/* Avatar */}
             <div className="flex flex-col items-center mb-4">
               <div className="w-16 h-16 rounded-full overflow-hidden mb-2">
-                <img 
-                  src={profile.avatar} 
+                <img
+                  src={profile.avatar}
                   alt={profile.name}
                   className="w-full h-full object-cover"
                 />
@@ -221,9 +225,12 @@ const VoiceCloneTab = () => {
                 variant="play"
                 size="sm"
                 className="justify-start gap-2 text-xs"
-                onClick={() => handlePlayPause(profile.id, 'original')}
+                onClick={() => handlePlayPause(profile.id, "original")}
+                disabled={loadingCache[`${profile.id}-original`]}
               >
-                {playingId === `${profile.id}-original` ? (
+                {loadingCache[`${profile.id}-original`] ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : playingId === `${profile.id}-original` ? (
                   <Pause className="h-3 w-3" />
                 ) : (
                   <Play className="h-3 w-3" />
@@ -234,7 +241,7 @@ const VoiceCloneTab = () => {
                 variant="play"
                 size="sm"
                 className="justify-start gap-2 text-xs"
-                onClick={() => handlePlayPause(profile.id, 'cloned')}
+                onClick={() => handlePlayPause(profile.id, "cloned")}
                 disabled={loadingCache[`${profile.id}-cloned`]}
               >
                 {loadingCache[`${profile.id}-cloned`] ? (
