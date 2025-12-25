@@ -58,6 +58,11 @@ const WaveformAnimation = ({ isPlaying, variant = "default" }: { isPlaying: bool
   );
 };
 
+interface EditedAudio {
+  url: string;
+  fileName: string;
+}
+
 const VoiceEditTab = () => {
   // Upload/Record state
   const [audioSource, setAudioSource] = useState<"none" | "upload" | "record">("none");
@@ -72,13 +77,13 @@ const VoiceEditTab = () => {
   
   // Audio playback state
   const [isPlayingOriginal, setIsPlayingOriginal] = useState(false);
-  const [isPlayingEdited, setIsPlayingEdited] = useState(false);
+  const [playingEditedIndex, setPlayingEditedIndex] = useState<number | null>(null);
   
   // Edit state
   const [showModal, setShowModal] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [editedAudioUrl, setEditedAudioUrl] = useState<string | null>(null);
+  const [editedAudios, setEditedAudios] = useState<EditedAudio[]>([]);
   
   // Refs
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -86,7 +91,7 @@ const VoiceEditTab = () => {
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const originalAudioRef = useRef<HTMLAudioElement | null>(null);
-  const editedAudioRef = useRef<HTMLAudioElement | null>(null);
+  const editedAudioRefs = useRef<Map<number, HTMLAudioElement>>(new Map());
 
   // Generate random sample text
   const generateRandomText = () => {
@@ -103,13 +108,11 @@ const VoiceEditTab = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith("audio/")) {
       toast.error("请上传音频文件（mp3, wav等）");
       return;
     }
 
-    // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       toast.error("文件大小不能超过10MB");
       return;
@@ -120,7 +123,9 @@ const VoiceEditTab = () => {
     setOriginalAudioUrl(url);
     setOriginalFileName(file.name);
     setAudioSource("upload");
-    setEditedAudioUrl(null);
+    // Clear previous edited audios
+    editedAudios.forEach(audio => URL.revokeObjectURL(audio.url));
+    setEditedAudios([]);
     toast.success("音频上传成功");
   };
 
@@ -152,7 +157,6 @@ const VoiceEditTab = () => {
       setIsRecording(true);
       setCountdown(10);
 
-      // Start countdown
       countdownIntervalRef.current = setInterval(() => {
         setCountdown((prev) => prev - 1);
       }, 1000);
@@ -189,16 +193,14 @@ const VoiceEditTab = () => {
     if (originalAudioUrl) {
       URL.revokeObjectURL(originalAudioUrl);
     }
-    if (editedAudioUrl) {
-      URL.revokeObjectURL(editedAudioUrl);
-    }
+    editedAudios.forEach(audio => URL.revokeObjectURL(audio.url));
     setOriginalAudioBlob(null);
     setOriginalAudioUrl(null);
     setOriginalFileName("");
     setAudioSource("none");
-    setEditedAudioUrl(null);
+    setEditedAudios([]);
     setIsPlayingOriginal(false);
-    setIsPlayingEdited(false);
+    setPlayingEditedIndex(null);
   };
 
   // Toggle play original
@@ -207,30 +209,41 @@ const VoiceEditTab = () => {
     
     if (isPlayingOriginal) {
       originalAudioRef.current.pause();
+      setIsPlayingOriginal(false);
     } else {
-      if (editedAudioRef.current && isPlayingEdited) {
-        editedAudioRef.current.pause();
-        setIsPlayingEdited(false);
+      // Pause any playing edited audio
+      if (playingEditedIndex !== null) {
+        const editedAudio = editedAudioRefs.current.get(playingEditedIndex);
+        if (editedAudio) editedAudio.pause();
+        setPlayingEditedIndex(null);
       }
       originalAudioRef.current.play();
+      setIsPlayingOriginal(true);
     }
-    setIsPlayingOriginal(!isPlayingOriginal);
   };
 
-  // Toggle play edited
-  const togglePlayEdited = () => {
-    if (!editedAudioRef.current || !editedAudioUrl) return;
+  // Toggle play edited audio
+  const togglePlayEdited = (index: number) => {
+    const audioElement = editedAudioRefs.current.get(index);
+    if (!audioElement) return;
     
-    if (isPlayingEdited) {
-      editedAudioRef.current.pause();
+    if (playingEditedIndex === index) {
+      audioElement.pause();
+      setPlayingEditedIndex(null);
     } else {
-      if (originalAudioRef.current && isPlayingOriginal) {
+      // Pause original if playing
+      if (isPlayingOriginal && originalAudioRef.current) {
         originalAudioRef.current.pause();
         setIsPlayingOriginal(false);
       }
-      editedAudioRef.current.play();
+      // Pause other edited audio
+      if (playingEditedIndex !== null) {
+        const otherAudio = editedAudioRefs.current.get(playingEditedIndex);
+        if (otherAudio) otherAudio.pause();
+      }
+      audioElement.play();
+      setPlayingEditedIndex(index);
     }
-    setIsPlayingEdited(!isPlayingEdited);
   };
 
   // Toggle tag selection
@@ -251,7 +264,6 @@ const VoiceEditTab = () => {
     
     setIsGenerating(true);
     try {
-      // Simulate edited audio generation using TTS
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
         {
@@ -274,7 +286,11 @@ const VoiceEditTab = () => {
 
       const audioBlob = await response.blob();
       const url = URL.createObjectURL(audioBlob);
-      setEditedAudioUrl(url);
+      const editNumber = editedAudios.length + 1;
+      const baseFileName = originalFileName.replace(/\.\w+$/, "");
+      const newFileName = `${baseFileName}_v${editNumber}.wav`;
+      
+      setEditedAudios(prev => [...prev, { url, fileName: newFileName }]);
       setShowModal(false);
       setSelectedTags([]);
       
@@ -296,9 +312,7 @@ const VoiceEditTab = () => {
       if (originalAudioUrl) {
         URL.revokeObjectURL(originalAudioUrl);
       }
-      if (editedAudioUrl) {
-        URL.revokeObjectURL(editedAudioUrl);
-      }
+      editedAudios.forEach(audio => URL.revokeObjectURL(audio.url));
     };
   }, []);
 
@@ -312,13 +326,20 @@ const VoiceEditTab = () => {
           onEnded={() => setIsPlayingOriginal(false)}
         />
       )}
-      {editedAudioUrl && (
+      {editedAudios.map((audio, index) => (
         <audio
-          ref={editedAudioRef}
-          src={editedAudioUrl}
-          onEnded={() => setIsPlayingEdited(false)}
+          key={index}
+          ref={(el) => {
+            if (el) {
+              editedAudioRefs.current.set(index, el);
+            } else {
+              editedAudioRefs.current.delete(index);
+            }
+          }}
+          src={audio.url}
+          onEnded={() => setPlayingEditedIndex(null)}
         />
-      )}
+      ))}
 
       {/* Hidden file input */}
       <input
@@ -389,7 +410,6 @@ const VoiceEditTab = () => {
           </div>
 
           <div className="flex flex-col items-center gap-4">
-            {/* Recording animation */}
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1">
                 {[...Array(20)].map((_, i) => (
@@ -452,60 +472,65 @@ const VoiceEditTab = () => {
                 </div>
               </div>
               
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                  onClick={deleteAudio}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowModal(true)}
-                  className="gap-2 bg-background/80 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200"
-                >
-                  编辑
-                </Button>
-              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                onClick={deleteAudio}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
+          </div>
+          
+          {/* Edit Button - Below original audio */}
+          <div className="flex justify-center">
+            <Button
+              variant="outline"
+              onClick={() => setShowModal(true)}
+              className="min-w-[120px]"
+            >
+              编辑
+            </Button>
           </div>
         </div>
       )}
 
       {/* Edited Audio Section */}
-      {editedAudioUrl && (
+      {editedAudios.length > 0 && (
         <div className="space-y-3 animate-slide-up">
           <h3 className="text-sm font-medium text-foreground">编辑后的音频</h3>
-          <div className="relative group bg-gradient-to-br from-accent via-primary/5 to-accent rounded-xl p-4 border border-primary/20 shadow-[var(--shadow-audio)] hover:shadow-md hover:shadow-primary/10 transition-all duration-300">
-            <div className="relative flex items-center gap-4">
-              <Button 
-                variant="audioSquare" 
-                size="icon"
-                onClick={togglePlayEdited}
-                className="w-12 h-12 shrink-0"
+          <div className="space-y-3">
+            {editedAudios.map((audio, index) => (
+              <div 
+                key={index}
+                className="relative group bg-gradient-to-br from-accent via-primary/5 to-accent rounded-xl p-4 border border-primary/20 shadow-[var(--shadow-audio)] hover:shadow-md hover:shadow-primary/10 transition-all duration-300"
               >
-                {isPlayingEdited ? (
-                  <Pause className="h-5 w-5" />
-                ) : (
-                  <Play className="h-5 w-5 ml-0.5" />
-                )}
-              </Button>
-              
-              <WaveformAnimation isPlaying={isPlayingEdited} variant="primary" />
-              
-              <div>
-                <p className="text-sm font-semibold text-foreground">
-                  {originalFileName.replace(/\.\w+$/, "_edited.wav")}
-                </p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <p className="text-xs text-muted-foreground">时长 00:10</p>
-                  <span className="text-xs text-primary font-medium px-1.5 py-0.5 bg-primary/10 rounded">已编辑</span>
+                <div className="relative flex items-center gap-4">
+                  <Button 
+                    variant="audioSquare" 
+                    size="icon"
+                    onClick={() => togglePlayEdited(index)}
+                    className="w-12 h-12 shrink-0"
+                  >
+                    {playingEditedIndex === index ? (
+                      <Pause className="h-5 w-5" />
+                    ) : (
+                      <Play className="h-5 w-5 ml-0.5" />
+                    )}
+                  </Button>
+                  
+                  <WaveformAnimation isPlaying={playingEditedIndex === index} variant="primary" />
+                  
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {audio.fileName}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">时长 00:10</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       )}
@@ -520,7 +545,9 @@ const VoiceEditTab = () => {
                   参数设置
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  选择编辑参数来调整音频风格
+                  {editedAudios.length > 0 
+                    ? `基于第 ${editedAudios.length} 次编辑继续调整` 
+                    : "选择编辑参数来调整音频风格"}
                 </p>
               </div>
               <Button
@@ -592,9 +619,7 @@ const VoiceEditTab = () => {
               </div>
 
               <div>
-                <p className="text-sm font-medium text-foreground mb-2">
-                  其他
-                </p>
+                <p className="text-sm font-medium text-foreground mb-2">其他</p>
                 <div className="flex flex-wrap gap-2">
                   {otherTags.map((tag, i) => (
                     <span
