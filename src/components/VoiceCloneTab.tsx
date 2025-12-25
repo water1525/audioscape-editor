@@ -95,13 +95,7 @@ const VoiceCloneTab = () => {
 
       // Start countdown
       countdownIntervalRef.current = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            stopRecording();
-            return 0;
-          }
-          return prev - 1;
-        });
+        setCountdown((prev) => prev - 1);
       }, 1000);
 
       toast.success("开始录制，请朗读文本");
@@ -288,6 +282,13 @@ const VoiceCloneTab = () => {
     setVoiceName("");
     toast.success(`音色"${trimmedName}"保存成功！`);
   };
+
+  // Auto stop when countdown reaches 0
+  useEffect(() => {
+    if (countdown === 0 && isRecording) {
+      stopRecording();
+    }
+  }, [countdown, isRecording, stopRecording]);
 
   // Cleanup on unmount
   useEffect(() => {
