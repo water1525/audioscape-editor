@@ -14,13 +14,13 @@ import {
 } from "@/components/ui/dialog";
 import { useCustomVoices } from "@/hooks/useCustomVoices";
 
-// Sample texts for recording (under 30 characters each)
+// Sample texts for recording (20-30 characters each)
 const sampleTexts = [
-  "阳光透过窗帘，洒落在地板上。",
-  "科技正在改变我们的生活方式。",
-  "中华文化源远流长，博大精深。",
-  "音乐是心灵的语言，触动内心。",
-  "大自然是最伟大的艺术家。",
+  "阳光透过窗帘洒落在地板上，形成金色的光斑。",
+  "科技的发展日新月异，正在改变我们的生活。",
+  "中华文化源远流长，承载着深厚的历史底蕴。",
+  "音乐是心灵的语言，能够触动每个人的内心。",
+  "大自然用四季更迭，绘制出一幅壮丽的画卷。",
 ];
 
 const VoiceCloneTab = () => {
