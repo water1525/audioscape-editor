@@ -34,57 +34,72 @@ const TextToSpeechTab = () => {
 
   // Preload audio sequentially to avoid rate limits
   useEffect(() => {
+    const abortController = new AbortController();
+    let cancelled = false;
+
+    const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
     const loadAudioSequentially = async () => {
       for (const caseItem of cases) {
-        if (audioCache[caseItem.id]) continue;
-        
-        setLoadingCache(prev => ({ ...prev, [caseItem.id]: true }));
+        if (cancelled) return;
+
+        setLoadingCache((prev) => ({ ...prev, [caseItem.id]: true }));
+
         try {
-          // Retry logic for rate limits
           let retries = 3;
-          let response: Response | null = null;
-          
-          while (retries > 0) {
-            response = await fetch(
-              `${SUPABASE_URL}/functions/v1/step-tts`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "apikey": SUPABASE_ANON_KEY,
-                  "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
-                },
-                body: JSON.stringify({ text: caseItem.text }),
-              }
-            );
+
+          while (!cancelled && retries > 0) {
+            const response = await fetch(`${SUPABASE_URL}/functions/v1/step-tts`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                apikey: SUPABASE_ANON_KEY,
+                Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+              },
+              body: JSON.stringify({ text: caseItem.text }),
+              signal: abortController.signal,
+            });
 
             if (response.ok) {
-              break;
-            } else if (response.status === 429) {
-              retries--;
-              await new Promise(r => setTimeout(r, 1500)); // Wait before retry
-            } else {
+              const audioBlob = await response.blob();
+              const audioUrl = URL.createObjectURL(audioBlob);
+              setAudioCache((prev) => ({ ...prev, [caseItem.id]: audioUrl }));
               break;
             }
-          }
 
-          if (response?.ok) {
-            const audioBlob = await response.blob();
-            const audioUrl = URL.createObjectURL(audioBlob);
-            setAudioCache(prev => ({ ...prev, [caseItem.id]: audioUrl }));
+            if (response.status === 429) {
+              retries -= 1;
+              await sleep(1200);
+              continue;
+            }
+
+            break;
           }
         } catch (error) {
-          console.error("Preload error:", error);
+          // Ignore aborts (React StrictMode remount, tab switch, etc.)
+          if ((error as { name?: string } | null)?.name !== "AbortError") {
+            console.error("Preload error:", error);
+          }
         } finally {
-          setLoadingCache(prev => ({ ...prev, [caseItem.id]: false }));
+          if (!cancelled) {
+            setLoadingCache((prev) => ({ ...prev, [caseItem.id]: false }));
+          }
         }
-        
-        // Small delay between requests to avoid rate limits
-        await new Promise(r => setTimeout(r, 500));
+
+        await sleep(350);
       }
     };
-    
-    loadAudioSequentially();
+
+    // Defer start so StrictMode's mount/unmount cycle won't create overlapping requests
+    const t = window.setTimeout(() => {
+      void loadAudioSequentially();
+    }, 0);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t);
+      abortController.abort();
+    };
   }, []);
 
   const handlePlayPause = () => {
