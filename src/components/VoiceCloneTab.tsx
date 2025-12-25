@@ -431,7 +431,9 @@ const VoiceCloneTab = () => {
 
       {/* Step 3: Cloned Audio Player */}
       {clonedAudioUrl && (
-        <div className="bg-card border border-border rounded-lg p-4 space-y-4">
+        <div className="space-y-3">
+          <h3 className="text-sm font-medium text-foreground">step 3 生成复刻音频</h3>
+          <div className="bg-card border border-border rounded-lg p-4 space-y-4">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -484,6 +486,7 @@ const VoiceCloneTab = () => {
             </Button>
           </div>
         </div>
+      </div>
       )}
 
       {/* Save Voice Dialog */}
