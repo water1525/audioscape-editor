@@ -123,9 +123,17 @@ const VoiceCloneTab = () => {
     if (recordedAudioUrl) {
       URL.revokeObjectURL(recordedAudioUrl);
     }
+    if (clonedAudioUrl) {
+      URL.revokeObjectURL(clonedAudioUrl);
+    }
     setRecordedAudio(null);
     setRecordedAudioUrl(null);
     setIsPlayingRecorded(false);
+    setClonedAudioUrl(null);
+    setIsPlayingCloned(false);
+    setClonedCurrentTime(0);
+    setClonedDuration(0);
+    clonedAudioRef.current = null;
   };
 
   // Play/pause recorded audio
