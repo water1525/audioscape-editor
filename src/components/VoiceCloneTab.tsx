@@ -1,9 +1,13 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, RefreshCw, Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import avatarFemale from "@/assets/avatar-female.png";
 import avatarMale from "@/assets/avatar-male.png";
+import { supabase } from "@/integrations/supabase/client";
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 const voiceProfiles = [
   {
@@ -13,8 +17,8 @@ const voiceProfiles = [
     avatar: avatarFemale,
     original: "Cila 原声",
     cloned: "Cila 声音复刻",
-    originalAudio: "/audio/cila-original.mp3",
-    clonedAudio: "/audio/cila-cloned.mp3",
+    originalFile: "voice-clone/cila-original.mp3",
+    clonedFile: "voice-clone/cila-cloned.mp3",
   },
   {
     id: "john",
@@ -23,19 +27,85 @@ const voiceProfiles = [
     avatar: avatarMale,
     original: "John 原声",
     cloned: "John 声音复刻",
-    originalAudio: "/audio/john-original.mp3",
-    clonedAudio: "/audio/john-cloned.mp3",
+    originalFile: "voice-clone/john-original.mp3",
+    clonedFile: "voice-clone/john-cloned.mp3",
   },
 ];
 
 const VoiceCloneTab = () => {
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [audioUrls, setAudioUrls] = useState<Record<string, string>>({});
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [audioReady, setAudioReady] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Check if audio files exist in storage
+  const checkAudioFiles = async () => {
+    const urls: Record<string, string> = {};
+    let allExist = true;
+
+    for (const profile of voiceProfiles) {
+      for (const type of ["original", "cloned"] as const) {
+        const file = type === "original" ? profile.originalFile : profile.clonedFile;
+        const key = `${profile.id}-${type}`;
+
+        const { data } = supabase.storage.from("audio").getPublicUrl(file);
+
+        // Check if file actually exists by trying to fetch headers
+        try {
+          const response = await fetch(data.publicUrl, { method: "HEAD" });
+          if (response.ok) {
+            urls[key] = data.publicUrl;
+          } else {
+            allExist = false;
+          }
+        } catch {
+          allExist = false;
+        }
+      }
+    }
+
+    setAudioUrls(urls);
+    setAudioReady(allExist && Object.keys(urls).length === 4);
+  };
+
+  useEffect(() => {
+    checkAudioFiles();
+  }, []);
+
+  const generateAudio = async () => {
+    setIsGenerating(true);
+    toast.info("正在生成音频文件，请稍候...");
+
+    try {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-voice-audio`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success("音频生成完成！");
+        await checkAudioFiles();
+      } else {
+        toast.error(`部分音频生成失败: ${result.message}`);
+        await checkAudioFiles();
+      }
+    } catch (error) {
+      toast.error("音频生成失败");
+      console.error(error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handlePlayPause = (profileId: string, type: "original" | "cloned") => {
     const buttonId = `${profileId}-${type}`;
-    const profile = voiceProfiles.find((p) => p.id === profileId);
-    if (!profile) return;
 
     if (playingId === buttonId && audioRef.current) {
       audioRef.current.pause();
@@ -49,7 +119,12 @@ const VoiceCloneTab = () => {
       setPlayingId(null);
     }
 
-    const audioUrl = type === "original" ? profile.originalAudio : profile.clonedAudio;
+    const audioUrl = audioUrls[buttonId];
+    if (!audioUrl) {
+      toast.error("音频未就绪，请先点击生成音频");
+      return;
+    }
+
     const audio = new Audio(audioUrl);
     audioRef.current = audio;
 
@@ -61,7 +136,7 @@ const VoiceCloneTab = () => {
     audio.onerror = () => {
       setPlayingId(null);
       audioRef.current = null;
-      toast.error("音频文件不存在，请先生成音频");
+      toast.error("音频播放失败");
     };
 
     audio.play().catch(() => {
@@ -74,6 +149,38 @@ const VoiceCloneTab = () => {
 
   return (
     <div className="animate-fade-in">
+      {/* Generate Button */}
+      {!audioReady && (
+        <div className="mb-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">首次使用需生成音频</p>
+              <p className="text-xs text-muted-foreground">点击按钮一键生成所有语音样本</p>
+            </div>
+            <Button
+              onClick={generateAudio}
+              disabled={isGenerating}
+              className="gap-2"
+            >
+              {isGenerating ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
+              {isGenerating ? "生成中..." : "生成音频"}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {audioReady && (
+        <div className="mb-4 flex items-center gap-2 text-xs text-green-600">
+          <CheckCircle2 className="h-4 w-4" />
+          <span>音频已就绪，点击即可播放</span>
+        </div>
+      )}
+
+      {/* Voice Profiles Grid */}
       <div className="flex items-start gap-6 mb-6">
         {voiceProfiles.map((profile) => (
           <div
@@ -94,6 +201,7 @@ const VoiceCloneTab = () => {
                 size="sm"
                 className="justify-start gap-2 text-xs"
                 onClick={() => handlePlayPause(profile.id, "original")}
+                disabled={!audioUrls[`${profile.id}-original`]}
               >
                 {playingId === `${profile.id}-original` ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
                 {profile.original}
@@ -103,6 +211,7 @@ const VoiceCloneTab = () => {
                 size="sm"
                 className="justify-start gap-2 text-xs"
                 onClick={() => handlePlayPause(profile.id, "cloned")}
+                disabled={!audioUrls[`${profile.id}-cloned`]}
               >
                 {playingId === `${profile.id}-cloned` ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
                 {profile.cloned}
