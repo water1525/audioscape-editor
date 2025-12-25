@@ -358,7 +358,7 @@ const handleConfirm = async () => {
 
             {/* 副标题 */}
             <p className="text-sm text-muted-foreground mb-6">
-              选择您想要的音色特征，当前只支持单选
+              选择您想要的音色特征
             </p>
 
             {/* 标签分类 */}
