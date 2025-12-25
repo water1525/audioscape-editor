@@ -180,7 +180,7 @@ const TextToSpeechTab = () => {
       {/* Description and Play */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          <span className="text-foreground font-medium">@step-tts-2</span>{" "}
+          <span className="text-foreground font-medium">@Step-tts-2</span>{" "}
           生成效具有人感、拥有丰富情绪、风格的语音
         </p>
         <Button 

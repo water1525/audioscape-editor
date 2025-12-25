@@ -19,7 +19,7 @@ const HeroSection = () => {
         <div className="max-w-2xl">
           {/* Title */}
           <h1 className="hero-title text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 animate-fade-in">
-            step-tts-2
+            Step-tts-2
           </h1>
 
           {/* Subtitle */}
