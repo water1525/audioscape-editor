@@ -451,6 +451,9 @@ const VoiceCloneTab = () => {
             >
               <Sparkles className="h-3.5 w-3.5" />
               <span className="text-xs font-medium">AI</span>
+              {aiTargetTexts.includes(targetText) && (
+                <RefreshCw className="h-3 w-3 ml-0.5" />
+              )}
             </button>
             <span className="text-xs text-muted-foreground">
               {targetText.length}/1000字符
