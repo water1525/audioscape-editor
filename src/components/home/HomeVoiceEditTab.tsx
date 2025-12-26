@@ -328,7 +328,7 @@ const handleConfirm = async () => {
       )}
 
       <p className="text-sm text-muted-foreground">
-        <span className="text-foreground font-medium">@Step-tts-edit</span> 编辑原音频的情绪、风格、速度
+        <span className="text-foreground font-medium">@Step-Audio-EditX</span> 编辑原音频的情绪、风格、速度
       </p>
 
       {/* 参数设置弹窗 */}
