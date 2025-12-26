@@ -524,6 +524,11 @@ const Playground = () => {
                 onSaveVoiceReady={(openDialog) => {
                   setSaveVoiceCallback(() => openDialog);
                 }}
+                onAudioDeleted={() => {
+                  setShowPlayerBar(false);
+                  setShowSaveVoice(false);
+                  setSaveVoiceCallback(null);
+                }}
               />
             )}
             {activeTab === "edit" && (
