@@ -207,6 +207,19 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady }: VoiceCloneTabProp
         throw new Error((error as any)?.message || "音色复刻失败");
       }
 
+      // New function response: { audioBase64 }
+      if (data && typeof data === "object" && "audioBase64" in (data as any)) {
+        const audioBlob = base64ToBlob(String((data as any).audioBase64), "audio/mpeg");
+        const url = URL.createObjectURL(audioBlob);
+        setClonedAudioUrl(url);
+        toast.success("音色复刻成功！使用您的声音生成了音频");
+
+        // Notify parent component to play in bottom bar
+        onAudioGenerated?.(url, "复刻音频");
+        return;
+      }
+
+      // Fallback (older response)
       const audioBlob = data instanceof Blob ? data : new Blob([data as any], { type: "audio/mpeg" });
       const url = URL.createObjectURL(audioBlob);
       setClonedAudioUrl(url);

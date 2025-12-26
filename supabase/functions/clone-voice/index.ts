@@ -145,12 +145,22 @@ serve(async (req) => {
 
     console.log("Audio generated successfully with cloned voice");
 
-    // Return the audio as binary
+    // Return the audio as base64 JSON (more reliable for web clients)
     const audioBuffer = await ttsResponse.arrayBuffer();
-    return new Response(audioBuffer, {
+    const uint8 = new Uint8Array(audioBuffer);
+
+    let binary = "";
+    const chunkSize = 0x8000;
+    for (let i = 0; i < uint8.length; i += chunkSize) {
+      binary += String.fromCharCode(...uint8.subarray(i, i + chunkSize));
+    }
+
+    const audioBase64Out = btoa(binary);
+
+    return new Response(JSON.stringify({ audioBase64: audioBase64Out, format: "mp3" }), {
       headers: {
         ...corsHeaders,
-        "Content-Type": "audio/mpeg",
+        "Content-Type": "application/json",
       },
     });
   } catch (error) {

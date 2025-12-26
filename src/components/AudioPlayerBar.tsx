@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import { Play, Pause, Download, RotateCcw, ChevronDown, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface AudioPlayerBarProps {
   audioUrl: string | null;
@@ -34,14 +35,23 @@ const AudioPlayerBar = ({
     }
   }, [audioUrl]);
 
-  const togglePlayPause = () => {
+  const togglePlayPause = async () => {
     if (!audioRef.current) return;
+
     if (isPlaying) {
       audioRef.current.pause();
-    } else {
-      audioRef.current.play();
+      setIsPlaying(false);
+      return;
     }
-    setIsPlaying(!isPlaying);
+
+    try {
+      await audioRef.current.play();
+      setIsPlaying(true);
+    } catch (err) {
+      console.error("Audio play failed:", err);
+      setIsPlaying(false);
+      toast.error("音频播放失败，请重试");
+    }
   };
 
   const handleTimeUpdate = () => {
@@ -102,6 +112,10 @@ const AudioPlayerBar = ({
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onEnded={() => setIsPlaying(false)}
+        onError={() => {
+          setIsPlaying(false);
+          toast.error("音频加载失败，请重新生成");
+        }}
       />
 
       <div className="px-6 py-3">
