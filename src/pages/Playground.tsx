@@ -131,6 +131,8 @@ const Playground = () => {
   const [currentAudioTitle, setCurrentAudioTitle] = useState<string>("");
   const [currentVoiceDisplayName, setCurrentVoiceDisplayName] = useState<string>("");
   const [showPlayerBar, setShowPlayerBar] = useState(false);
+  const [showSaveVoice, setShowSaveVoice] = useState(false);
+  const [saveVoiceCallback, setSaveVoiceCallback] = useState<(() => void) | null>(null);
 
   // Get current voice name for display
   const getCurrentVoiceName = () => {
@@ -235,6 +237,8 @@ const Playground = () => {
 
   const handleClosePlayerBar = () => {
     setShowPlayerBar(false);
+    setShowSaveVoice(false);
+    setSaveVoiceCallback(null);
   };
 
   return (
@@ -454,6 +458,10 @@ const Playground = () => {
                   setCurrentAudioTitle(title);
                   setCurrentVoiceDisplayName("复刻音色");
                   setShowPlayerBar(true);
+                  setShowSaveVoice(true);
+                }}
+                onSaveVoiceReady={(openDialog) => {
+                  setSaveVoiceCallback(() => openDialog);
                 }}
               />
             )}
@@ -558,6 +566,8 @@ const Playground = () => {
         voiceName={currentVoiceDisplayName || getCurrentVoiceName()}
         isVisible={showPlayerBar}
         onClose={handleClosePlayerBar}
+        showSaveVoice={showSaveVoice && activeTab === "clone"}
+        onSaveVoice={saveVoiceCallback || undefined}
       />
     </div>
   );
