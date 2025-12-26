@@ -385,11 +385,14 @@ const VoiceCloneTab = () => {
                 onClick={togglePlayRecorded}
               >
                 {isPlayingRecorded ? (
-                  <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
+                  <Pause className="h-4 w-4" />
                 ) : (
                   <Play className="h-4 w-4" />
                 )}
               </Button>
+              {isPlayingRecorded && (
+                <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
+              )}
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">
                   {Date.now()}.wav
@@ -451,11 +454,14 @@ const VoiceCloneTab = () => {
               onClick={togglePlayCloned}
             >
               {isPlayingCloned ? (
-                <WaveformAnimation isPlaying={true} variant="primary" barCount={5} />
+                <Pause className="h-5 w-5" />
               ) : (
                 <Play className="h-5 w-5" />
               )}
             </Button>
+            {isPlayingCloned && (
+              <WaveformAnimation isPlaying={true} variant="primary" barCount={5} />
+            )}
             
             <div className="flex-1 space-y-2">
               <Slider
