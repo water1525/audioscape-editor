@@ -48,6 +48,7 @@ const caseSamples = [
     id: 1,
     title: "新闻播报",
     description: "Step 3模型发布",
+    audioTitle: "Step 3发布",
     icon: Cpu,
     iconColor: "text-emerald-500",
     bgColor: "bg-emerald-500/10",
@@ -57,6 +58,7 @@ const caseSamples = [
     id: 2,
     title: "有声读物",
     description: "悬疑故事",
+    audioTitle: "午夜来信",
     icon: BookOpen,
     iconColor: "text-amber-500",
     bgColor: "bg-amber-500/10",
@@ -66,6 +68,7 @@ const caseSamples = [
     id: 3,
     title: "客服助手",
     description: "智能客服对话",
+    audioTitle: "智能客服",
     icon: Headphones,
     iconColor: "text-rose-500",
     bgColor: "bg-rose-500/10",
@@ -75,6 +78,7 @@ const caseSamples = [
     id: 4,
     title: "广告配音",
     description: "品牌宣传片",
+    audioTitle: "品牌宣传",
     icon: Mic,
     iconColor: "text-violet-500",
     bgColor: "bg-violet-500/10",
@@ -84,6 +88,7 @@ const caseSamples = [
     id: 5,
     title: "教育朗读",
     description: "古诗词赏析",
+    audioTitle: "静夜思",
     icon: GraduationCap,
     iconColor: "text-sky-500",
     bgColor: "bg-sky-500/10",
@@ -93,6 +98,7 @@ const caseSamples = [
     id: 6,
     title: "情感电台",
     description: "深夜治愈",
+    audioTitle: "深夜治愈",
     icon: Sparkles,
     iconColor: "text-pink-500",
     bgColor: "bg-pink-500/10",
@@ -114,7 +120,8 @@ const Playground = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [waveformHeights, setWaveformHeights] = useState<number[]>(Array(20).fill(20));
+  const [waveformHeights, setWaveformHeights] = useState<number[]>(Array(8).fill(20));
+  const [currentAudioTitle, setCurrentAudioTitle] = useState<string>("");
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Refresh custom voices when switching to TTS tab
@@ -127,7 +134,7 @@ const Playground = () => {
   // Animate waveform when playing
   useEffect(() => {
     if (!isPlaying) {
-      setWaveformHeights(Array(20).fill(20));
+      setWaveformHeights(Array(8).fill(20));
       return;
     }
     
@@ -173,13 +180,18 @@ const Playground = () => {
     }
   };
 
-  const handleCaseClick = async (sample: string) => {
-    setText(sample);
-    await generateAudio(sample);
+  const handleCaseClick = async (sample: typeof caseSamples[0]) => {
+    setText(sample.text);
+    setCurrentAudioTitle(sample.audioTitle);
+    await generateAudio(sample.text);
   };
 
   const handleGenerateClick = () => {
     if (text.trim()) {
+      // 如果没有选择案例，生成默认标题
+      if (!currentAudioTitle) {
+        setCurrentAudioTitle("自定义音频");
+      }
       generateAudio(text);
     }
   };
@@ -453,18 +465,23 @@ const Playground = () => {
                           {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
                         </button>
                         
-                        {/* Waveform Animation */}
-                        <div className="flex items-center gap-[3px] h-8">
-                          {waveformHeights.map((height, i) => (
-                            <div
-                              key={i}
-                              className="w-[3px] rounded-full bg-primary transition-all duration-100"
-                              style={{
-                                height: `${height}%`,
-                                opacity: isPlaying ? 0.8 : 0.4,
-                              }}
-                            />
-                          ))}
+                        {/* Waveform Animation + Title */}
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-[2px] h-6">
+                            {waveformHeights.map((height, i) => (
+                              <div
+                                key={i}
+                                className="w-[2px] rounded-full bg-primary transition-all duration-100"
+                                style={{
+                                  height: `${height}%`,
+                                  opacity: isPlaying ? 0.8 : 0.4,
+                                }}
+                              />
+                            ))}
+                          </div>
+                          {currentAudioTitle && (
+                            <span className="text-sm font-medium text-foreground">{currentAudioTitle}</span>
+                          )}
                         </div>
                         
                         <div className="flex-1">
@@ -517,7 +534,7 @@ const Playground = () => {
                         return (
                           <button
                             key={sample.id}
-                            onClick={() => handleCaseClick(sample.text)}
+                            onClick={() => handleCaseClick(sample)}
                             className="group flex items-center gap-2 px-4 py-2.5 rounded-full border border-border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200"
                           >
                             <div className={`w-6 h-6 rounded-md ${sample.bgColor} flex items-center justify-center shrink-0`}>
