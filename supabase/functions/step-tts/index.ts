@@ -66,10 +66,58 @@ serve(async (req) => {
         });
 
         if (response.ok) {
-          console.log("Step TTS API response received successfully");
+          const contentType = response.headers.get("content-type") ?? "";
+
+          // Some upstream failures can still return 200 with a JSON body.
+          if (contentType.includes("application/json")) {
+            const maybeError = await response.text();
+            console.error("Step TTS API returned JSON with 200:", maybeError);
+
+            if (attempt < maxAttempts - 1) {
+              await sleep(700 * (attempt + 1));
+              continue;
+            }
+
+            return new Response(
+              JSON.stringify({
+                error: `Step TTS API returned JSON with 200: ${maybeError}`,
+              }),
+              {
+                status: 502,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              }
+            );
+          }
 
           // Return the audio as binary
           const audioBuffer = await response.arrayBuffer();
+          console.log(
+            "Step TTS API response received successfully",
+            "content-length:",
+            response.headers.get("content-length"),
+            "bytes:",
+            audioBuffer.byteLength
+          );
+
+          // Occasionally the upstream returns 200 with an empty body.
+          // Treat as transient and retry.
+          if (audioBuffer.byteLength === 0) {
+            console.error("Step TTS API returned empty audio with 200");
+
+            if (attempt < maxAttempts - 1) {
+              await sleep(700 * (attempt + 1));
+              continue;
+            }
+
+            return new Response(
+              JSON.stringify({ error: "Step TTS API returned empty audio" }),
+              {
+                status: 502,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              }
+            );
+          }
+
           return new Response(audioBuffer, {
             headers: {
               ...corsHeaders,
