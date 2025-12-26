@@ -62,10 +62,23 @@ serve(async (req) => {
       throw new Error("Missing required environment variables");
     }
 
+    // Parse request body to check for specific case ID
+    let requestBody: { caseId?: number } = {};
+    try {
+      requestBody = await req.json();
+    } catch {
+      // No body or invalid JSON, generate all cases
+    }
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const results: Array<{ id: number; success: boolean; url?: string; error?: string }> = [];
 
-    for (const caseItem of playgroundCases) {
+    // Filter cases if specific caseId is provided
+    const casesToGenerate = requestBody.caseId 
+      ? playgroundCases.filter(c => c.id === requestBody.caseId)
+      : playgroundCases;
+
+    for (const caseItem of casesToGenerate) {
       console.log(`Generating audio for case ${caseItem.id}: ${caseItem.text.substring(0, 30)}...`);
 
       try {
