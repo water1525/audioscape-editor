@@ -496,7 +496,16 @@ const Playground = () => {
                 }}
               />
             )}
-            {activeTab === "edit" && <VoiceEditTab />}
+            {activeTab === "edit" && (
+              <VoiceEditTab
+                onAudioGenerated={(url, title) => {
+                  setAudioUrl(url);
+                  setCurrentAudioTitle(title);
+                  setCurrentVoiceDisplayName("编辑音频");
+                  setShowPlayerBar(true);
+                }}
+              />
+            )}
           </div>
         </main>
 

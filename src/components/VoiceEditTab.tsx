@@ -29,7 +29,11 @@ interface EditedAudio {
   fileName: string;
 }
 
-const VoiceEditTab = () => {
+interface VoiceEditTabProps {
+  onAudioGenerated?: (audioUrl: string, title: string) => void;
+}
+
+const VoiceEditTab = ({ onAudioGenerated }: VoiceEditTabProps) => {
   // Upload/Record state
   const [audioSource, setAudioSource] = useState<"none" | "upload" | "record">("none");
   const [originalAudioBlob, setOriginalAudioBlob] = useState<Blob | null>(null);
@@ -262,6 +266,9 @@ const VoiceEditTab = () => {
       const newFileName = `${baseFileName}_v${editNumber}.wav`;
       
       setEditedAudios(prev => [...prev, { url, fileName: newFileName }]);
+      
+      // Notify parent to show in bottom player bar
+      onAudioGenerated?.(url, newFileName);
       
       toast.success(`音频编辑成功，已应用 ${tagsCount} 个风格标签`);
     } catch (error) {
