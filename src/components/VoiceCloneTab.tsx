@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface VoiceCloneTabProps {
   onAudioGenerated?: (audioUrl: string, title: string) => void;
   onSaveVoiceReady?: (openSaveDialog: () => void) => void;
+  onAudioDeleted?: () => void;
 }
 
 // Sample texts for recording (20-30 characters each)
@@ -41,7 +42,7 @@ const aiTargetTexts = [
   "春天的樱花如粉色的雪花，飘落在小径上。",
 ];
 
-const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady }: VoiceCloneTabProps) => {
+const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: VoiceCloneTabProps) => {
   // Custom voices hook
   const { saveVoice } = useCustomVoices();
 
@@ -157,6 +158,8 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady }: VoiceCloneTabProp
     setRecordedAudioName("");
     setIsPlayingRecorded(false);
     setClonedAudioUrl(null);
+    // Notify parent to hide the player bar
+    onAudioDeleted?.();
   };
 
   // Play/pause recorded audio
