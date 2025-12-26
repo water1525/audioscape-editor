@@ -2,9 +2,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Play, Pause, RefreshCw, Trash2, Download, RotateCcw, Sparkles } from "lucide-react";
+import { Play, Pause, RefreshCw, Trash2, Sparkles, Save } from "lucide-react";
 import { toast } from "sonner";
-import { Slider } from "@/components/ui/slider";
 import WaveformAnimation from "@/components/ui/WaveformAnimation";
 import {
   Dialog,
@@ -14,6 +13,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useCustomVoices } from "@/hooks/useCustomVoices";
+
+interface VoiceCloneTabProps {
+  onAudioGenerated?: (audioUrl: string, title: string) => void;
+}
 
 // Sample texts for recording (20-30 characters each)
 const sampleTexts = [
@@ -36,7 +39,7 @@ const aiTargetTexts = [
   "春天的樱花如粉色的雪花，飘落在小径上。",
 ];
 
-const VoiceCloneTab = () => {
+const VoiceCloneTab = ({ onAudioGenerated }: VoiceCloneTabProps) => {
   // Custom voices hook
   const { saveVoice } = useCustomVoices();
 
@@ -54,9 +57,6 @@ const VoiceCloneTab = () => {
   // Step 3: Clone state
   const [isCloning, setIsCloning] = useState(false);
   const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
-  const [isPlayingCloned, setIsPlayingCloned] = useState(false);
-  const [clonedDuration, setClonedDuration] = useState(0);
-  const [clonedCurrentTime, setClonedCurrentTime] = useState(0);
 
   // Save voice dialog state
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
@@ -68,7 +68,6 @@ const VoiceCloneTab = () => {
   const audioChunksRef = useRef<Blob[]>([]);
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const recordedAudioRef = useRef<HTMLAudioElement | null>(null);
-  const clonedAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Generate random sample text
   const generateRandomText = () => {
@@ -153,10 +152,6 @@ const VoiceCloneTab = () => {
     setRecordedAudioUrl(null);
     setIsPlayingRecorded(false);
     setClonedAudioUrl(null);
-    setIsPlayingCloned(false);
-    setClonedCurrentTime(0);
-    setClonedDuration(0);
-    clonedAudioRef.current = null;
   };
 
   // Play/pause recorded audio
@@ -222,6 +217,11 @@ const VoiceCloneTab = () => {
       const url = URL.createObjectURL(audioBlob);
       setClonedAudioUrl(url);
       toast.success("音色复刻成功！使用您的声音生成了音频");
+      
+      // Notify parent component to play in bottom bar
+      if (onAudioGenerated) {
+        onAudioGenerated(url, "复刻音频");
+      }
     } catch (error) {
       console.error("Voice cloning error:", error);
       toast.error(error instanceof Error ? error.message : "音色复刻失败，请重试");
@@ -230,7 +230,7 @@ const VoiceCloneTab = () => {
     }
   };
 
-  // Base64 to Blob helper
+  // Base64 to Blob helper (kept for potential future use)
   const base64ToBlob = (base64: string, mimeType: string): Blob => {
     const byteCharacters = atob(base64);
     const byteNumbers = new Array(byteCharacters.length);
@@ -239,63 +239,6 @@ const VoiceCloneTab = () => {
     }
     const byteArray = new Uint8Array(byteNumbers);
     return new Blob([byteArray], { type: mimeType });
-  };
-
-  // Play/pause cloned audio
-  const togglePlayCloned = () => {
-    if (!clonedAudioUrl) return;
-
-    if (!clonedAudioRef.current) {
-      clonedAudioRef.current = new Audio(clonedAudioUrl);
-      clonedAudioRef.current.onended = () => setIsPlayingCloned(false);
-      clonedAudioRef.current.onloadedmetadata = () => {
-        setClonedDuration(clonedAudioRef.current?.duration || 0);
-      };
-      clonedAudioRef.current.ontimeupdate = () => {
-        setClonedCurrentTime(clonedAudioRef.current?.currentTime || 0);
-      };
-    }
-
-    if (isPlayingCloned) {
-      clonedAudioRef.current.pause();
-      setIsPlayingCloned(false);
-    } else {
-      clonedAudioRef.current.play();
-      setIsPlayingCloned(true);
-    }
-  };
-
-  // Seek cloned audio
-  const seekClonedAudio = (value: number[]) => {
-    if (clonedAudioRef.current) {
-      clonedAudioRef.current.currentTime = value[0];
-      setClonedCurrentTime(value[0]);
-    }
-  };
-
-  // Reset cloned audio
-  const resetClonedAudio = () => {
-    if (clonedAudioRef.current) {
-      clonedAudioRef.current.currentTime = 0;
-      setClonedCurrentTime(0);
-    }
-  };
-
-  // Download cloned audio
-  const downloadClonedAudio = () => {
-    if (clonedAudioUrl) {
-      const link = document.createElement("a");
-      link.href = clonedAudioUrl;
-      link.download = `cloned-voice-${Date.now()}.mp3`;
-      link.click();
-    }
-  };
-
-  // Format time
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   // Open save dialog
@@ -478,64 +421,28 @@ const VoiceCloneTab = () => {
       {/* Step 3: Cloned Audio Player */}
       {clonedAudioUrl && (
         <div className="space-y-3">
-          <h3 className="text-sm font-medium text-foreground">step 3 生成复刻音频</h3>
-          <div className="bg-card border border-border rounded-lg p-4 space-y-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-12 w-12 rounded-full bg-primary/10"
-              onClick={togglePlayCloned}
-            >
-              {isPlayingCloned ? (
-                <Pause className="h-5 w-5" />
-              ) : (
-                <Play className="h-5 w-5" />
-              )}
-            </Button>
-            {isPlayingCloned && (
-              <WaveformAnimation isPlaying={true} variant="primary" barCount={5} />
-            )}
-            
-            <div className="flex-1 space-y-2">
-              <Slider
-                value={[clonedCurrentTime]}
-                max={clonedDuration || 100}
-                step={0.1}
-                onValueChange={seekClonedAudio}
-                className="cursor-pointer"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{formatTime(clonedCurrentTime)}</span>
-                <span>{formatTime(clonedDuration)}</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={resetClonedAudio}
-              >
-                <RotateCcw className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={downloadClonedAudio}
-              >
-                <Download className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <Button variant="outline" className="min-w-[100px]" onClick={openSaveDialog}>
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-foreground">step 3 生成复刻音频</h3>
+            <Button variant="outline" size="sm" className="gap-2" onClick={openSaveDialog}>
+              <Save className="h-4 w-4" />
               保存音色
             </Button>
           </div>
+          <div className="bg-card border border-border rounded-lg p-4">
+            <div className="flex items-center gap-4">
+              <p className="text-sm text-muted-foreground flex-1">
+                音频已生成，请在底部播放器中播放
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onAudioGenerated?.(clonedAudioUrl, "复刻音频")}
+              >
+                在播放器中打开
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
       )}
 
       {/* Save Voice Dialog */}

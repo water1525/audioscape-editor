@@ -129,6 +129,7 @@ const Playground = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [currentAudioTitle, setCurrentAudioTitle] = useState<string>("");
+  const [currentVoiceDisplayName, setCurrentVoiceDisplayName] = useState<string>("");
   const [showPlayerBar, setShowPlayerBar] = useState(false);
 
   // Get current voice name for display
@@ -213,6 +214,11 @@ const Playground = () => {
       if (!currentAudioTitle) {
         setCurrentAudioTitle("自定义音频");
       }
+      // Set voice name from current TTS settings
+      const voiceName = voiceOptions.find(v => v.value === voice)?.label || 
+                        customVoices.find(v => v.id === voice)?.name || 
+                        "未知音色";
+      setCurrentVoiceDisplayName(voiceName);
       generateAudio(text);
     }
   };
@@ -445,7 +451,16 @@ const Playground = () => {
               </>
             )}
 
-            {activeTab === "clone" && <VoiceCloneTab />}
+            {activeTab === "clone" && (
+              <VoiceCloneTab
+                onAudioGenerated={(url, title) => {
+                  setAudioUrl(url);
+                  setCurrentAudioTitle(title);
+                  setCurrentVoiceDisplayName("复刻音色");
+                  setShowPlayerBar(true);
+                }}
+              />
+            )}
             {activeTab === "edit" && <VoiceEditTab />}
           </div>
         </main>
@@ -544,7 +559,7 @@ const Playground = () => {
       <AudioPlayerBar
         audioUrl={audioUrl}
         title={currentAudioTitle}
-        voiceName={getCurrentVoiceName()}
+        voiceName={currentVoiceDisplayName || getCurrentVoiceName()}
         isVisible={showPlayerBar}
         onClose={handleClosePlayerBar}
       />
