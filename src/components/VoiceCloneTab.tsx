@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Play, Pause, RefreshCw, Trash2, Download, RotateCcw } from "lucide-react";
+import { Play, Pause, RefreshCw, Trash2, Download, RotateCcw, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
 import WaveformAnimation from "@/components/ui/WaveformAnimation";
@@ -22,6 +22,18 @@ const sampleTexts = [
   "中华文化源远流长，承载着深厚的历史底蕴。",
   "音乐是心灵的语言，能够触动每个人的内心。",
   "大自然用四季更迭，绘制出一幅壮丽的画卷。",
+];
+
+// AI generated target texts (20-30 characters each)
+const aiTargetTexts = [
+  "清晨的微风轻轻拂过脸颊，带来花朵的芬芳。",
+  "城市的霓虹灯在夜幕中闪烁，如繁星点点。",
+  "咖啡的香气弥漫在空气中，唤醒沉睡的灵魂。",
+  "书页翻动的声音，是知识最美的旋律。",
+  "雨滴敲打窗户的节奏，谱写一曲自然的乐章。",
+  "孩子们的笑声回荡在公园里，充满纯真与快乐。",
+  "夕阳将天空染成橘红色，美得令人心醉。",
+  "春天的樱花如粉色的雪花，飘落在小径上。",
 ];
 
 const VoiceCloneTab = () => {
@@ -66,6 +78,16 @@ const VoiceCloneTab = () => {
       newIndex = Math.floor(Math.random() * sampleTexts.length);
     }
     setSampleText(sampleTexts[newIndex]);
+  };
+
+  // Generate AI target text
+  const generateAITargetText = () => {
+    const currentIndex = aiTargetTexts.indexOf(targetText);
+    let newIndex = Math.floor(Math.random() * aiTargetTexts.length);
+    while (newIndex === currentIndex && aiTargetTexts.length > 1) {
+      newIndex = Math.floor(Math.random() * aiTargetTexts.length);
+    }
+    setTargetText(aiTargetTexts[newIndex]);
   };
 
   // Start recording
@@ -422,9 +444,18 @@ const VoiceCloneTab = () => {
             onChange={(e) => setTargetText(e.target.value.slice(0, 1000))}
             className="min-h-[120px] resize-none pr-16"
           />
-          <span className="absolute bottom-3 right-3 text-xs text-muted-foreground">
-            {targetText.length}/1000字符
-          </span>
+          <div className="absolute bottom-3 right-3 flex items-center gap-2">
+            <button
+              onClick={generateAITargetText}
+              className="flex items-center gap-1 px-2 py-1 rounded-md bg-gradient-to-r from-violet-500 to-purple-500 text-white text-xs font-medium hover:from-violet-600 hover:to-purple-600 transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+              <Sparkles className="h-3 w-3" />
+              AI生成
+            </button>
+            <span className="text-xs text-muted-foreground">
+              {targetText.length}/1000字符
+            </span>
+          </div>
         </div>
       </div>
 
