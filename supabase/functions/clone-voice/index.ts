@@ -66,31 +66,56 @@ serve(async (req) => {
     const fileId = uploadResult.id;
     console.log("File uploaded successfully, file_id:", fileId);
 
-    // Step 2: Create cloned voice
+    // Step 2: Create cloned voice with retry
     // Note: We don't pass the 'text' parameter to let the API use its built-in ASR
     // This is more forgiving when users don't read the exact sample text
     console.log("Step 2: Creating cloned voice with step-tts-mini...");
     
-    const voiceResponse = await fetch("https://api.stepfun.com/v1/audio/voices", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${STEPFUN_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        file_id: fileId,
-        model: "step-tts-mini",
-        // Omit 'text' to let API use ASR for better tolerance
-      }),
-    });
+    let voiceResult;
+    let retryCount = 0;
+    const maxRetries = 2;
+    
+    while (retryCount <= maxRetries) {
+      const voiceResponse = await fetch("https://api.stepfun.com/v1/audio/voices", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${STEPFUN_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          file_id: fileId,
+          model: "step-tts-mini",
+          // Omit 'text' to let API use ASR for better tolerance
+        }),
+      });
 
-    if (!voiceResponse.ok) {
+      if (voiceResponse.ok) {
+        voiceResult = await voiceResponse.json();
+        break;
+      }
+      
       const errorText = await voiceResponse.text();
-      console.error("Voice cloning error:", voiceResponse.status, errorText);
-      throw new Error(`Failed to clone voice: ${errorText}`);
+      console.error(`Voice cloning attempt ${retryCount + 1} error:`, voiceResponse.status, errorText);
+      
+      if (voiceResponse.status === 503 && retryCount < maxRetries) {
+        retryCount++;
+        console.log(`Retrying voice cloning (${retryCount}/${maxRetries})...`);
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds before retry
+        continue;
+      }
+      
+      // If it's a 503 error, provide a friendlier message
+      if (voiceResponse.status === 503) {
+        throw new Error("服务暂时繁忙，请稍后重试");
+      }
+      
+      throw new Error(`音色复刻失败: ${errorText}`);
+    }
+    
+    if (!voiceResult) {
+      throw new Error("服务暂时繁忙，请稍后重试");
     }
 
-    const voiceResult = await voiceResponse.json();
     const voiceId = voiceResult.id;
     console.log("Voice cloned successfully, voice_id:", voiceId);
 
