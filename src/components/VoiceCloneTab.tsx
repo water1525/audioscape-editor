@@ -51,6 +51,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady }: VoiceCloneTabProp
   const [countdown, setCountdown] = useState(10);
   const [recordedAudio, setRecordedAudio] = useState<Blob | null>(null);
   const [recordedAudioUrl, setRecordedAudioUrl] = useState<string | null>(null);
+  const [recordedAudioName, setRecordedAudioName] = useState<string>("");
   const [isPlayingRecorded, setIsPlayingRecorded] = useState(false);
   
   // Step 2: Target text state
@@ -110,6 +111,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady }: VoiceCloneTabProp
         setRecordedAudio(audioBlob);
         const url = URL.createObjectURL(audioBlob);
         setRecordedAudioUrl(url);
+        setRecordedAudioName(`${Date.now()}.wav`);
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -152,6 +154,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady }: VoiceCloneTabProp
     }
     setRecordedAudio(null);
     setRecordedAudioUrl(null);
+    setRecordedAudioName("");
     setIsPlayingRecorded(false);
     setClonedAudioUrl(null);
   };
@@ -356,7 +359,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady }: VoiceCloneTabProp
               )}
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">
-                  {Date.now()}.wav
+                  {recordedAudioName}
                 </p>
                 <p className="text-xs text-muted-foreground">00:10</p>
               </div>
