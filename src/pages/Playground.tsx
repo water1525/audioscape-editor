@@ -178,11 +178,16 @@ const Playground = () => {
         body: { text: inputText, voice },
       });
 
+      // Network/relay errors still come through here
       if (error) {
         const status = (error as any)?.context?.status ?? (error as any)?.status;
         const msg = (error as any)?.message || "音频生成失败";
 
-        if (status === 402 || String(msg).includes("quota_exceeded") || String(msg).includes(" 402")) {
+        if (
+          status === 402 ||
+          String(msg).includes("quota_exceeded") ||
+          String(msg).includes(" 402")
+        ) {
           toast.error("额度已用完，请更新密钥或升级套餐");
         } else {
           toast.error(msg);
@@ -190,7 +195,25 @@ const Playground = () => {
         return;
       }
 
-      const audioBlob = data instanceof Blob ? data : new Blob([data as any], { type: "audio/mpeg" });
+      // The function may return JSON { error } (e.g. quota exceeded) with 200
+      if (data && typeof data === "object" && "error" in (data as any)) {
+        const upstreamStatus = (data as any).upstream_status;
+        const message = String((data as any).error || "音频生成失败");
+
+        if (
+          upstreamStatus === 402 ||
+          message.includes("quota") ||
+          message.includes("quota_exceeded")
+        ) {
+          toast.error("额度已用完，请更新密钥或升级套餐");
+        } else {
+          toast.error(message);
+        }
+        return;
+      }
+
+      const audioBlob =
+        data instanceof Blob ? data : new Blob([data as any], { type: "audio/mpeg" });
       console.log("Audio blob size:", audioBlob.size);
 
       if (audioBlob.size === 0) {

@@ -121,7 +121,9 @@ serve(async (req) => {
           return new Response(audioBuffer, {
             headers: {
               ...corsHeaders,
-              "Content-Type": "audio/mpeg",
+              // functions-js treats octet-stream as binary and returns Blob on the client
+              "Content-Type": "application/octet-stream",
+              "Content-Disposition": "inline; filename=\"audio.mp3\"",
             },
           });
         }
@@ -140,19 +142,33 @@ serve(async (req) => {
           continue;
         }
 
+        const upstreamStatus = response.status;
+
+        // Avoid propagating non-2xx to the client for quota errors to prevent UI hard-fail.
+        if (upstreamStatus === 402) {
+          return new Response(
+            JSON.stringify({
+              error: "Step TTS quota exceeded. Please check your plan/billing.",
+              upstream_status: upstreamStatus,
+              upstream_error: errorText,
+            }),
+            {
+              status: 200,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
+
         return new Response(
           JSON.stringify({
-            error: `Step TTS API error: ${response.status} - ${errorText}`,
+            error: `Step TTS API error: ${upstreamStatus} - ${errorText}`,
+            upstream_status: upstreamStatus,
           }),
           {
-            status: response.status,
+            status: upstreamStatus,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           }
         );
-      }
-
-      // Should be unreachable, but keeps TypeScript happy.
-      return new Response(
         JSON.stringify({ error: "Step TTS API error: retry attempts exceeded" }),
         {
           status: 429,
