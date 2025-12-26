@@ -8,23 +8,24 @@ const banners = [
     title: "Step-tts-2",
     subtitle: "Text to speech large model",
     tags: ["Hyper-realism", "Emotional mastery", "Instant cloning"],
+    animation: "waveform",
   },
   {
     id: 2,
     title: "Step-Audio-EditX",
     subtitle: "Text to speech large model",
     tags: ["Hyper-realism", "Emotional mastery", "Instant cloning"],
+    animation: "spectrum",
   },
 ];
 
-// Animated waveform component for hero section
+// Animated waveform component for Step-tts-2
 const HeroWaveform = () => {
   const bars = 48;
   
   return (
     <div className="flex items-center justify-center gap-[3px] h-32">
       {[...Array(bars)].map((_, i) => {
-        // Create a wave pattern - higher in the middle, lower at edges
         const distanceFromCenter = Math.abs(i - bars / 2);
         const baseHeight = Math.max(12, 80 - distanceFromCenter * 3);
         
@@ -44,14 +45,56 @@ const HeroWaveform = () => {
   );
 };
 
+// Spectrum analyzer animation for Step-Audio-EditX
+const HeroSpectrum = () => {
+  const columns = 12;
+  const rows = 8;
+  
+  return (
+    <div className="flex items-end justify-center gap-2 h-40">
+      {[...Array(columns)].map((_, col) => {
+        // Create varying heights for spectrum effect
+        const baseHeight = Math.sin((col / columns) * Math.PI) * 6 + 2;
+        
+        return (
+          <div key={col} className="flex flex-col-reverse gap-1">
+            {[...Array(rows)].map((_, row) => {
+              const isActive = row < baseHeight;
+              const delay = col * 0.1 + row * 0.05;
+              
+              return (
+                <div
+                  key={row}
+                  className={`w-4 h-3 rounded-sm transition-all duration-300 ${
+                    isActive 
+                      ? 'bg-[hsl(var(--hero-accent))]' 
+                      : 'bg-[hsl(var(--hero-accent))/0.15]'
+                  }`}
+                  style={{
+                    animation: isActive ? `spectrum-pulse 0.8s ease-in-out infinite` : 'none',
+                    animationDelay: `${delay}s`,
+                    boxShadow: isActive 
+                      ? '0 0 12px hsl(195 100% 50% / 0.6), 0 0 24px hsl(195 100% 50% / 0.3)' 
+                      : 'none',
+                  }}
+                />
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 const HeroSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Auto-rotate banners every 3 seconds
+  // Auto-rotate banners every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % banners.length);
-    }, 3000);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -70,7 +113,7 @@ const HeroSection = () => {
 
       {/* Waveform Animation positioned in the circle area */}
       <div className="absolute right-[15%] top-1/2 -translate-y-1/2 z-10 hidden md:block animate-fade-in" style={{ animationDelay: "0.5s" }}>
-        <HeroWaveform />
+        {currentBanner.animation === "waveform" ? <HeroWaveform /> : <HeroSpectrum />}
       </div>
 
       {/* Content */}
@@ -110,8 +153,8 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Banner indicators */}
-      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+      {/* Banner indicators - moved to left side */}
+      <div className="absolute bottom-20 left-6 md:left-12 lg:left-20 flex items-center gap-2 z-20">
         {banners.map((_, index) => (
           <button
             key={index}
@@ -132,6 +175,14 @@ const HeroSection = () => {
           <div className="w-1 h-2 bg-[hsl(0,0%,60%)] rounded-full" />
         </div>
       </div>
+
+      {/* Spectrum animation keyframes */}
+      <style>{`
+        @keyframes spectrum-pulse {
+          0%, 100% { opacity: 1; transform: scaleY(1); }
+          50% { opacity: 0.7; transform: scaleY(0.85); }
+        }
+      `}</style>
     </section>
   );
 };
