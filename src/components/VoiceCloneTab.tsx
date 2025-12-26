@@ -447,10 +447,10 @@ const VoiceCloneTab = () => {
           <div className="absolute bottom-3 right-3 flex items-center gap-2">
             <button
               onClick={generateAITargetText}
-              className="flex items-center gap-1 px-2 py-1 rounded-md bg-gradient-to-r from-violet-500 to-purple-500 text-white text-xs font-medium hover:from-violet-600 hover:to-purple-600 transition-all duration-200 shadow-sm hover:shadow-md"
+              className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
             >
-              <Sparkles className="h-3 w-3" />
-              AI生成
+              <Sparkles className="h-3.5 w-3.5" />
+              <span className="text-xs font-medium">AI</span>
             </button>
             <span className="text-xs text-muted-foreground">
               {targetText.length}/1000字符
