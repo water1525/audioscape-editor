@@ -13,7 +13,7 @@ const banners = [
   {
     id: 2,
     title: "Step-Audio-EditX",
-    subtitle: "Text to speech large model",
+    subtitle: "Audio edit large model",
     tags: ["Hyper-realism", "Emotional mastery", "Instant cloning"],
     animation: "spectrum",
   },
