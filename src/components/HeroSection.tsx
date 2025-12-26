@@ -45,44 +45,41 @@ const HeroWaveform = () => {
   );
 };
 
-// Spectrum analyzer animation for Step-Audio-EditX
-const HeroSpectrum = () => {
-  const columns = 12;
-  const rows = 8;
+// Floating particles animation for Step-Audio-EditX
+const HeroParticles = () => {
+  const particles = 16;
   
   return (
-    <div className="flex items-end justify-center gap-2 h-40">
-      {[...Array(columns)].map((_, col) => {
-        // Create varying heights for spectrum effect
-        const baseHeight = Math.sin((col / columns) * Math.PI) * 6 + 2;
+    <div className="relative w-48 h-32 flex items-center justify-center">
+      {[...Array(particles)].map((_, i) => {
+        const angle = (i / particles) * Math.PI * 2;
+        const radius = 40 + Math.random() * 20;
+        const size = 4 + Math.random() * 6;
+        const delay = i * 0.15;
         
         return (
-          <div key={col} className="flex flex-col-reverse gap-1">
-            {[...Array(rows)].map((_, row) => {
-              const isActive = row < baseHeight;
-              const delay = col * 0.1 + row * 0.05;
-              
-              return (
-                <div
-                  key={row}
-                  className={`w-4 h-3 rounded-sm transition-all duration-300 ${
-                    isActive 
-                      ? 'bg-[hsl(var(--hero-accent))]' 
-                      : 'bg-[hsl(var(--hero-accent))/0.15]'
-                  }`}
-                  style={{
-                    animation: isActive ? `spectrum-pulse 0.8s ease-in-out infinite` : 'none',
-                    animationDelay: `${delay}s`,
-                    boxShadow: isActive 
-                      ? '0 0 12px hsl(195 100% 50% / 0.6), 0 0 24px hsl(195 100% 50% / 0.3)' 
-                      : 'none',
-                  }}
-                />
-              );
-            })}
-          </div>
+          <div
+            key={i}
+            className="absolute bg-[hsl(var(--hero-accent))] rounded-full"
+            style={{
+              width: `${size}px`,
+              height: `${size}px`,
+              left: `calc(50% + ${Math.cos(angle) * radius}px)`,
+              top: `calc(50% + ${Math.sin(angle) * radius}px)`,
+              animation: `particle-float 2s ease-in-out infinite`,
+              animationDelay: `${delay}s`,
+              boxShadow: '0 0 10px hsl(195 100% 50% / 0.8), 0 0 20px hsl(195 100% 50% / 0.4)',
+            }}
+          />
         );
       })}
+      {/* Center glow */}
+      <div 
+        className="absolute w-8 h-8 bg-[hsl(var(--hero-accent))/0.3] rounded-full blur-lg"
+        style={{
+          animation: 'pulse-glow 1.5s ease-in-out infinite',
+        }}
+      />
     </div>
   );
 };
@@ -113,7 +110,7 @@ const HeroSection = () => {
 
       {/* Waveform Animation positioned in the circle area */}
       <div className="absolute right-[15%] top-1/2 -translate-y-1/2 z-10 hidden md:block animate-fade-in" style={{ animationDelay: "0.5s" }}>
-        {currentBanner.animation === "waveform" ? <HeroWaveform /> : <HeroSpectrum />}
+        {currentBanner.animation === "waveform" ? <HeroWaveform /> : <HeroParticles />}
       </div>
 
       {/* Content */}
@@ -176,11 +173,15 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Spectrum animation keyframes */}
+      {/* Particle animation keyframes */}
       <style>{`
-        @keyframes spectrum-pulse {
-          0%, 100% { opacity: 1; transform: scaleY(1); }
-          50% { opacity: 0.7; transform: scaleY(0.85); }
+        @keyframes particle-float {
+          0%, 100% { opacity: 1; transform: translateY(0) scale(1); }
+          50% { opacity: 0.6; transform: translateY(-8px) scale(1.2); }
+        }
+        @keyframes pulse-glow {
+          0%, 100% { opacity: 0.3; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(1.5); }
         }
       `}</style>
     </section>
