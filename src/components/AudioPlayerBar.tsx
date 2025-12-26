@@ -91,7 +91,7 @@ const AudioPlayerBar = ({
   if (!isVisible || !audioUrl) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-lg">
+    <div className="fixed bottom-0 left-56 right-64 z-50 bg-card border-t border-l border-r border-border shadow-lg rounded-t-xl">
       <audio
         ref={audioRef}
         src={audioUrl}
@@ -102,7 +102,7 @@ const AudioPlayerBar = ({
 
       {/* Progress bar - clickable */}
       <div
-        className="h-1 bg-muted cursor-pointer group"
+        className="h-1 bg-muted cursor-pointer group rounded-t-xl overflow-hidden"
         onClick={handleSeek}
       >
         <div
@@ -111,7 +111,7 @@ const AudioPlayerBar = ({
         />
       </div>
 
-      <div className="container mx-auto px-6 py-3">
+      <div className="px-6 py-3">
         <div className="flex items-center justify-between gap-4">
           {/* Left: Title and Voice Info */}
           <div className="flex-1 min-w-0">
