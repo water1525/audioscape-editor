@@ -163,40 +163,36 @@ const Playground = () => {
     
     try {
       console.log("Starting TTS generation...");
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ text: inputText, voice }),
+
+      const { data, error } = await supabase.functions.invoke("step-tts", {
+        body: { text: inputText, voice },
+      });
+
+      if (error) {
+        const status = (error as any)?.context?.status ?? (error as any)?.status;
+        const msg = (error as any)?.message || "音频生成失败";
+
+        if (status === 402 || String(msg).includes("quota_exceeded") || String(msg).includes(" 402")) {
+          toast.error("额度已用完，请更新密钥或升级套餐");
+        } else {
+          toast.error(msg);
         }
-      );
-
-      console.log("TTS response status:", response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("TTS error response:", errorText);
-        throw new Error(`生成音频失败: ${response.status}`);
+        return;
       }
 
-      const audioBlob = await response.blob();
+      const audioBlob = data instanceof Blob ? data : new Blob([data as any], { type: "audio/mpeg" });
       console.log("Audio blob size:", audioBlob.size);
-      
+
       if (audioBlob.size === 0) {
         throw new Error("生成的音频为空");
       }
-      
+
       const url = URL.createObjectURL(audioBlob);
       setAudioUrl(url);
       console.log("Audio URL created successfully");
     } catch (error) {
       console.error("TTS error:", error);
-      toast.error("音频生成失败，请重试");
+      toast.error(error instanceof Error ? error.message : "音频生成失败，请重试");
     } finally {
       setIsGenerating(false);
       console.log("TTS generation finished");
