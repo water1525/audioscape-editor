@@ -197,6 +197,21 @@ const Playground = () => {
     return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/audio/${filePath}`;
   };
 
+  // Preload audio to get duration before displaying
+  const preloadAudioDuration = (url: string): Promise<number> => {
+    return new Promise((resolve) => {
+      const audio = new Audio();
+      audio.preload = "metadata";
+      audio.src = url;
+      audio.onloadedmetadata = () => {
+        resolve(audio.duration);
+      };
+      audio.onerror = () => {
+        resolve(0);
+      };
+    });
+  };
+
   const handleCaseClick = async (sample: typeof caseSamples[0]) => {
     setText(sample.text);
     setCurrentAudioTitle(sample.audioTitle);
@@ -206,9 +221,15 @@ const Playground = () => {
     if (storageUrl) {
       setIsGenerating(true);
       try {
-        // Check if file exists in storage
+        // Check if file exists and has content
         const response = await fetch(storageUrl, { method: 'HEAD' });
-        if (response.ok) {
+        const contentLength = response.headers.get('content-length');
+        
+        if (response.ok && contentLength && parseInt(contentLength) > 0) {
+          // Preload audio to get duration before setting URL
+          const audioDuration = await preloadAudioDuration(storageUrl);
+          setDuration(audioDuration);
+          setCurrentTime(0);
           setAudioUrl(storageUrl);
           setIsGenerating(false);
           return;
@@ -218,7 +239,7 @@ const Playground = () => {
       }
     }
     
-    // Fallback to real-time generation if storage file doesn't exist
+    // Fallback to real-time generation if storage file doesn't exist or is empty
     await generateAudio(sample.text);
   };
 
