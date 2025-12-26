@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface VoiceCloneTabProps {
   onAudioGenerated?: (audioUrl: string, title: string) => void;
+  onSaveVoiceReady?: (openSaveDialog: () => void) => void;
 }
 
 // Sample texts for recording (20-30 characters each)
@@ -40,7 +41,7 @@ const aiTargetTexts = [
   "春天的樱花如粉色的雪花，飘落在小径上。",
 ];
 
-const VoiceCloneTab = ({ onAudioGenerated }: VoiceCloneTabProps) => {
+const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady }: VoiceCloneTabProps) => {
   // Custom voices hook
   const { saveVoice } = useCustomVoices();
 
@@ -263,6 +264,13 @@ const VoiceCloneTab = ({ onAudioGenerated }: VoiceCloneTabProps) => {
     }
   }, [countdown, isRecording, stopRecording]);
 
+  // Expose openSaveDialog to parent when cloned audio is ready
+  useEffect(() => {
+    if (clonedAudioUrl && onSaveVoiceReady) {
+      onSaveVoiceReady(openSaveDialog);
+    }
+  }, [clonedAudioUrl, onSaveVoiceReady]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -406,32 +414,6 @@ const VoiceCloneTab = ({ onAudioGenerated }: VoiceCloneTabProps) => {
         </div>
       )}
 
-      {/* Step 3: Cloned Audio Player */}
-      {clonedAudioUrl && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-foreground">step 3 生成复刻音频</h3>
-            <Button variant="outline" size="sm" className="gap-2" onClick={openSaveDialog}>
-              <Save className="h-4 w-4" />
-              保存音色
-            </Button>
-          </div>
-          <div className="bg-card border border-border rounded-lg p-4">
-            <div className="flex items-center gap-4">
-              <p className="text-sm text-muted-foreground flex-1">
-                音频已生成，请在底部播放器中播放
-              </p>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onAudioGenerated?.(clonedAudioUrl, "复刻音频")}
-              >
-                在播放器中打开
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Save Voice Dialog */}
       <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>

@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { Play, Pause, Download, RotateCcw, ChevronDown } from "lucide-react";
+import { Play, Pause, Download, RotateCcw, ChevronDown, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AudioPlayerBarProps {
@@ -8,6 +8,8 @@ interface AudioPlayerBarProps {
   voiceName: string;
   isVisible: boolean;
   onClose: () => void;
+  showSaveVoice?: boolean;
+  onSaveVoice?: () => void;
 }
 
 const AudioPlayerBar = ({
@@ -16,6 +18,8 @@ const AudioPlayerBar = ({
   voiceName,
   isVisible,
   onClose,
+  showSaveVoice,
+  onSaveVoice,
 }: AudioPlayerBarProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -168,6 +172,18 @@ const AudioPlayerBar = ({
 
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
+            {showSaveVoice && onSaveVoice && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onSaveVoice}
+                className="gap-1.5"
+              >
+                <Save className="w-4 h-4" />
+                保存音色
+              </Button>
+            )}
+
             <Button
               variant="ghost"
               size="icon"
