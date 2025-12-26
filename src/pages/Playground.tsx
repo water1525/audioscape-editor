@@ -504,6 +504,9 @@ const Playground = () => {
                   setCurrentVoiceDisplayName("编辑音频");
                   setShowPlayerBar(true);
                 }}
+                onAudioDeleted={() => {
+                  setShowPlayerBar(false);
+                }}
               />
             )}
           </div>

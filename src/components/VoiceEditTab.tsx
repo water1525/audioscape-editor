@@ -31,9 +31,10 @@ interface EditedAudio {
 
 interface VoiceEditTabProps {
   onAudioGenerated?: (audioUrl: string, title: string) => void;
+  onAudioDeleted?: () => void;
 }
 
-const VoiceEditTab = ({ onAudioGenerated }: VoiceEditTabProps) => {
+const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted }: VoiceEditTabProps) => {
   // Upload/Record state
   const [audioSource, setAudioSource] = useState<"none" | "upload" | "record">("none");
   const [originalAudioBlob, setOriginalAudioBlob] = useState<Blob | null>(null);
@@ -171,6 +172,8 @@ const VoiceEditTab = ({ onAudioGenerated }: VoiceEditTabProps) => {
     setEditedAudios([]);
     setIsPlayingOriginal(false);
     setPlayingEditedIndex(null);
+    // Notify parent to hide the player bar
+    onAudioDeleted?.();
   };
 
   // Toggle play original
