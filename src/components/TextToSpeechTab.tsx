@@ -324,7 +324,7 @@ const TextToSpeechTab = () => {
           ) : (
             <Play className="h-4 w-4" />
           )}
-          {isGenerating ? "生成中..." : isPlaying ? currentCase.audioTitle : "播放"}
+          {isGenerating ? "生成中..." : isPlaying ? "播放中" : "播放"}
         </Button>
       </div>
     </div>
