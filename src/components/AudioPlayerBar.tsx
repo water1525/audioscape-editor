@@ -91,7 +91,7 @@ const AudioPlayerBar = ({
   if (!isVisible || !audioUrl) return null;
 
   return (
-    <div className="fixed bottom-0 left-56 right-64 z-50 bg-card border-t border-l border-r border-border shadow-lg rounded-t-xl">
+    <div className="fixed bottom-0 left-56 right-0 z-50 bg-card border-t border-l border-border shadow-lg rounded-tl-xl">
       <audio
         ref={audioRef}
         src={audioUrl}
@@ -99,17 +99,6 @@ const AudioPlayerBar = ({
         onLoadedMetadata={handleLoadedMetadata}
         onEnded={() => setIsPlaying(false)}
       />
-
-      {/* Progress bar - clickable */}
-      <div
-        className="h-1 bg-muted cursor-pointer group rounded-t-xl overflow-hidden"
-        onClick={handleSeek}
-      >
-        <div
-          className="h-full bg-primary transition-all duration-100"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
 
       <div className="px-6 py-3">
         <div className="flex items-center justify-between gap-4">
@@ -156,9 +145,25 @@ const AudioPlayerBar = ({
             </button>
           </div>
 
-          {/* Time Display */}
-          <div className="text-sm text-muted-foreground min-w-[80px] text-center">
-            {formatTime(currentTime)} / {formatTime(duration)}
+          {/* Progress Bar - Always visible */}
+          <div className="flex items-center gap-3 flex-1 max-w-md">
+            <span className="text-xs text-muted-foreground min-w-[40px] text-right">
+              {formatTime(currentTime)}
+            </span>
+            <div
+              className="flex-1 h-1.5 bg-muted rounded-full cursor-pointer group"
+              onClick={handleSeek}
+            >
+              <div
+                className="h-full bg-primary rounded-full transition-all duration-100 relative"
+                style={{ width: `${progress}%` }}
+              >
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </div>
+            <span className="text-xs text-muted-foreground min-w-[40px]">
+              {formatTime(duration)}
+            </span>
           </div>
 
           {/* Right: Actions */}
