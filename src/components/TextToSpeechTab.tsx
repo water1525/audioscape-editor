@@ -35,6 +35,7 @@ const cases = [
     id: "case1",
     label: "新闻播报",
     description: "Step 3模型发布",
+    audioTitle: "Step 3发布",
     icon: "📰",
     gradient: "from-blue-400 to-cyan-400",
     text: voiceConfigs.case1.text,
@@ -44,6 +45,7 @@ const cases = [
     id: "case2",
     label: "有声读物",
     description: "悬疑故事",
+    audioTitle: "午夜来信",
     icon: "📖",
     gradient: "from-purple-400 to-pink-400",
     text: voiceConfigs.case2.text,
@@ -53,6 +55,7 @@ const cases = [
     id: "case3",
     label: "客服助手",
     description: "智能客服对话",
+    audioTitle: "订单查询",
     icon: "🎧",
     gradient: "from-green-400 to-emerald-400",
     text: dialogueLines.map(line => `${line.speaker}：${line.text}`).join("\n"),
@@ -317,11 +320,11 @@ const TextToSpeechTab = () => {
           {isGenerating ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : isPlaying ? (
-            <WaveformAnimation isPlaying={true} variant="small" barCount={4} className="text-primary-foreground [&>div]:bg-primary-foreground" />
+            <WaveformAnimation isPlaying={true} variant="small" barCount={3} className="text-primary-foreground [&>div]:bg-primary-foreground" />
           ) : (
             <Play className="h-4 w-4" />
           )}
-          {isGenerating ? "生成中..." : isPlaying ? "播放中" : "播放"}
+          {isGenerating ? "生成中..." : isPlaying ? currentCase.audioTitle : "播放"}
         </Button>
       </div>
     </div>
