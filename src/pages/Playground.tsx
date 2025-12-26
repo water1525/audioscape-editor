@@ -121,6 +121,14 @@ const Playground = () => {
   const { customVoices, refreshVoices } = useCustomVoices();
   
   const [activeTab, setActiveTab] = useState("tts");
+
+  // Hide player bar when switching tabs
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setShowPlayerBar(false);
+    setShowSaveVoice(false);
+    setSaveVoiceCallback(null);
+  };
   const [text, setText] = useState("");
   const [voice, setVoice] = useState("tianmeinvsheng");
   const [speed, setSpeed] = useState([1]);
@@ -297,7 +305,7 @@ const Playground = () => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => handleTabChange(tab.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
                     isActive
                       ? "bg-primary/10 text-primary font-medium"
