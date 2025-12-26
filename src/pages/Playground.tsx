@@ -141,6 +141,7 @@ const Playground = () => {
   const [showPlayerBar, setShowPlayerBar] = useState(false);
   const [showSaveVoice, setShowSaveVoice] = useState(false);
   const [saveVoiceCallback, setSaveVoiceCallback] = useState<(() => void) | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Get current voice name for display
   const getCurrentVoiceName = () => {
@@ -168,6 +169,15 @@ const Playground = () => {
   const generateAudio = async (inputText: string) => {
     if (!inputText.trim()) return;
     
+    // Cancel any previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // Create new abort controller
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+    
     setIsGenerating(true);
     setAudioUrl(null);
     
@@ -177,6 +187,12 @@ const Playground = () => {
       const { data, error } = await supabase.functions.invoke("step-tts", {
         body: { text: inputText, voice },
       });
+      
+      // Check if request was aborted
+      if (abortController.signal.aborted) {
+        console.log("TTS generation was cancelled");
+        return;
+      }
 
       // Network/relay errors still come through here
       if (error) {
@@ -224,11 +240,19 @@ const Playground = () => {
       setAudioUrl(url);
       console.log("Audio URL created successfully");
     } catch (error) {
+      // Don't show error if it was an abort
+      if (abortController.signal.aborted) {
+        console.log("TTS generation was cancelled");
+        return;
+      }
       console.error("TTS error:", error);
       toast.error(error instanceof Error ? error.message : "音频生成失败，请重试");
     } finally {
-      setIsGenerating(false);
-      console.log("TTS generation finished");
+      // Only update state if not aborted
+      if (!abortController.signal.aborted) {
+        setIsGenerating(false);
+        console.log("TTS generation finished");
+      }
     }
   };
 
@@ -260,6 +284,12 @@ const Playground = () => {
   };
 
   const handleClear = () => {
+    // Cancel any ongoing generation
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsGenerating(false);
     setText("");
     setAudioUrl(null);
     setShowPlayerBar(false);
