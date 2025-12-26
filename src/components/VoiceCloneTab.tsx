@@ -309,13 +309,13 @@ const VoiceCloneTab = () => {
   const handleSaveVoice = () => {
     const trimmedName = voiceName.trim();
     
-    if (trimmedName.length < 5) {
-      setVoiceNameError("音色名称至少需要5个字符");
+    if (trimmedName.length < 1) {
+      setVoiceNameError("音色名称至少需要1个字符");
       return;
     }
     
-    if (trimmedName.length > 15) {
-      setVoiceNameError("音色名称不能超过15个字符");
+    if (trimmedName.length > 20) {
+      setVoiceNameError("音色名称不能超过20个字符");
       return;
     }
 
@@ -547,19 +547,19 @@ const VoiceCloneTab = () => {
                 音色名称
               </label>
               <Input
-                placeholder="请输入音色名称（5-15个字符）"
+                placeholder="请输入音色名称（1-20个字符）"
                 value={voiceName}
                 onChange={(e) => {
                   setVoiceName(e.target.value);
                   setVoiceNameError("");
                 }}
-                maxLength={15}
+                maxLength={20}
               />
               {voiceNameError && (
                 <p className="text-sm text-destructive">{voiceNameError}</p>
               )}
               <p className="text-xs text-muted-foreground">
-                {voiceName.length}/15 字符
+                {voiceName.length}/20 字符
               </p>
             </div>
           </div>
