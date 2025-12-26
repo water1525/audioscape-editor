@@ -33,7 +33,7 @@ const VoicePlatformSection = () => {
       {/* Header */}
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3 tracking-tight">
-          打造智能语音交互的未来
+          探索AI语音的更多可能
         </h2>
         <p className="text-muted-foreground text-base md:text-lg">
           领先的模型和工具助力行业变革
