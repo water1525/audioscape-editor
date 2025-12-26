@@ -212,35 +212,18 @@ const Playground = () => {
     });
   };
 
-  const handleCaseClick = async (sample: typeof caseSamples[0]) => {
+  const handleCaseClick = (sample: typeof caseSamples[0]) => {
+    // Only load text, don't auto-generate audio
     setText(sample.text);
     setCurrentAudioTitle(sample.audioTitle);
-    
-    // Try to use pre-generated audio from storage first
-    const storageUrl = getStorageUrl(sample.id);
-    if (storageUrl) {
-      setIsGenerating(true);
-      try {
-        // Check if file exists and has content
-        const response = await fetch(storageUrl, { method: 'HEAD' });
-        const contentLength = response.headers.get('content-length');
-        
-        if (response.ok && contentLength && parseInt(contentLength) > 0) {
-          // Preload audio to get duration before setting URL
-          const audioDuration = await preloadAudioDuration(storageUrl);
-          setDuration(audioDuration);
-          setCurrentTime(0);
-          setAudioUrl(storageUrl);
-          setIsGenerating(false);
-          return;
-        }
-      } catch (error) {
-        console.log("Storage audio not available, generating...");
-      }
+    // Reset audio state
+    setAudioUrl(null);
+    setCurrentTime(0);
+    setDuration(0);
+    setIsPlaying(false);
+    if (audioRef.current) {
+      audioRef.current.pause();
     }
-    
-    // Fallback to real-time generation if storage file doesn't exist or is empty
-    await generateAudio(sample.text);
   };
 
   const handleGenerateClick = () => {
