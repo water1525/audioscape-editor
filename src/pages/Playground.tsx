@@ -43,6 +43,16 @@ const formatOptions = [
   { value: "ogg", label: "ogg" },
 ];
 
+// Storage file mapping for pre-generated audio
+const storageFiles: Record<number, string> = {
+  1: "tts/playground-case-1.mp3",
+  2: "tts/playground-case-2.mp3",
+  3: "tts/playground-case-3.mp3",
+  4: "tts/playground-case-4.mp3",
+  5: "tts/playground-case-5.mp3",
+  6: "tts/playground-case-6.mp3",
+};
+
 const caseSamples = [
   {
     id: 1,
@@ -180,9 +190,35 @@ const Playground = () => {
     }
   };
 
+  // Get storage URL for pre-generated audio
+  const getStorageUrl = (caseId: number): string | null => {
+    const filePath = storageFiles[caseId];
+    if (!filePath) return null;
+    return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/audio/${filePath}`;
+  };
+
   const handleCaseClick = async (sample: typeof caseSamples[0]) => {
     setText(sample.text);
     setCurrentAudioTitle(sample.audioTitle);
+    
+    // Try to use pre-generated audio from storage first
+    const storageUrl = getStorageUrl(sample.id);
+    if (storageUrl) {
+      setIsGenerating(true);
+      try {
+        // Check if file exists in storage
+        const response = await fetch(storageUrl, { method: 'HEAD' });
+        if (response.ok) {
+          setAudioUrl(storageUrl);
+          setIsGenerating(false);
+          return;
+        }
+      } catch (error) {
+        console.log("Storage audio not available, generating...");
+      }
+    }
+    
+    // Fallback to real-time generation if storage file doesn't exist
     await generateAudio(sample.text);
   };
 
