@@ -517,44 +517,6 @@ const VoiceEditTab = ({ onAudioGenerated }: VoiceEditTabProps) => {
         </div>
       )}
 
-      {/* Edited Audio Section */}
-      {editedAudios.length > 0 && (
-        <div className="space-y-3 animate-slide-up">
-          <h3 className="text-sm font-medium text-foreground">编辑后的音频</h3>
-          <div className="space-y-3">
-            {editedAudios.map((audio, index) => (
-              <div 
-                key={index}
-                className="relative group bg-gradient-to-br from-accent via-primary/5 to-accent rounded-xl p-4 border border-primary/20 shadow-[var(--shadow-audio)] hover:shadow-md hover:shadow-primary/10 transition-all duration-300"
-              >
-                <div className="relative flex items-center gap-4">
-                  <Button 
-                    variant="audioSquare" 
-                    size="icon"
-                    onClick={() => togglePlayEdited(index)}
-                    className="w-12 h-12 shrink-0"
-                  >
-                    {playingEditedIndex === index ? (
-                      <Pause className="h-5 w-5" />
-                    ) : (
-                      <Play className="h-5 w-5 ml-0.5" />
-                    )}
-                  </Button>
-                  
-                  <WaveformAnimation isPlaying={playingEditedIndex === index} variant="primary" />
-                  
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">
-                      {audio.fileName}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">时长 00:10</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Edit Modal */}
       {showModal && createPortal(
