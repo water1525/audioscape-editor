@@ -1,6 +1,21 @@
+import { useState, useEffect } from "react";
 import heroBg from "@/assets/hero-bg.jpg";
 
-const tags = ["Hyper-realism", "Emotional mastery", "Instant cloning"];
+// Banner data
+const banners = [
+  {
+    id: 1,
+    title: "Step-tts-2",
+    subtitle: "Text to speech large model",
+    tags: ["Hyper-realism", "Emotional mastery", "Instant cloning"],
+  },
+  {
+    id: 2,
+    title: "Step-Audio-EditX",
+    subtitle: "Text to speech large model",
+    tags: ["Hyper-realism", "Emotional mastery", "Instant cloning"],
+  },
+];
 
 // Animated waveform component for hero section
 const HeroWaveform = () => {
@@ -30,6 +45,18 @@ const HeroWaveform = () => {
 };
 
 const HeroSection = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // Auto-rotate banners every 3 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % banners.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const currentBanner = banners[activeIndex];
+
   return (
     <section className="hero-section relative min-h-screen flex items-center overflow-hidden">
       {/* Background Image */}
@@ -50,18 +77,21 @@ const HeroSection = () => {
       <div className="relative z-10 container mx-auto px-6 md:px-12 lg:px-20">
         <div className="max-w-2xl">
           {/* Title */}
-          <h1 className="hero-title text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 animate-fade-in">
-            Step-tts-2
+          <h1 
+            key={currentBanner.id}
+            className="hero-title text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 animate-fade-in"
+          >
+            {currentBanner.title}
           </h1>
 
           {/* Subtitle */}
           <p className="text-xl md:text-2xl font-semibold text-[hsl(0,0%,100%)] mb-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            Text to speech large model
+            {currentBanner.subtitle}
           </p>
 
           {/* Tags */}
           <div className="flex flex-wrap gap-3 mb-10 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            {tags.map((tag) => (
+            {currentBanner.tags.map((tag) => (
               <span key={tag} className="hero-tag">
                 {tag}
               </span>
@@ -78,6 +108,22 @@ const HeroSection = () => {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Banner indicators */}
+      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+        {banners.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setActiveIndex(index)}
+            className={`h-1 rounded-full transition-all duration-300 ${
+              index === activeIndex 
+                ? 'w-8 bg-primary' 
+                : 'w-4 bg-muted-foreground/40 hover:bg-muted-foreground/60'
+            }`}
+            aria-label={`切换到第${index + 1}个banner`}
+          />
+        ))}
       </div>
 
       {/* Scroll indicator */}
