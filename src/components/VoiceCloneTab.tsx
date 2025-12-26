@@ -13,6 +13,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useCustomVoices } from "@/hooks/useCustomVoices";
+import { supabase } from "@/integrations/supabase/client";
 
 interface VoiceCloneTabProps {
   onAudioGenerated?: (audioUrl: string, title: string) => void;
@@ -190,38 +191,25 @@ const VoiceCloneTab = ({ onAudioGenerated }: VoiceCloneTabProps) => {
       }
       const audioBase64 = btoa(binary);
 
-      // Call the clone-voice edge function
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/clone-voice`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            audioBase64,
-            sampleText, // The text that was spoken during recording
-            targetText, // The text to generate with the cloned voice
-          }),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke("clone-voice", {
+        body: {
+          audioBase64,
+          sampleText, // The text that was spoken during recording
+          targetText, // The text to generate with the cloned voice
+        },
+      });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "音色复刻失败");
+      if (error) {
+        throw new Error((error as any)?.message || "音色复刻失败");
       }
 
-      const audioBlob = await response.blob();
+      const audioBlob = data instanceof Blob ? data : new Blob([data as any], { type: "audio/mpeg" });
       const url = URL.createObjectURL(audioBlob);
       setClonedAudioUrl(url);
       toast.success("音色复刻成功！使用您的声音生成了音频");
-      
+
       // Notify parent component to play in bottom bar
-      if (onAudioGenerated) {
-        onAudioGenerated(url, "复刻音频");
-      }
+      onAudioGenerated?.(url, "复刻音频");
     } catch (error) {
       console.error("Voice cloning error:", error);
       toast.error(error instanceof Error ? error.message : "音色复刻失败，请重试");
