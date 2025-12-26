@@ -460,7 +460,7 @@ const VoiceEditTab = () => {
                   className="w-12 h-12 shrink-0"
                 >
                   {isPlayingOriginal ? (
-                    <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
+                    <Pause className="h-5 w-5" />
                   ) : (
                     <Play className="h-5 w-5 ml-0.5" />
                   )}
@@ -528,7 +528,7 @@ const VoiceEditTab = () => {
                     className="w-12 h-12 shrink-0"
                   >
                     {playingEditedIndex === index ? (
-                      <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
+                      <Pause className="h-5 w-5" />
                     ) : (
                       <Play className="h-5 w-5 ml-0.5" />
                     )}
