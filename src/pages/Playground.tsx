@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, MessageSquareText, Copy, Wand2, Play, Pause, RotateCcw, Download, RefreshCw, X, BookOpen, Cpu, Headphones, Mic, GraduationCap, Sparkles, Mail, HeadphonesIcon } from "lucide-react";
+import { ChevronDown, MessageSquareText, Copy, Wand2, RefreshCw, X, BookOpen, Cpu, Headphones, Mic, GraduationCap, Sparkles, HeadphonesIcon, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import VoiceCloneTab from "@/components/VoiceCloneTab";
 import VoiceEditTab from "@/components/VoiceEditTab";
 import { Slider } from "@/components/ui/slider";
+import AudioPlayerBar from "@/components/AudioPlayerBar";
 import {
   Select,
   SelectContent,
@@ -127,12 +128,17 @@ const Playground = () => {
   const [format, setFormat] = useState("mp3");
   const [isGenerating, setIsGenerating] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [waveformHeights, setWaveformHeights] = useState<number[]>(Array(8).fill(20));
   const [currentAudioTitle, setCurrentAudioTitle] = useState<string>("");
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [showPlayerBar, setShowPlayerBar] = useState(false);
+
+  // Get current voice name for display
+  const getCurrentVoiceName = () => {
+    const systemVoice = voiceOptions.find(v => v.value === voice);
+    if (systemVoice) return systemVoice.label;
+    const customVoice = customVoices.find(v => v.id === voice);
+    if (customVoice) return customVoice.name;
+    return "未知音色";
+  };
 
   // Refresh custom voices when switching to TTS tab
   useEffect(() => {
@@ -141,19 +147,12 @@ const Playground = () => {
     }
   }, [activeTab, refreshVoices]);
 
-  // Animate waveform when playing
+  // Show player bar when audio is ready
   useEffect(() => {
-    if (!isPlaying) {
-      setWaveformHeights(Array(8).fill(20));
-      return;
+    if (audioUrl) {
+      setShowPlayerBar(true);
     }
-    
-    const interval = setInterval(() => {
-      setWaveformHeights(prev => prev.map(() => Math.random() * 80 + 20));
-    }, 100);
-    
-    return () => clearInterval(interval);
-  }, [isPlaying]);
+  }, [audioUrl]);
 
   const generateAudio = async (inputText: string) => {
     if (!inputText.trim()) return;
@@ -190,101 +189,19 @@ const Playground = () => {
     }
   };
 
-  // Get storage URL for pre-generated audio
-  const getStorageUrl = (caseId: number): string | null => {
-    const filePath = storageFiles[caseId];
-    if (!filePath) return null;
-    return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/audio/${filePath}`;
-  };
-
-  // Preload audio to get duration before displaying
-  const preloadAudioDuration = (url: string): Promise<number> => {
-    return new Promise((resolve) => {
-      const audio = new Audio();
-      audio.preload = "metadata";
-      audio.src = url;
-      audio.onloadedmetadata = () => {
-        resolve(audio.duration);
-      };
-      audio.onerror = () => {
-        resolve(0);
-      };
-    });
-  };
-
   const handleCaseClick = (sample: typeof caseSamples[0]) => {
-    // Only load text, don't auto-generate audio
     setText(sample.text);
     setCurrentAudioTitle(sample.audioTitle);
-    // Reset audio state
     setAudioUrl(null);
-    setCurrentTime(0);
-    setDuration(0);
-    setIsPlaying(false);
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
   };
 
   const handleGenerateClick = () => {
     if (text.trim()) {
-      // 如果没有选择案例，生成默认标题
       if (!currentAudioTitle) {
         setCurrentAudioTitle("自定义音频");
       }
       generateAudio(text);
     }
-  };
-
-  const togglePlayPause = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-    }
-  };
-
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const time = parseFloat(e.target.value);
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      setCurrentTime(time);
-    }
-  };
-
-  const skipTime = (seconds: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = Math.max(0, Math.min(audioRef.current.currentTime + seconds, duration));
-    }
-  };
-
-  const handleDownload = () => {
-    if (audioUrl) {
-      const a = document.createElement("a");
-      a.href = audioUrl;
-      a.download = `audio.${format}`;
-      a.click();
-    }
-  };
-
-  const formatTime = (time: number) => {
-    const mins = Math.floor(time / 60);
-    const secs = Math.floor(time % 60);
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -297,12 +214,12 @@ const Playground = () => {
   const handleClear = () => {
     setText("");
     setAudioUrl(null);
-    setIsPlaying(false);
-    setCurrentTime(0);
-    setDuration(0);
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
+    setShowPlayerBar(false);
+    setCurrentAudioTitle("");
+  };
+
+  const handleClosePlayerBar = () => {
+    setShowPlayerBar(false);
   };
 
   return (
@@ -472,94 +389,18 @@ const Playground = () => {
                   </div>
                 )}
 
-                {/* Audio Player - Only show when audio is ready */}
+                {/* Audio Ready State - Show regenerate button */}
                 {audioUrl && !isGenerating && (
-                  <div className="mb-6">
-                    <div className="flex items-center justify-between mb-2">
-                      {currentAudioTitle && (
-                        <span className="text-sm font-medium text-foreground">{currentAudioTitle}</span>
-                      )}
-                      <div className="flex-1" />
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleGenerateClick}
-                        disabled={isGenerating || !text.trim()}
-                        className="gap-2"
-                      >
-                        <RefreshCw className="w-4 h-4" />
-                        重新生成
-                      </Button>
-                    </div>
-                    
-                    <div className="bg-primary/10 rounded-xl p-4">
-                      <audio
-                        ref={audioRef}
-                        src={audioUrl}
-                        onTimeUpdate={handleTimeUpdate}
-                        onLoadedMetadata={handleLoadedMetadata}
-                        onEnded={() => setIsPlaying(false)}
-                      />
-                      
-                      <div className="flex items-center gap-4">
-                        <button
-                          onClick={togglePlayPause}
-                          className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center hover:bg-foreground/90 transition-colors"
-                        >
-                          {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
-                        </button>
-                        
-                        {/* Waveform Animation */}
-                        <div className="flex items-center gap-[2px] h-6">
-                          {waveformHeights.map((height, i) => (
-                            <div
-                              key={i}
-                              className="w-[2px] rounded-full bg-primary transition-all duration-100"
-                              style={{
-                                height: `${height}%`,
-                                opacity: isPlaying ? 0.8 : 0.4,
-                              }}
-                            />
-                          ))}
-                        </div>
-                        
-                        <div className="flex-1">
-                          <input
-                            type="range"
-                            min={0}
-                            max={duration || 100}
-                            value={currentTime}
-                            onChange={handleSeek}
-                            className="w-full h-2 bg-primary/30 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
-                          />
-                        </div>
-                        
-                        <span className="text-sm text-muted-foreground min-w-[100px]">
-                          {formatTime(currentTime)}/{formatTime(duration)}
-                        </span>
-                        
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => skipTime(-5)}
-                            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            <RotateCcw className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => skipTime(5)}
-                            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            <RotateCcw className="w-5 h-5 scale-x-[-1]" />
-                          </button>
-                          <button
-                            onClick={handleDownload}
-                            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            <Download className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="mb-6 flex justify-center">
+                    <Button
+                      variant="outline"
+                      onClick={handleGenerateClick}
+                      disabled={isGenerating || !text.trim()}
+                      className="gap-2"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                      重新生成
+                    </Button>
                   </div>
                 )}
 
@@ -682,6 +523,18 @@ const Playground = () => {
           </aside>
         )}
       </div>
+
+      {/* Bottom padding when player bar is visible */}
+      {showPlayerBar && <div className="h-20" />}
+
+      {/* Fixed Bottom Audio Player Bar */}
+      <AudioPlayerBar
+        audioUrl={audioUrl}
+        title={currentAudioTitle}
+        voiceName={getCurrentVoiceName()}
+        isVisible={showPlayerBar}
+        onClose={handleClosePlayerBar}
+      />
     </div>
   );
 };
