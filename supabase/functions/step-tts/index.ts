@@ -169,6 +169,10 @@ serve(async (req) => {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           }
         );
+      }
+
+      // Should be unreachable, but keeps TypeScript happy.
+      return new Response(
         JSON.stringify({ error: "Step TTS API error: retry attempts exceeded" }),
         {
           status: 429,
