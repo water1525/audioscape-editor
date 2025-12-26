@@ -435,7 +435,11 @@ const Playground = () => {
                 {/* Audio Player - Only show when audio is ready */}
                 {audioUrl && !isGenerating && (
                   <div className="mb-6">
-                    <div className="flex justify-end mb-2">
+                    <div className="flex items-center justify-between mb-2">
+                      {currentAudioTitle && (
+                        <span className="text-sm font-medium text-foreground">{currentAudioTitle}</span>
+                      )}
+                      <div className="flex-1" />
                       <Button
                         variant="outline"
                         size="sm"
@@ -465,23 +469,18 @@ const Playground = () => {
                           {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
                         </button>
                         
-                        {/* Waveform Animation + Title */}
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-[2px] h-6">
-                            {waveformHeights.map((height, i) => (
-                              <div
-                                key={i}
-                                className="w-[2px] rounded-full bg-primary transition-all duration-100"
-                                style={{
-                                  height: `${height}%`,
-                                  opacity: isPlaying ? 0.8 : 0.4,
-                                }}
-                              />
-                            ))}
-                          </div>
-                          {currentAudioTitle && (
-                            <span className="text-sm font-medium text-foreground">{currentAudioTitle}</span>
-                          )}
+                        {/* Waveform Animation */}
+                        <div className="flex items-center gap-[2px] h-6">
+                          {waveformHeights.map((height, i) => (
+                            <div
+                              key={i}
+                              className="w-[2px] rounded-full bg-primary transition-all duration-100"
+                              style={{
+                                height: `${height}%`,
+                                opacity: isPlaying ? 0.8 : 0.4,
+                              }}
+                            />
+                          ))}
                         </div>
                         
                         <div className="flex-1">
