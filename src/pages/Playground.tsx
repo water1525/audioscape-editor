@@ -161,6 +161,7 @@ const Playground = () => {
     setAudioUrl(null);
     
     try {
+      console.log("Starting TTS generation...");
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
         {
@@ -174,18 +175,30 @@ const Playground = () => {
         }
       );
 
+      console.log("TTS response status:", response.status);
+
       if (!response.ok) {
-        throw new Error("生成音频失败");
+        const errorText = await response.text();
+        console.error("TTS error response:", errorText);
+        throw new Error(`生成音频失败: ${response.status}`);
       }
 
       const audioBlob = await response.blob();
+      console.log("Audio blob size:", audioBlob.size);
+      
+      if (audioBlob.size === 0) {
+        throw new Error("生成的音频为空");
+      }
+      
       const url = URL.createObjectURL(audioBlob);
       setAudioUrl(url);
+      console.log("Audio URL created successfully");
     } catch (error) {
       console.error("TTS error:", error);
       toast.error("音频生成失败，请重试");
     } finally {
       setIsGenerating(false);
+      console.log("TTS generation finished");
     }
   };
 
