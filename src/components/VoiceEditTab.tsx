@@ -47,9 +47,10 @@ interface VoiceEditTabProps {
   onAudioGenerated?: (audioUrl: string, title: string) => void;
   onAudioDeleted?: () => void;
   onSentencesChange?: (sentences: SentenceSegment[]) => void;
+  onGeneratingChange?: (isGenerating: boolean, title?: string) => void;
 }
 
-const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange }: VoiceEditTabProps) => {
+const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onGeneratingChange }: VoiceEditTabProps) => {
   // Upload/Record state
   const [audioSource, setAudioSource] = useState<"none" | "upload" | "record">("none");
   const [originalAudioBlob, setOriginalAudioBlob] = useState<Blob | null>(null);
@@ -106,6 +107,21 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange }: V
     
     setIsGeneratingPreset(scenario.id);
     
+    // Immediately show next step with sentences
+    const sentenceTexts = splitIntoSentences(scenario.text);
+    const newSentences: SentenceSegment[] = sentenceTexts.map((text, index) => ({
+      id: index,
+      text,
+      isEdited: false,
+      versions: [],
+      currentVersionIndex: -1,
+    }));
+    setSentences(newSentences);
+    setAudioSource("record");
+    
+    // Notify parent that we're generating
+    onGeneratingChange?.(true, `${scenario.title} - ${scenario.subtitle}`);
+    
     try {
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
@@ -133,26 +149,18 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange }: V
       setOriginalAudioBlob(audioBlob);
       setOriginalAudioUrl(url);
       setOriginalFileName(`${scenario.title}_${scenario.subtitle}.wav`);
-      setAudioSource("record");
-      
-      // Split the text into sentences
-      const sentenceTexts = splitIntoSentences(scenario.text);
-      const newSentences: SentenceSegment[] = sentenceTexts.map((text, index) => ({
-        id: index,
-        text,
-        isEdited: false,
-        versions: [],
-        currentVersionIndex: -1,
-      }));
-      setSentences(newSentences);
       
       onAudioGenerated?.(url, `${scenario.title} - ${scenario.subtitle}`);
       toast.success(`${scenario.title}音频生成成功`);
     } catch (error) {
       console.error("Error generating preset audio:", error);
       toast.error("音频生成失败，请重试");
+      // Reset state on error
+      setSentences([]);
+      setAudioSource("none");
     } finally {
       setIsGeneratingPreset(null);
+      onGeneratingChange?.(false);
     }
   };
 
