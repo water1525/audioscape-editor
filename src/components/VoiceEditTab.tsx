@@ -542,9 +542,9 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange }: V
         </div>
       )}
 
-      {/* Delete button fixed at top-right when sentences exist */}
+      {/* Delete button fixed at bottom-right, above sentence timeline */}
       {originalAudioUrl && sentences.length > 0 && (
-        <div className="fixed top-28 right-8 z-30">
+        <div className="fixed bottom-[140px] right-8 z-30">
           <Button
             variant="ghost"
             size="sm"
