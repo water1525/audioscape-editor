@@ -151,6 +151,8 @@ const Playground = () => {
   const [editSentences, setEditSentences] = useState<SentenceSegment[]>([]);
   const [editSelectedSentenceId, setEditSelectedSentenceId] = useState<number | null>(null);
   const [editPlayingSentenceId, setEditPlayingSentenceId] = useState<number | null>(null);
+  const [editCurrentTime, setEditCurrentTime] = useState(0);
+  const [editDuration, setEditDuration] = useState(0);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Get current voice name for display
@@ -662,6 +664,10 @@ const Playground = () => {
           onSentencesUpdate={setEditSentences}
           onSelectionChange={setEditSelectedSentenceId}
           onPlayingChange={setEditPlayingSentenceId}
+          onTimeChange={(current, total) => {
+            setEditCurrentTime(current);
+            setEditDuration(total);
+          }}
         />
       )}
 
@@ -684,6 +690,8 @@ const Playground = () => {
         isPlayingOverride={
           activeTab === "edit" ? editPlayingSentenceId !== null : undefined
         }
+        durationOverride={activeTab === "edit" ? editDuration : undefined}
+        currentTimeOverride={activeTab === "edit" ? editCurrentTime : undefined}
       />
     </div>
   );
