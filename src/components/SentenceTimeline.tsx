@@ -449,6 +449,6 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
   }
 );
 
-SentenceTimeline.displayName = "SentenceTimeline";
+SentenceTimeline.displayName = "SentenceTimeline"; // v2
 
 export default SentenceTimeline;
