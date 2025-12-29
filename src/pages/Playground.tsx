@@ -668,6 +668,10 @@ const Playground = () => {
             setEditCurrentTime(current);
             setEditDuration(total);
           }}
+          onDelete={() => {
+            setEditSentences([]);
+            handleClosePlayerBar();
+          }}
         />
       )}
 
