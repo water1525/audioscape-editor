@@ -116,8 +116,8 @@ const SentenceItem = ({
             已编辑
           </Button>
         </div>
-      ) : isHovered && !isGenerating ? (
-        // Show "编辑" button on hover for non-edited sentences
+      ) : (isHovered || isSelected) && !isGenerating ? (
+        // Show "编辑" button on hover or when selected for non-edited sentences
         <div className="absolute top-0.5 right-0.5 z-10">
           <Button
             variant="outline"
