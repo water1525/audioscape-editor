@@ -542,7 +542,20 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange }: V
         </div>
       )}
 
-      {/* Empty placeholder - delete button moved to SentenceTimeline */}
+      {/* Delete button fixed at top-right when sentences exist */}
+      {originalAudioUrl && sentences.length > 0 && (
+        <div className="fixed top-28 right-8 z-30">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 text-destructive/60 hover:text-destructive hover:bg-destructive/10 gap-1"
+            onClick={deleteAudio}
+          >
+            <Trash2 className="h-4 w-4" />
+            删除
+          </Button>
+        </div>
+      )}
 
       {/* Upload mode - show simple player */}
       {originalAudioUrl && audioSource === "upload" && (
