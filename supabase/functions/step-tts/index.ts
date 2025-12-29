@@ -44,25 +44,31 @@ serve(async (req) => {
     return await enqueueStepCall(async () => {
       console.log(
         "Calling Step TTS API with text:",
-        text.substring(0, 50) + "..."
+        text.substring(0, 100) + (text.length > 100 ? "..." : ""),
+        "voice:",
+        voice
       );
 
-      const maxAttempts = 5;
+      const maxAttempts = 3;
 
       for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const requestBody = {
+          model: "step-tts-mini",
+          input: text,
+          voice: voice,
+          response_format: "mp3",
+          speed: 1.0,
+        };
+        
+        console.log("Request attempt", attempt + 1, "body:", JSON.stringify(requestBody));
+        
         const response = await fetch("https://api.stepfun.com/v1/audio/speech", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${STEPFUN_API_KEY}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            model: "step-tts-2",
-            input: text,
-            voice: voice,
-            response_format: "mp3",
-            speed: 1.0,
-          }),
+          body: JSON.stringify(requestBody),
         });
 
         if (response.ok) {
