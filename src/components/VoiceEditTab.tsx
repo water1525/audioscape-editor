@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Play, Pause, Upload, Mic, RefreshCw, Trash2, X, Loader2, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
+import { Headphones, MessageSquare, Megaphone, GraduationCap, Radio, Newspaper } from "lucide-react";
+
 // Sample texts for recording (~50 characters each, 10-30s reading time)
 const sampleTexts = [
   "在这个快速发展的时代，科技改变了我们的生活方式，让我们能够更加便捷地与世界各地的人们进行交流和互动。",
@@ -11,6 +13,16 @@ const sampleTexts = [
   "人工智能技术正在深刻地改变着各行各业，从医疗诊断到自动驾驶，它的应用范围越来越广泛，影响着每个人的日常生活。",
   "夜晚的城市灯火辉煌，高楼大厦的窗户里透出温暖的光芒，街道上车水马龙，人们匆匆忙忙地赶往各自的目的地。",
   "音乐是一种无国界的语言，它能够跨越文化和地域的限制，触动每个人心中最柔软的部分，带来无尽的感动与共鸣。",
+];
+
+// Preset scenarios for quick generation
+const presetScenarios = [
+  { id: "news", icon: Newspaper, title: "新闻播报", subtitle: "Step 3模型发布", color: "text-emerald-500", bgColor: "bg-emerald-50", text: "最新消息，Step 3语音模型正式发布，支持多种情感风格的自然语音合成，为用户带来更加真实的语音体验。" },
+  { id: "audiobook", icon: Headphones, title: "有声读物", subtitle: "悬疑故事", color: "text-purple-500", bgColor: "bg-purple-50", text: "那个雨夜，他独自走在空无一人的街道上。突然，一道闪电划破夜空，他看到了一个神秘的身影站在街角。" },
+  { id: "service", icon: MessageSquare, title: "客服助手", subtitle: "智能客服对话", color: "text-orange-500", bgColor: "bg-orange-50", text: "您好，欢迎致电客户服务中心。我是您的智能客服助手，请问有什么可以帮助您的吗？" },
+  { id: "ad", icon: Megaphone, title: "广告配音", subtitle: "品牌宣传片", color: "text-pink-500", bgColor: "bg-pink-50", text: "探索无限可能，创造精彩未来。我们用科技改变生活，用创新定义明天。" },
+  { id: "education", icon: GraduationCap, title: "教育朗读", subtitle: "古诗词赏析", color: "text-blue-500", bgColor: "bg-blue-50", text: "床前明月光，疑是地上霜。举头望明月，低头思故乡。这首诗表达了诗人对故乡的深深思念之情。" },
+  { id: "radio", icon: Radio, title: "情感电台", subtitle: "深夜治愈", color: "text-red-500", bgColor: "bg-red-50", text: "在这个安静的夜晚，让我们一起放慢脚步，聆听内心的声音。愿你今夜好梦，明天依然充满希望。" },
 ];
 
 const emotionTags = ["高兴", "愤怒", "悲伤", "幽默", "困惑", "厌恶", "共情", "尴尬", "恐惧", "惊讶", "兴奋", "沮丧", "冷漠", "钦佩"];
@@ -57,6 +69,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange }: V
   const [showModal, setShowModal] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratingPreset, setIsGeneratingPreset] = useState<string | null>(null);
   
   // Refs
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -85,6 +98,62 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange }: V
       newIndex = Math.floor(Math.random() * sampleTexts.length);
     }
     setSampleText(sampleTexts[newIndex]);
+  };
+
+  // Handle preset scenario click
+  const handlePresetClick = async (scenario: typeof presetScenarios[0]) => {
+    if (isGeneratingPreset) return;
+    
+    setIsGeneratingPreset(scenario.id);
+    
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            text: scenario.text,
+            voice: "tianmeinvsheng",
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to generate audio");
+      }
+
+      const audioBlob = await response.blob();
+      const url = URL.createObjectURL(audioBlob);
+      
+      setOriginalAudioBlob(audioBlob);
+      setOriginalAudioUrl(url);
+      setOriginalFileName(`${scenario.title}_${scenario.subtitle}.wav`);
+      setAudioSource("record");
+      
+      // Split the text into sentences
+      const sentenceTexts = splitIntoSentences(scenario.text);
+      const newSentences: SentenceSegment[] = sentenceTexts.map((text, index) => ({
+        id: index,
+        text,
+        isEdited: false,
+        versions: [],
+        currentVersionIndex: -1,
+      }));
+      setSentences(newSentences);
+      
+      onAudioGenerated?.(url, `${scenario.title} - ${scenario.subtitle}`);
+      toast.success(`${scenario.title}音频生成成功`);
+    } catch (error) {
+      console.error("Error generating preset audio:", error);
+      toast.error("音频生成失败，请重试");
+    } finally {
+      setIsGeneratingPreset(null);
+    }
   };
 
   // Handle file upload
@@ -316,68 +385,103 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange }: V
 
       {/* Initial State: Upload or Record */}
       {audioSource === "none" && !isRecording && (
-        <div className="bg-primary/5 border border-primary/20 rounded-lg p-8">
-          <div className="flex flex-col items-center gap-4">
-            <div className="relative">
-              <svg 
-                width="80" 
-                height="60" 
-                viewBox="0 0 80 60" 
-                fill="none"
-                className="text-primary"
-              >
-                <path 
-                  d="M5 30 L10 30 L15 20 L20 40 L25 15 L30 45 L35 10 L40 50 L45 5 L50 55 L55 20 L60 35 L65 25 L70 30 L75 30" 
-                  stroke="currentColor" 
-                  strokeWidth="2.5" 
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                />
-              </svg>
-              <div className="absolute -top-2 -right-4">
+        <div className="space-y-6">
+          {/* Upload/Record Section */}
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-8">
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative">
                 <svg 
-                  width="24" 
-                  height="24" 
-                  viewBox="0 0 24 24" 
+                  width="80" 
+                  height="60" 
+                  viewBox="0 0 80 60" 
                   fill="none"
                   className="text-primary"
                 >
                   <path 
-                    d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" 
+                    d="M5 30 L10 30 L15 20 L20 40 L25 15 L30 45 L35 10 L40 50 L45 5 L50 55 L55 20 L60 35 L65 25 L70 30 L75 30" 
                     stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
+                    strokeWidth="2.5" 
+                    strokeLinecap="round"
                     strokeLinejoin="round"
-                    fill="hsl(var(--primary) / 0.1)"
+                    fill="none"
                   />
                 </svg>
+                <div className="absolute -top-2 -right-4">
+                  <svg 
+                    width="24" 
+                    height="24" 
+                    viewBox="0 0 24 24" 
+                    fill="none"
+                    className="text-primary"
+                  >
+                    <path 
+                      d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                      fill="hsl(var(--primary) / 0.1)"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground">
+                  请选择音频文件，可直接录制
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  支持mp3/wav格式，限制时长10-30S
+                </p>
+              </div>
+              <div className="flex items-center gap-3 mt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="gap-2"
+                >
+                  <Upload className="h-4 w-4" />
+                  上传音频
+                </Button>
+                <Button
+                  onClick={startRecording}
+                  className="gap-2"
+                >
+                  <Mic className="h-4 w-4" />
+                  开始录制
+                </Button>
               </div>
             </div>
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">
-                请选择音频文件，可直接录制
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                支持mp3/wav格式，限制时长10-30S
-              </p>
-            </div>
-            <div className="flex items-center gap-3 mt-2">
-              <Button
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                className="gap-2"
-              >
-                <Upload className="h-4 w-4" />
-                上传音频
-              </Button>
-              <Button
-                onClick={startRecording}
-                className="gap-2"
-              >
-                <Mic className="h-4 w-4" />
-                开始录制
-              </Button>
+          </div>
+
+          {/* Preset Scenarios */}
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">选择一个场景案例体验语音合成</p>
+            <div className="grid grid-cols-2 gap-3">
+              {presetScenarios.map((scenario) => (
+                <button
+                  key={scenario.id}
+                  onClick={() => handlePresetClick(scenario)}
+                  disabled={isGeneratingPreset !== null}
+                  className={`flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-background hover:bg-secondary/50 transition-all text-left ${
+                    isGeneratingPreset === scenario.id ? "opacity-70" : ""
+                  }`}
+                >
+                  <div className={`w-10 h-10 rounded-lg ${scenario.bgColor} flex items-center justify-center shrink-0`}>
+                    {isGeneratingPreset === scenario.id ? (
+                      <Loader2 className={`h-5 w-5 ${scenario.color} animate-spin`} />
+                    ) : (
+                      <scenario.icon className={`h-5 w-5 ${scenario.color}`} />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-foreground text-sm">{scenario.title}</span>
+                      <span className="text-muted-foreground text-xs">|</span>
+                      <span className="text-muted-foreground text-xs truncate">{scenario.subtitle}</span>
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
         </div>
