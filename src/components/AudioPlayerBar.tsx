@@ -137,8 +137,8 @@ const AudioPlayerBar = ({
         }}
       />
 
-      <div className="px-6 py-3">
-        <div className="flex items-center justify-between gap-4">
+      <div className="px-6 py-3 relative">
+        <div className="flex items-center gap-4">
           {/* Left: Title and Voice Info */}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground truncate">
@@ -149,8 +149,8 @@ const AudioPlayerBar = ({
             </p>
           </div>
 
-          {/* Center: Playback Controls */}
-          <div className="flex items-center gap-2">
+          {/* Center: Playback Controls - Absolutely centered */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
             {/* Skip Back */}
             {!hideSkipControls && (
               <button
@@ -194,7 +194,7 @@ const AudioPlayerBar = ({
 
           {/* Progress Bar - Conditionally visible */}
           {!hideProgressBar && (
-            <div className="flex items-center gap-3 flex-1 max-w-md">
+            <div className="flex items-center gap-3 flex-1 max-w-md ml-auto">
               <span className="text-xs text-muted-foreground min-w-[40px] text-right">
                 {formatTime(typeof currentTimeOverride === "number" ? currentTimeOverride : currentTime)}
               </span>
@@ -217,7 +217,7 @@ const AudioPlayerBar = ({
 
           {/* Duration only (no progress bar) */}
           {hideProgressBar && (typeof durationOverride === "number" || duration > 0) && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ml-auto">
               <span className="text-xs text-muted-foreground">
                 {formatTime(typeof currentTimeOverride === "number" ? currentTimeOverride : currentTime)}
               </span>
@@ -229,7 +229,7 @@ const AudioPlayerBar = ({
           )}
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {showSaveVoice && onSaveVoice && (
               <Button
                 variant="outline"
