@@ -25,6 +25,147 @@ interface SentenceTimelineProps {
   onTimeChange?: (currentTime: number, duration: number) => void;
 }
 
+// Individual sentence item component with hover state
+interface SentenceItemProps {
+  sentence: SentenceSegment;
+  isSelected: boolean;
+  isPlaying: boolean;
+  isGenerating: boolean;
+  onEdit: (sentenceId: number) => void;
+  onClick: (sentence: SentenceSegment) => void;
+  onNavigateVersion: (sentenceId: number, direction: "prev" | "next") => void;
+  generateWaveformBars: (count: number, isActive: boolean) => JSX.Element[];
+}
+
+const SentenceItem = ({
+  sentence,
+  isSelected,
+  isPlaying,
+  isGenerating,
+  onEdit,
+  onClick,
+  onNavigateVersion,
+  generateWaveformBars,
+}: SentenceItemProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      onClick={() => onClick(sentence)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={`
+        relative flex-shrink-0 min-w-[100px] max-w-[180px] h-12 rounded cursor-pointer
+        transition-all duration-200 overflow-hidden group
+        ${isSelected || isPlaying
+          ? "bg-primary/20 ring-2 ring-primary"
+          : sentence.isEdited
+            ? "bg-primary/10 hover:bg-primary/15"
+            : "bg-secondary/80 hover:bg-secondary"
+        }
+      `}
+    >
+      {/* Waveform background */}
+      <div className="absolute inset-0 flex items-center justify-center gap-0.5 px-1">
+        {generateWaveformBars(16, isSelected || isPlaying)}
+      </div>
+
+      {/* Text overlay */}
+      <div className="absolute inset-0 flex items-center px-2 bg-gradient-to-t from-background/90 via-background/50 to-transparent">
+        <p
+          className={`text-xs line-clamp-2 leading-tight ${
+            isSelected || isPlaying
+              ? "text-foreground font-medium"
+              : "text-muted-foreground"
+          }`}
+        >
+          {sentence.text}
+        </p>
+      </div>
+
+      {/* Edited badge */}
+      {sentence.isEdited && !isHovered && (
+        <div className="absolute top-0.5 right-0.5">
+          <span className="px-1 py-0.5 text-[9px] bg-primary text-primary-foreground rounded">
+            已编辑
+          </span>
+        </div>
+      )}
+
+      {/* Hover edit button */}
+      {isHovered && !isGenerating && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/60">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(sentence.id);
+            }}
+            className="h-7 text-xs"
+          >
+            编辑
+          </Button>
+        </div>
+      )}
+
+      {/* Generating indicator */}
+      {isGenerating && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/60">
+          <Loader2 className="w-4 h-4 animate-spin text-primary" />
+        </div>
+      )}
+
+      {/* Playing indicator */}
+      {isPlaying && !isGenerating && !isHovered && (
+        <div className="absolute bottom-1 left-1">
+          <div className="flex items-center gap-0.5">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="w-0.5 bg-primary rounded-full animate-pulse"
+                style={{
+                  height: `${6 + i * 2}px`,
+                  animationDelay: `${i * 0.1}s`,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Version navigation for edited sentences */}
+      {sentence.isEdited && sentence.versions.length > 1 && isSelected && !isHovered && (
+        <div className="absolute bottom-0.5 right-0.5 flex items-center gap-0.5">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onNavigateVersion(sentence.id, "prev");
+            }}
+            disabled={sentence.currentVersionIndex <= 0}
+            className="h-4 w-4 flex items-center justify-center rounded bg-background/80 text-muted-foreground hover:text-foreground disabled:opacity-30"
+          >
+            <ChevronLeft className="h-2.5 w-2.5" />
+          </button>
+          <span className="text-[8px] text-muted-foreground">
+            {sentence.currentVersionIndex + 1}/{sentence.versions.length}
+          </span>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onNavigateVersion(sentence.id, "next");
+            }}
+            disabled={sentence.currentVersionIndex >= sentence.versions.length - 1}
+            className="h-4 w-4 flex items-center justify-center rounded bg-background/80 text-muted-foreground hover:text-foreground disabled:opacity-30"
+          >
+            <ChevronRight className="h-2.5 w-2.5" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProps>(
   ({
     sentences,
@@ -285,133 +426,22 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
 
     return (
       <div className="fixed bottom-[68px] left-56 right-0 z-40 bg-card border-t border-l border-border rounded-tl-xl">
-        {/* Selected sentence detail */}
-        {selectedId !== null && (() => {
-          const sentence = sentences.find((s) => s.id === selectedId);
-          if (!sentence) return null;
-          return (
-            <div className="px-6 py-2 flex items-center justify-between gap-4 border-b border-border/50">
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-foreground truncate">{sentence.text}</p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                {sentence.isEdited && sentence.versions.length > 0 && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="iconSm"
-                      onClick={() => navigateVersion(sentence.id, "prev")}
-                      disabled={sentence.currentVersionIndex <= 0}
-                      className="h-6 w-6"
-                    >
-                      <ChevronLeft className="h-3 w-3" />
-                    </Button>
-                    <span className="text-xs text-muted-foreground min-w-[50px] text-center">
-                      v{sentence.currentVersionIndex + 1}/{sentence.versions.length}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="iconSm"
-                      onClick={() => navigateVersion(sentence.id, "next")}
-                      disabled={
-                        sentence.currentVersionIndex >= sentence.versions.length - 1
-                      }
-                      className="h-6 w-6"
-                    >
-                      <ChevronRight className="h-3 w-3" />
-                    </Button>
-                  </>
-                )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onEditSentence(sentence.id)}
-                  className="h-7 text-xs"
-                >
-                  编辑
-                </Button>
-              </div>
-            </div>
-          );
-        })()}
-
         {/* Horizontal sentence segments */}
-        <div className="px-6 py-2">
+        <div className="px-6 py-3">
           <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-            {sentences.map((sentence) => {
-              const isSelected = selectedId === sentence.id;
-              const isPlaying = playingId === sentence.id;
-              const isGenerating = generatingId === sentence.id;
-
-              return (
-                <div
-                  key={sentence.id}
-                  onClick={() => handleClick(sentence)}
-                  className={`
-                    relative flex-shrink-0 min-w-[100px] max-w-[180px] h-12 rounded cursor-pointer
-                    transition-all duration-200 overflow-hidden group
-                    ${isSelected || isPlaying
-                      ? "bg-primary/20 ring-2 ring-primary"
-                      : sentence.isEdited
-                        ? "bg-primary/10 hover:bg-primary/15"
-                        : "bg-secondary/80 hover:bg-secondary"
-                    }
-                  `}
-                >
-                  {/* Waveform background */}
-                  <div className="absolute inset-0 flex items-center justify-center gap-0.5 px-1">
-                    {generateWaveformBars(16, isSelected || isPlaying)}
-                  </div>
-
-                  {/* Text overlay */}
-                  <div className="absolute inset-0 flex items-center px-2 bg-gradient-to-t from-background/90 via-background/50 to-transparent">
-                    <p
-                      className={`text-xs line-clamp-2 leading-tight ${
-                        isSelected || isPlaying
-                          ? "text-foreground font-medium"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      {sentence.text}
-                    </p>
-                  </div>
-
-                  {/* Edited badge */}
-                  {sentence.isEdited && (
-                    <div className="absolute top-0.5 right-0.5">
-                      <span className="px-1 py-0.5 text-[9px] bg-primary text-primary-foreground rounded">
-                        已编辑
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Generating indicator */}
-                  {isGenerating && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-background/60">
-                      <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                    </div>
-                  )}
-
-                  {/* Playing indicator */}
-                  {isPlaying && !isGenerating && (
-                    <div className="absolute bottom-1 left-1">
-                      <div className="flex items-center gap-0.5">
-                        {[1, 2, 3].map((i) => (
-                          <div
-                            key={i}
-                            className="w-0.5 bg-primary rounded-full animate-pulse"
-                            style={{
-                              height: `${6 + i * 2}px`,
-                              animationDelay: `${i * 0.1}s`,
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            {sentences.map((sentence) => (
+              <SentenceItem
+                key={sentence.id}
+                sentence={sentence}
+                isSelected={selectedId === sentence.id}
+                isPlaying={playingId === sentence.id}
+                isGenerating={generatingId === sentence.id}
+                onEdit={onEditSentence}
+                onClick={handleClick}
+                onNavigateVersion={navigateVersion}
+                generateWaveformBars={generateWaveformBars}
+              />
+            ))}
           </div>
         </div>
       </div>
