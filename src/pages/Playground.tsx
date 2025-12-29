@@ -155,6 +155,8 @@ const Playground = () => {
   const [editDuration, setEditDuration] = useState(0);
   const [editIsGenerating, setEditIsGenerating] = useState(false);
   const [editGeneratingSentenceId, setEditGeneratingSentenceId] = useState<number | null>(null);
+  const [isBatchGenerating, setIsBatchGenerating] = useState(false);
+  const [batchProgress, setBatchProgress] = useState({ current: 0, total: 0 });
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Get current voice name for display
@@ -561,6 +563,8 @@ const Playground = () => {
                   setEditSentences([]);
                   setEditIsGenerating(false);
                   setEditGeneratingSentenceId(null);
+                  setIsBatchGenerating(false);
+                  setBatchProgress({ current: 0, total: 0 });
                 }}
                 onSentencesChange={setEditSentences}
                 onGeneratingChange={(generating, title) => {
@@ -572,6 +576,10 @@ const Playground = () => {
                   }
                 }}
                 onEditGeneratingChange={setEditGeneratingSentenceId}
+                onBatchGeneratingChange={(generating, progress) => {
+                  setIsBatchGenerating(generating);
+                  setBatchProgress(progress);
+                }}
               />
             )}
           </div>
@@ -675,6 +683,12 @@ const Playground = () => {
           onEditSentence={(id) => {
             (window as any).__voiceEditOpenModal?.(id);
           }}
+          onEditAll={() => {
+            (window as any).__voiceEditOpenBatchModal?.();
+          }}
+          onDelete={() => {
+            (window as any).__voiceEditDeleteAudio?.();
+          }}
           onSentencesUpdate={setEditSentences}
           onSelectionChange={setEditSelectedSentenceId}
           onPlayingChange={setEditPlayingSentenceId}
@@ -683,6 +697,8 @@ const Playground = () => {
             setEditDuration(total);
           }}
           editGeneratingId={editGeneratingSentenceId}
+          isBatchGenerating={isBatchGenerating}
+          batchProgress={batchProgress}
         />
       )}
 

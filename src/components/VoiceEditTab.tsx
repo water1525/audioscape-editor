@@ -49,9 +49,10 @@ interface VoiceEditTabProps {
   onSentencesChange?: (sentences: SentenceSegment[]) => void;
   onGeneratingChange?: (isGenerating: boolean, title?: string) => void;
   onEditGeneratingChange?: (sentenceId: number | null) => void;
+  onBatchGeneratingChange?: (isGenerating: boolean, progress: { current: number; total: number }) => void;
 }
 
-const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onGeneratingChange, onEditGeneratingChange }: VoiceEditTabProps) => {
+const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onGeneratingChange, onEditGeneratingChange, onBatchGeneratingChange }: VoiceEditTabProps) => {
   // Upload/Record state
   const [audioSource, setAudioSource] = useState<"none" | "upload" | "record">("none");
   const [originalAudioBlob, setOriginalAudioBlob] = useState<Blob | null>(null);
@@ -287,11 +288,15 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
     setShowModal(true);
   };
 
-  // Expose openEditModal to parent
+  // Expose openEditModal and openBatchEditModal to parent
   useEffect(() => {
     (window as any).__voiceEditOpenModal = openEditModal;
+    (window as any).__voiceEditOpenBatchModal = openBatchEditModal;
+    (window as any).__voiceEditDeleteAudio = deleteAudio;
     return () => {
       delete (window as any).__voiceEditOpenModal;
+      delete (window as any).__voiceEditOpenBatchModal;
+      delete (window as any).__voiceEditDeleteAudio;
     };
   }, []);
 
@@ -319,11 +324,14 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
     if (isBatchEdit) {
       setIsBatchGenerating(true);
       setBatchProgress({ current: 0, total: sentences.length });
+      onBatchGeneratingChange?.(true, { current: 0, total: sentences.length });
       
       try {
         for (let i = 0; i < sentences.length; i++) {
           const sentence = sentences[i];
-          setBatchProgress({ current: i + 1, total: sentences.length });
+          const progress = { current: i + 1, total: sentences.length };
+          setBatchProgress(progress);
+          onBatchGeneratingChange?.(true, progress);
           onEditGeneratingChange?.(sentence.id);
           
           const response = await fetch(
@@ -371,6 +379,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
         setIsBatchGenerating(false);
         setIsBatchEdit(false);
         setBatchProgress({ current: 0, total: 0 });
+        onBatchGeneratingChange?.(false, { current: 0, total: 0 });
         onEditGeneratingChange?.(null);
       }
       return;
@@ -627,43 +636,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
         </div>
       )}
 
-      {/* Action buttons when sentences exist (record mode) */}
-      {sentences.length > 0 && audioSource === "record" && (
-        <div className="flex justify-end gap-2">
-          {/* Edit All button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={openBatchEditModal}
-            disabled={isBatchGenerating}
-            className="gap-1.5"
-          >
-            {isBatchGenerating ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                生成中 ({batchProgress.current}/{batchProgress.total})
-              </>
-            ) : (
-              <>
-                <Pencil className="h-4 w-4" />
-                编辑全部
-              </>
-            )}
-          </Button>
-          
-          {/* Delete button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={deleteAudio}
-            disabled={isBatchGenerating}
-            className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 gap-1.5"
-          >
-            <Trash2 className="h-4 w-4" />
-            删除
-          </Button>
-        </div>
-      )}
+      {/* Action buttons are now in SentenceTimeline */}
 
       {/* Upload mode - show simple player */}
       {originalAudioUrl && audioSource === "upload" && (
