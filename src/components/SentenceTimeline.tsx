@@ -87,17 +87,9 @@ const SentenceItem = ({
         </p>
       </div>
 
-      {/* Edited badge */}
-      {sentence.isEdited && !isHovered && (
-        <div className="absolute top-0.5 right-0.5">
-          <span className="px-1 py-0.5 text-[9px] bg-primary text-primary-foreground rounded">
-            已编辑
-          </span>
-        </div>
-      )}
-
-      {/* Hover edit button or loading/edited state */}
+      {/* Edit button / loading / edited state */}
       {isEditGenerating ? (
+        // Show loading state during generation
         <div className="absolute top-0.5 right-0.5 z-10">
           <Button
             variant="outline"
@@ -109,7 +101,23 @@ const SentenceItem = ({
             生成中
           </Button>
         </div>
+      ) : sentence.isEdited ? (
+        // Always show "已编辑" button for edited sentences
+        <div className="absolute top-0.5 right-0.5 z-10">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(sentence.id);
+            }}
+            className="h-5 px-1.5 text-[10px] bg-primary/10 text-primary border-primary/30 hover:bg-primary/20"
+          >
+            已编辑
+          </Button>
+        </div>
       ) : isHovered && !isGenerating ? (
+        // Show "编辑" button on hover for non-edited sentences
         <div className="absolute top-0.5 right-0.5 z-10">
           <Button
             variant="outline"
@@ -120,7 +128,7 @@ const SentenceItem = ({
             }}
             className="h-5 px-1.5 text-[10px] bg-background/90 hover:bg-background"
           >
-            {sentence.isEdited ? "已编辑" : "编辑"}
+            编辑
           </Button>
         </div>
       ) : null}
