@@ -428,21 +428,8 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
 
     return (
       <div className="fixed bottom-[68px] left-56 right-0 z-40 bg-card border-t border-l border-border rounded-tl-xl">
-        {/* Delete button in top-right */}
-        {onDelete && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute top-1 right-2 h-7 text-destructive/60 hover:text-destructive hover:bg-destructive/10 gap-1 z-10"
-            onClick={onDelete}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-            删除
-          </Button>
-        )}
-        
         {/* Horizontal sentence segments */}
-        <div className="px-6 py-3 pr-20">
+        <div className="px-6 py-3">
           <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
             {sentences.map((sentence) => (
               <SentenceItem
