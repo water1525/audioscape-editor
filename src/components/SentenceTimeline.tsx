@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { ChevronLeft, ChevronRight, Loader2, PenLine } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, PenLine, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SentenceSegment } from "@/components/VoiceEditTab";
 import { toast } from "sonner";
@@ -19,11 +19,15 @@ export type SentenceTimelineHandle = {
 interface SentenceTimelineProps {
   sentences: SentenceSegment[];
   onEditSentence: (sentenceId: number) => void;
+  onEditAll?: () => void;
+  onDelete?: () => void;
   onSentencesUpdate: (sentences: SentenceSegment[]) => void;
   onSelectionChange?: (sentenceId: number | null) => void;
   onPlayingChange?: (playingSentenceId: number | null) => void;
   onTimeChange?: (currentTime: number, duration: number) => void;
   editGeneratingId?: number | null;
+  isBatchGenerating?: boolean;
+  batchProgress?: { current: number; total: number };
 }
 
 // Individual sentence item component with hover state
@@ -181,11 +185,15 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
   ({
     sentences,
     onEditSentence,
+    onEditAll,
+    onDelete,
     onSentencesUpdate,
     onSelectionChange,
     onPlayingChange,
     onTimeChange,
     editGeneratingId,
+    isBatchGenerating,
+    batchProgress,
   }, ref) => {
     const [selectedId, setSelectedId] = useState<number | null>(null);
     const [playingId, setPlayingId] = useState<number | null>(null);
@@ -523,6 +531,43 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
+
+          {/* Edit All button */}
+          {onEditAll && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onEditAll}
+              disabled={isBatchGenerating}
+              className="h-8 gap-1.5 shrink-0"
+            >
+              {isBatchGenerating ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  生成中 ({batchProgress?.current || 0}/{batchProgress?.total || 0})
+                </>
+              ) : (
+                <>
+                  <Pencil className="h-3.5 w-3.5" />
+                  编辑全部
+                </>
+              )}
+            </Button>
+          )}
+
+          {/* Delete button */}
+          {onDelete && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onDelete}
+              disabled={isBatchGenerating}
+              className="h-8 text-destructive/60 hover:text-destructive hover:bg-destructive/10 gap-1.5 shrink-0"
+            >
+              <Trash2 className="h-4 w-4" />
+              删除
+            </Button>
+          )}
         </div>
       </div>
     );
