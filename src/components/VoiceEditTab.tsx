@@ -463,7 +463,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
 
           {/* Preset Scenarios */}
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">选择一个场景案例体验语音合成</p>
+            <p className="text-sm text-muted-foreground">选择一个场景案例体验语音编辑</p>
             <div className="grid grid-cols-2 gap-3">
               {presetScenarios.map((scenario) => (
                 <button
