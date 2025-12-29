@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { ChevronLeft, ChevronRight, Loader2, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SentenceSegment } from "@/components/VoiceEditTab";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ export type SentenceTimelineHandle = {
 interface SentenceTimelineProps {
   sentences: SentenceSegment[];
   onEditSentence: (sentenceId: number) => void;
+  onEditAllSentences?: () => void;
   onSentencesUpdate: (sentences: SentenceSegment[]) => void;
   onSelectionChange?: (sentenceId: number | null) => void;
   onPlayingChange?: (playingSentenceId: number | null) => void;
@@ -59,7 +60,7 @@ const SentenceItem = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`
-        relative flex-shrink-0 min-w-[100px] max-w-[180px] h-12 rounded cursor-pointer
+        relative flex-shrink-0 w-[200px] h-12 rounded cursor-pointer
         transition-all duration-200 overflow-hidden group
         ${isSelected || isPlaying
           ? "bg-primary/20 ring-2 ring-primary"
@@ -96,34 +97,22 @@ const SentenceItem = ({
             <span>生成中</span>
           </div>
         </div>
-      ) : sentence.isEdited ? (
-        // Always show "已编辑" button for edited sentences
-        <div className="absolute top-0.5 right-0.5 z-10">
-          <Button
-            variant="default"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit(sentence.id);
-            }}
-            className="h-5 px-1.5 text-[10px] bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            已编辑
-          </Button>
-        </div>
       ) : (isHovered || isSelected) && !isGenerating ? (
-        // Show "编辑" button on hover or when selected for non-edited sentences
+        // Show button on hover or when selected
         <div className="absolute top-0.5 right-0.5 z-10">
           <Button
-            variant="outline"
+            variant={sentence.isEdited ? "default" : "outline"}
             size="sm"
             onClick={(e) => {
               e.stopPropagation();
               onEdit(sentence.id);
             }}
-            className="h-5 px-1.5 text-[10px] bg-background/90 hover:bg-background"
+            className={sentence.isEdited 
+              ? "h-5 px-1.5 text-[10px] bg-primary text-primary-foreground hover:bg-primary/90"
+              : "h-5 px-1.5 text-[10px] bg-background/90 hover:bg-background"
+            }
           >
-            编辑
+            {sentence.isEdited ? "已编辑" : "编辑"}
           </Button>
         </div>
       ) : null}
@@ -189,6 +178,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
   ({
     sentences,
     onEditSentence,
+    onEditAllSentences,
     onSentencesUpdate,
     onSelectionChange,
     onPlayingChange,
@@ -199,6 +189,9 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
     const [selectedId, setSelectedId] = useState<number | null>(null);
     const [playingId, setPlayingId] = useState<number | null>(null);
     const [generatingId, setGeneratingId] = useState<number | null>(null);
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(false);
 
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const playQueueRef = useRef<number[]>([]);
@@ -443,13 +436,66 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
       };
     }, [stop]);
 
+    // Check scroll state
+    const checkScrollState = useCallback(() => {
+      const container = scrollContainerRef.current;
+      if (container) {
+        setCanScrollLeft(container.scrollLeft > 0);
+        setCanScrollRight(
+          container.scrollLeft < container.scrollWidth - container.clientWidth - 1
+        );
+      }
+    }, []);
+
+    useEffect(() => {
+      checkScrollState();
+      const container = scrollContainerRef.current;
+      if (container) {
+        container.addEventListener('scroll', checkScrollState);
+        window.addEventListener('resize', checkScrollState);
+        return () => {
+          container.removeEventListener('scroll', checkScrollState);
+          window.removeEventListener('resize', checkScrollState);
+        };
+      }
+    }, [checkScrollState, sentences]);
+
+    const scrollLeft = () => {
+      const container = scrollContainerRef.current;
+      if (container) {
+        container.scrollBy({ left: -300, behavior: 'smooth' });
+      }
+    };
+
+    const scrollRight = () => {
+      const container = scrollContainerRef.current;
+      if (container) {
+        container.scrollBy({ left: 300, behavior: 'smooth' });
+      }
+    };
+
     if (sentences.length === 0) return null;
 
     return (
       <div className="fixed bottom-[68px] left-56 right-0 z-40 bg-card border-t border-l border-border rounded-tl-xl">
-        {/* Horizontal sentence segments */}
-        <div className="px-6 py-3">
-          <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+        {/* Horizontal sentence segments with navigation */}
+        <div className="px-6 py-3 flex items-center gap-2">
+          {/* Left scroll button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`h-8 w-8 shrink-0 ${!canScrollLeft ? 'opacity-30 cursor-not-allowed' : ''}`}
+            onClick={scrollLeft}
+            disabled={!canScrollLeft}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+
+          {/* Scrollable container */}
+          <div 
+            ref={scrollContainerRef}
+            className="flex gap-2 overflow-x-auto pb-1 scrollbar-none flex-1"
+          >
             {sentences.map((sentence) => (
               <SentenceItem
                 key={sentence.id}
@@ -465,6 +511,43 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
               />
             ))}
           </div>
+
+          {/* Right scroll button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`h-8 w-8 shrink-0 ${!canScrollRight ? 'opacity-30 cursor-not-allowed' : ''}`}
+            onClick={scrollRight}
+            disabled={!canScrollRight}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+
+          {/* Edit all button */}
+          {onEditAllSentences && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 gap-1 shrink-0"
+              onClick={onEditAllSentences}
+            >
+              <Pencil className="h-3 w-3" />
+              编辑
+            </Button>
+          )}
+
+          {/* Delete button */}
+          {onDelete && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 text-destructive/60 hover:text-destructive hover:bg-destructive/10 gap-1 shrink-0"
+              onClick={onDelete}
+            >
+              <Trash2 className="h-4 w-4" />
+              删除
+            </Button>
+          )}
         </div>
       </div>
     );
