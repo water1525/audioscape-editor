@@ -24,6 +24,7 @@ interface SentenceTimelineProps {
   onPlayingChange?: (playingSentenceId: number | null) => void;
   onTimeChange?: (currentTime: number, duration: number) => void;
   onDelete?: () => void;
+  editGeneratingId?: number | null;
 }
 
 // Individual sentence item component with hover state
@@ -32,6 +33,7 @@ interface SentenceItemProps {
   isSelected: boolean;
   isPlaying: boolean;
   isGenerating: boolean;
+  isEditGenerating: boolean;
   onEdit: (sentenceId: number) => void;
   onClick: (sentence: SentenceSegment) => void;
   onNavigateVersion: (sentenceId: number, direction: "prev" | "next") => void;
@@ -43,6 +45,7 @@ const SentenceItem = ({
   isSelected,
   isPlaying,
   isGenerating,
+  isEditGenerating,
   onEdit,
   onClick,
   onNavigateVersion,
@@ -93,8 +96,20 @@ const SentenceItem = ({
         </div>
       )}
 
-      {/* Hover edit button */}
-      {isHovered && !isGenerating && (
+      {/* Hover edit button or loading/edited state */}
+      {isEditGenerating ? (
+        <div className="absolute top-0.5 right-0.5 z-10">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled
+            className="h-5 px-1.5 text-[10px] bg-background/90"
+          >
+            <Loader2 className="h-3 w-3 animate-spin mr-1" />
+            生成中
+          </Button>
+        </div>
+      ) : isHovered && !isGenerating ? (
         <div className="absolute top-0.5 right-0.5 z-10">
           <Button
             variant="outline"
@@ -105,10 +120,10 @@ const SentenceItem = ({
             }}
             className="h-5 px-1.5 text-[10px] bg-background/90 hover:bg-background"
           >
-            编辑
+            {sentence.isEdited ? "已编辑" : "编辑"}
           </Button>
         </div>
-      )}
+      ) : null}
 
       {/* Generating indicator */}
       {isGenerating && (
@@ -176,6 +191,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
     onPlayingChange,
     onTimeChange,
     onDelete,
+    editGeneratingId,
   }, ref) => {
     const [selectedId, setSelectedId] = useState<number | null>(null);
     const [playingId, setPlayingId] = useState<number | null>(null);
@@ -260,7 +276,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
         return url;
       } catch (error) {
         console.error("Error generating audio for sentence:", error);
-        toast.error(`生成分句音频失败: ${sentence.text.slice(0, 10)}...`);
+        // Silently fail without showing toast
         return null;
       } finally {
         setGeneratingId(null);
@@ -438,6 +454,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
                 isSelected={selectedId === sentence.id}
                 isPlaying={playingId === sentence.id}
                 isGenerating={generatingId === sentence.id}
+                isEditGenerating={editGeneratingId === sentence.id}
                 onEdit={onEditSentence}
                 onClick={handleClick}
                 onNavigateVersion={navigateVersion}

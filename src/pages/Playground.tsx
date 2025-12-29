@@ -154,6 +154,7 @@ const Playground = () => {
   const [editCurrentTime, setEditCurrentTime] = useState(0);
   const [editDuration, setEditDuration] = useState(0);
   const [editIsGenerating, setEditIsGenerating] = useState(false);
+  const [editGeneratingSentenceId, setEditGeneratingSentenceId] = useState<number | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Get current voice name for display
@@ -559,6 +560,7 @@ const Playground = () => {
                   setShowPlayerBar(false);
                   setEditSentences([]);
                   setEditIsGenerating(false);
+                  setEditGeneratingSentenceId(null);
                 }}
                 onSentencesChange={setEditSentences}
                 onGeneratingChange={(generating, title) => {
@@ -569,6 +571,7 @@ const Playground = () => {
                     setShowPlayerBar(true);
                   }
                 }}
+                onEditGeneratingChange={setEditGeneratingSentenceId}
               />
             )}
           </div>
@@ -683,6 +686,7 @@ const Playground = () => {
             setEditSentences([]);
             handleClosePlayerBar();
           }}
+          editGeneratingId={editGeneratingSentenceId}
         />
       )}
 
