@@ -94,7 +94,7 @@ const SentenceItem = ({
 
       {/* Hover edit button */}
       {isHovered && !isGenerating && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/60">
+        <div className="absolute top-0.5 right-0.5 z-10">
           <Button
             variant="outline"
             size="sm"
@@ -102,7 +102,7 @@ const SentenceItem = ({
               e.stopPropagation();
               onEdit(sentence.id);
             }}
-            className="h-7 text-xs"
+            className="h-5 px-1.5 text-[10px] bg-background/90 hover:bg-background"
           >
             编辑
           </Button>
