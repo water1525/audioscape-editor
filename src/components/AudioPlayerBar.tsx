@@ -11,6 +11,7 @@ interface AudioPlayerBarProps {
   onClose: () => void;
   showSaveVoice?: boolean;
   onSaveVoice?: () => void;
+  hideProgressBar?: boolean;
 }
 
 const AudioPlayerBar = ({
@@ -21,6 +22,7 @@ const AudioPlayerBar = ({
   onClose,
   showSaveVoice,
   onSaveVoice,
+  hideProgressBar,
 }: AudioPlayerBarProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -163,26 +165,28 @@ const AudioPlayerBar = ({
             </button>
           </div>
 
-          {/* Progress Bar - Always visible */}
-          <div className="flex items-center gap-3 flex-1 max-w-md">
-            <span className="text-xs text-muted-foreground min-w-[40px] text-right">
-              {formatTime(currentTime)}
-            </span>
-            <div
-              className="flex-1 h-1.5 bg-muted rounded-full cursor-pointer group"
-              onClick={handleSeek}
-            >
+          {/* Progress Bar - Conditionally visible */}
+          {!hideProgressBar && (
+            <div className="flex items-center gap-3 flex-1 max-w-md">
+              <span className="text-xs text-muted-foreground min-w-[40px] text-right">
+                {formatTime(currentTime)}
+              </span>
               <div
-                className="h-full bg-primary rounded-full transition-all duration-100 relative"
-                style={{ width: `${progress}%` }}
+                className="flex-1 h-1.5 bg-muted rounded-full cursor-pointer group"
+                onClick={handleSeek}
               >
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div
+                  className="h-full bg-primary rounded-full transition-all duration-100 relative"
+                  style={{ width: `${progress}%` }}
+                >
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
               </div>
+              <span className="text-xs text-muted-foreground min-w-[40px]">
+                {formatTime(duration)}
+              </span>
             </div>
-            <span className="text-xs text-muted-foreground min-w-[40px]">
-              {formatTime(duration)}
-            </span>
-          </div>
+          )}
 
           {/* Right: Actions */}
           <div className="flex items-center gap-2">

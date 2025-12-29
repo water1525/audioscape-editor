@@ -662,6 +662,7 @@ const Playground = () => {
         onClose={handleClosePlayerBar}
         showSaveVoice={showSaveVoice && activeTab === "clone"}
         onSaveVoice={saveVoiceCallback || undefined}
+        hideProgressBar={activeTab === "edit"}
       />
     </div>
   );
