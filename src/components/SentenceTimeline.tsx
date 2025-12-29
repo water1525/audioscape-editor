@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { ChevronLeft, ChevronRight, Loader2, Pencil, Trash2, PenLine } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, PenLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SentenceSegment } from "@/components/VoiceEditTab";
 import { toast } from "sonner";
@@ -19,12 +19,10 @@ export type SentenceTimelineHandle = {
 interface SentenceTimelineProps {
   sentences: SentenceSegment[];
   onEditSentence: (sentenceId: number) => void;
-  onEditAllSentences?: () => void;
   onSentencesUpdate: (sentences: SentenceSegment[]) => void;
   onSelectionChange?: (sentenceId: number | null) => void;
   onPlayingChange?: (playingSentenceId: number | null) => void;
   onTimeChange?: (currentTime: number, duration: number) => void;
-  onDelete?: () => void;
   editGeneratingId?: number | null;
 }
 
@@ -183,12 +181,10 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
   ({
     sentences,
     onEditSentence,
-    onEditAllSentences,
     onSentencesUpdate,
     onSelectionChange,
     onPlayingChange,
     onTimeChange,
-    onDelete,
     editGeneratingId,
   }, ref) => {
     const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -527,32 +523,6 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
-
-          {/* Edit all button */}
-          {onEditAllSentences && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 gap-1 shrink-0"
-              onClick={onEditAllSentences}
-            >
-              <Pencil className="h-3 w-3" />
-              编辑
-            </Button>
-          )}
-
-          {/* Delete button */}
-          {onDelete && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 text-destructive/60 hover:text-destructive hover:bg-destructive/10 gap-1 shrink-0"
-              onClick={onDelete}
-            >
-              <Trash2 className="h-4 w-4" />
-              删除
-            </Button>
-          )}
         </div>
       </div>
     );
