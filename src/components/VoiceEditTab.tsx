@@ -48,9 +48,10 @@ interface VoiceEditTabProps {
   onAudioDeleted?: () => void;
   onSentencesChange?: (sentences: SentenceSegment[]) => void;
   onGeneratingChange?: (isGenerating: boolean, title?: string) => void;
+  onEditGeneratingChange?: (sentenceId: number | null) => void;
 }
 
-const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onGeneratingChange }: VoiceEditTabProps) => {
+const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onGeneratingChange, onEditGeneratingChange }: VoiceEditTabProps) => {
   // Upload/Record state
   const [audioSource, setAudioSource] = useState<"none" | "upload" | "record">("none");
   const [originalAudioBlob, setOriginalAudioBlob] = useState<Blob | null>(null);
@@ -314,6 +315,8 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
     
     setShowModal(false);
     setIsGenerating(true);
+    const currentEditingSentenceId = editingSentenceId;
+    onEditGeneratingChange?.(currentEditingSentenceId);
     const currentTags = [...selectedTags];
     setSelectedTags([]);
     
@@ -354,7 +357,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
         return s;
       }));
       
-      onAudioGenerated?.(url, `句子${editingSentenceId + 1}_编辑版本`);
+      // Do not call onAudioGenerated for sentence edits - we don't want to change the title
       toast.success(`句子编辑成功，已应用 ${currentTags.length} 个风格标签`);
     } catch (error) {
       console.error("Error generating edited audio:", error);
@@ -362,6 +365,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
     } finally {
       setIsGenerating(false);
       setEditingSentenceId(null);
+      onEditGeneratingChange?.(null);
     }
   };
 
