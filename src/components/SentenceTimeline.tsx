@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { ChevronLeft, ChevronRight, Loader2, Pencil, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Pencil, Trash2, PenLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SentenceSegment } from "@/components/VoiceEditTab";
 import { toast } from "sonner";
@@ -97,25 +97,30 @@ const SentenceItem = ({
             <span>生成中</span>
           </div>
         </div>
-      ) : (isHovered || isSelected) && !isGenerating ? (
-        // Show button on hover or when selected
-        <div className="absolute top-0.5 right-0.5 z-10">
-          <Button
-            variant={sentence.isEdited ? "default" : "outline"}
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit(sentence.id);
-            }}
-            className={sentence.isEdited 
-              ? "h-5 px-1.5 text-[10px] bg-primary text-primary-foreground hover:bg-primary/90"
-              : "h-5 px-1.5 text-[10px] bg-background/90 hover:bg-background"
-            }
-          >
-            {sentence.isEdited ? "已编辑" : "编辑"}
-          </Button>
+      ) : (
+        <div className="absolute top-0.5 right-0.5 z-10 flex items-center gap-1">
+          {/* Non-clickable "已编辑" badge for edited sentences */}
+          {sentence.isEdited && (
+            <span className="h-5 px-1.5 text-[10px] bg-primary text-primary-foreground rounded-md flex items-center">
+              已编辑
+            </span>
+          )}
+          {/* Pencil edit button - show on hover or selected */}
+          {(isHovered || isSelected) && !isGenerating && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(sentence.id);
+              }}
+              className="h-5 w-5 bg-background/90 hover:bg-background"
+            >
+              <PenLine className="h-3 w-3" />
+            </Button>
+          )}
         </div>
-      ) : null}
+      )}
 
       {/* Generating indicator */}
       {isGenerating && (
