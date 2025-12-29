@@ -12,9 +12,8 @@ interface SentenceTimelineProps {
 const SentenceTimeline = ({ sentences, onEditSentence, onSentencesUpdate }: SentenceTimelineProps) => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [playingId, setPlayingId] = useState<number | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const playQueueRef = useRef<SentenceSegment[]>([]);
+  const playQueueRef = useRef<number[]>([]); // Store sentence IDs instead of objects
 
   // Generate waveform bars for visual effect
   const generateWaveformBars = useCallback((count: number, isActive: boolean) => {
@@ -32,47 +31,70 @@ const SentenceTimeline = ({ sentences, onEditSentence, onSentencesUpdate }: Sent
     });
   }, []);
 
-  // Play next sentence in queue
-  const playNextInQueue = useCallback(() => {
-    if (playQueueRef.current.length === 0) {
-      setPlayingId(null);
-      setIsPlaying(false);
+  // Play a specific sentence by ID
+  const playSentenceById = useCallback((sentenceId: number) => {
+    const sentence = sentences.find(s => s.id === sentenceId);
+    if (!sentence || !sentence.isEdited || sentence.versions.length === 0) {
+      // Try next in queue
+      if (playQueueRef.current.length > 0) {
+        const nextId = playQueueRef.current.shift()!;
+        playSentenceById(nextId);
+      } else {
+        setPlayingId(null);
+      }
       return;
     }
 
-    const nextSentence = playQueueRef.current.shift();
-    if (!nextSentence) {
-      setPlayingId(null);
-      setIsPlaying(false);
-      return;
-    }
-
-    // Select and play the next sentence
-    setSelectedId(nextSentence.id);
-    setPlayingId(nextSentence.id);
-
-    const currentVersion = nextSentence.versions[nextSentence.currentVersionIndex];
+    const currentVersion = sentence.versions[sentence.currentVersionIndex];
     if (!currentVersion) {
-      // Skip to next if no version
-      playNextInQueue();
+      if (playQueueRef.current.length > 0) {
+        const nextId = playQueueRef.current.shift()!;
+        playSentenceById(nextId);
+      } else {
+        setPlayingId(null);
+      }
       return;
+    }
+
+    // Update selection and playing state
+    setSelectedId(sentenceId);
+    setPlayingId(sentenceId);
+
+    // Stop previous audio
+    if (audioRef.current) {
+      audioRef.current.pause();
     }
 
     const audio = new Audio(currentVersion.url);
     audioRef.current = audio;
 
     audio.onended = () => {
-      playNextInQueue();
+      if (playQueueRef.current.length > 0) {
+        const nextId = playQueueRef.current.shift()!;
+        playSentenceById(nextId);
+      } else {
+        setPlayingId(null);
+      }
     };
 
     audio.onerror = () => {
-      playNextInQueue();
+      if (playQueueRef.current.length > 0) {
+        const nextId = playQueueRef.current.shift()!;
+        playSentenceById(nextId);
+      } else {
+        setPlayingId(null);
+      }
     };
 
     audio.play().catch(() => {
-      playNextInQueue();
+      if (playQueueRef.current.length > 0) {
+        const nextId = playQueueRef.current.shift()!;
+        playSentenceById(nextId);
+      } else {
+        setPlayingId(null);
+      }
     });
-  }, []);
+  }, [sentences]);
 
   // Start playback from a sentence
   const startPlaybackFrom = useCallback((startSentence: SentenceSegment) => {
@@ -83,24 +105,28 @@ const SentenceTimeline = ({ sentences, onEditSentence, onSentencesUpdate }: Sent
     }
 
     // If clicking on currently playing sentence, stop playback
-    if (isPlaying && playingId === startSentence.id) {
+    if (playingId === startSentence.id) {
       setPlayingId(null);
-      setIsPlaying(false);
       playQueueRef.current = [];
       return;
     }
 
-    // Build queue from this sentence to the end (only edited sentences)
+    // Build queue from this sentence to the end (only edited sentences with versions)
     const startIndex = sentences.findIndex(s => s.id === startSentence.id);
     if (startIndex === -1) return;
 
-    const queue = sentences.slice(startIndex).filter(s => s.isEdited && s.versions.length > 0);
+    const queue = sentences
+      .slice(startIndex)
+      .filter(s => s.isEdited && s.versions.length > 0)
+      .map(s => s.id);
+    
     if (queue.length === 0) return;
 
+    // First one plays immediately, rest go to queue
+    const firstId = queue.shift()!;
     playQueueRef.current = queue;
-    setIsPlaying(true);
-    playNextInQueue();
-  }, [sentences, isPlaying, playingId, playNextInQueue]);
+    playSentenceById(firstId);
+  }, [sentences, playingId, playSentenceById]);
 
   // Navigate versions
   const navigateVersion = (sentenceId: number, direction: "prev" | "next") => {
