@@ -66,12 +66,15 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
   // Sentence segments state
   const [sentences, setSentences] = useState<SentenceSegment[]>([]);
   const [editingSentenceId, setEditingSentenceId] = useState<number | null>(null);
+  const [isBatchEdit, setIsBatchEdit] = useState(false);
   
   // Edit state
   const [showModal, setShowModal] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGeneratingPreset, setIsGeneratingPreset] = useState<string | null>(null);
+  const [isBatchGenerating, setIsBatchGenerating] = useState(false);
+  const [batchProgress, setBatchProgress] = useState({ current: 0, total: 0 });
   
   // Refs
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -301,24 +304,87 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
     );
   };
 
-  // Handle edit confirm for a sentence
+  // Handle edit confirm for a sentence or batch
   const handleConfirm = async () => {
     if (selectedTags.length === 0) {
       toast.error("请至少选择一个编辑参数");
       return;
     }
     
+    const currentTags = [...selectedTags];
+    setShowModal(false);
+    setSelectedTags([]);
+    
+    // Batch edit all sentences
+    if (isBatchEdit) {
+      setIsBatchGenerating(true);
+      setBatchProgress({ current: 0, total: sentences.length });
+      
+      try {
+        for (let i = 0; i < sentences.length; i++) {
+          const sentence = sentences[i];
+          setBatchProgress({ current: i + 1, total: sentences.length });
+          onEditGeneratingChange?.(sentence.id);
+          
+          const response = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+                Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+              },
+              body: JSON.stringify({
+                text: sentence.text,
+                voice: "tianmeinvsheng",
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`Failed to generate audio for sentence ${i + 1}`);
+          }
+
+          const audioBlob = await response.blob();
+          const url = URL.createObjectURL(audioBlob);
+          
+          setSentences(prev => prev.map(s => {
+            if (s.id === sentence.id) {
+              const newVersions = [...s.versions, { url, tags: currentTags }];
+              return {
+                ...s,
+                isEdited: true,
+                versions: newVersions,
+                currentVersionIndex: newVersions.length - 1,
+              };
+            }
+            return s;
+          }));
+        }
+        
+        toast.success(`全部 ${sentences.length} 个句子编辑成功`);
+      } catch (error) {
+        console.error("Error in batch generation:", error);
+        toast.error("批量编辑失败，请重试");
+      } finally {
+        setIsBatchGenerating(false);
+        setIsBatchEdit(false);
+        setBatchProgress({ current: 0, total: 0 });
+        onEditGeneratingChange?.(null);
+      }
+      return;
+    }
+    
+    // Single sentence edit
     if (editingSentenceId === null) return;
     
     const sentence = sentences.find(s => s.id === editingSentenceId);
     if (!sentence) return;
     
-    setShowModal(false);
     setIsGenerating(true);
     const currentEditingSentenceId = editingSentenceId;
     onEditGeneratingChange?.(currentEditingSentenceId);
-    const currentTags = [...selectedTags];
-    setSelectedTags([]);
     
     try {
       const response = await fetch(
@@ -367,6 +433,13 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
       setEditingSentenceId(null);
       onEditGeneratingChange?.(null);
     }
+  };
+
+  // Open batch edit modal
+  const openBatchEditModal = () => {
+    setIsBatchEdit(true);
+    setEditingSentenceId(null);
+    setShowModal(true);
   };
 
   // Cleanup on unmount
@@ -554,7 +627,43 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
         </div>
       )}
 
-      {/* Delete button is now in SentenceTimeline */}
+      {/* Action buttons when sentences exist (record mode) */}
+      {sentences.length > 0 && audioSource === "record" && (
+        <div className="flex justify-end gap-2">
+          {/* Edit All button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={openBatchEditModal}
+            disabled={isBatchGenerating}
+            className="gap-1.5"
+          >
+            {isBatchGenerating ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                生成中 ({batchProgress.current}/{batchProgress.total})
+              </>
+            ) : (
+              <>
+                <Pencil className="h-4 w-4" />
+                编辑全部
+              </>
+            )}
+          </Button>
+          
+          {/* Delete button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={deleteAudio}
+            disabled={isBatchGenerating}
+            className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 gap-1.5"
+          >
+            <Trash2 className="h-4 w-4" />
+            删除
+          </Button>
+        </div>
+      )}
 
       {/* Upload mode - show simple player */}
       {originalAudioUrl && audioSource === "upload" && (
@@ -600,13 +709,13 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
               <div>
                 <h3 className="text-lg font-semibold text-foreground">参数设置</h3>
                 <p className="text-sm text-muted-foreground">
-                  编辑句子 {editingSentenceId !== null ? editingSentenceId + 1 : ''}
+                  {isBatchEdit ? `编辑全部 ${sentences.length} 个句子` : `编辑句子 ${editingSentenceId !== null ? editingSentenceId + 1 : ''}`}
                 </p>
               </div>
               <Button
                 variant="ghost"
                 size="iconSm"
-                onClick={() => { setShowModal(false); setSelectedTags([]); setEditingSentenceId(null); }}
+                onClick={() => { setShowModal(false); setSelectedTags([]); setEditingSentenceId(null); setIsBatchEdit(false); }}
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -683,7 +792,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
 
             {/* Action Buttons */}
             <div className="flex items-center justify-end gap-3">
-              <Button variant="outline" onClick={() => { setShowModal(false); setSelectedTags([]); setEditingSentenceId(null); }}>
+              <Button variant="outline" onClick={() => { setShowModal(false); setSelectedTags([]); setEditingSentenceId(null); setIsBatchEdit(false); }}>
                 取消
               </Button>
               <Button onClick={handleConfirm} disabled={isGenerating}>
@@ -692,7 +801,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     生成中...
                   </>
-                ) : "确认"}
+                ) : isBatchEdit ? "确认编辑全部" : "确认"}
               </Button>
             </div>
           </div>

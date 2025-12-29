@@ -675,22 +675,12 @@ const Playground = () => {
           onEditSentence={(id) => {
             (window as any).__voiceEditOpenModal?.(id);
           }}
-          onEditAllSentences={() => {
-            // Edit the first sentence as a starting point
-            if (editSentences.length > 0) {
-              (window as any).__voiceEditOpenModal?.(editSentences[0].id);
-            }
-          }}
           onSentencesUpdate={setEditSentences}
           onSelectionChange={setEditSelectedSentenceId}
           onPlayingChange={setEditPlayingSentenceId}
           onTimeChange={(current, total) => {
             setEditCurrentTime(current);
             setEditDuration(total);
-          }}
-          onDelete={() => {
-            setEditSentences([]);
-            handleClosePlayerBar();
           }}
           editGeneratingId={editGeneratingSentenceId}
         />
