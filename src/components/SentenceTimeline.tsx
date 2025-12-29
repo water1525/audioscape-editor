@@ -84,13 +84,13 @@ const SentenceTimeline = ({ sentences, onEditSentence, onSentencesUpdate }: Sent
   if (sentences.length === 0) return null;
 
   return (
-    <div className="fixed bottom-20 left-0 right-0 z-40 bg-muted/95 backdrop-blur-sm border-t border-border">
+    <div className="fixed bottom-[68px] left-56 right-0 z-40 bg-card border-t border-l border-border rounded-tl-xl">
       {/* Selected sentence detail */}
       {selectedId !== null && (() => {
         const sentence = sentences.find(s => s.id === selectedId);
         if (!sentence) return null;
         return (
-          <div className="container mx-auto px-4 py-2 flex items-center justify-between gap-4 border-b border-border/50 bg-background/50">
+          <div className="px-6 py-2 flex items-center justify-between gap-4 border-b border-border/50">
             <div className="flex-1 min-w-0">
               <p className="text-sm text-foreground truncate">{sentence.text}</p>
             </div>
@@ -134,7 +134,7 @@ const SentenceTimeline = ({ sentences, onEditSentence, onSentencesUpdate }: Sent
       })()}
       
       {/* Horizontal sentence segments */}
-      <div className="container mx-auto px-4 py-2">
+      <div className="px-6 py-2">
         <div className="flex gap-1 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
           {sentences.map((sentence) => {
             const isSelected = selectedId === sentence.id;
