@@ -542,21 +542,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange }: V
         </div>
       )}
 
-      {/* Recorded content header */}
-      {originalAudioUrl && sentences.length > 0 && (
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-foreground">录制内容</h3>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 text-destructive/60 hover:text-destructive hover:bg-destructive/10 gap-1"
-            onClick={deleteAudio}
-          >
-            <Trash2 className="h-4 w-4" />
-            删除
-          </Button>
-        </div>
-      )}
+      {/* Empty placeholder - delete button moved to SentenceTimeline */}
 
       {/* Upload mode - show simple player */}
       {originalAudioUrl && audioSource === "upload" && (
