@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { Play, Pause, Download, RotateCcw, ChevronDown, Save } from "lucide-react";
+import { Play, Pause, Download, RotateCcw, ChevronDown, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -17,6 +17,7 @@ interface AudioPlayerBarProps {
   isPlayingOverride?: boolean;
   durationOverride?: number;
   currentTimeOverride?: number;
+  isGenerating?: boolean;
 }
 
 const AudioPlayerBar = ({
@@ -33,6 +34,7 @@ const AudioPlayerBar = ({
   isPlayingOverride,
   durationOverride,
   currentTimeOverride,
+  isGenerating,
 }: AudioPlayerBarProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -119,7 +121,7 @@ const AudioPlayerBar = ({
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-  if (!isVisible || !audioUrl) return null;
+  if (!isVisible || (!audioUrl && !isGenerating)) return null;
 
   return (
     <div className="fixed bottom-0 left-56 right-0 z-50 bg-card border-t border-l border-border shadow-lg rounded-tl-xl">
@@ -160,17 +162,23 @@ const AudioPlayerBar = ({
               </button>
             )}
 
-            {/* Play/Pause */}
-            <button
-              onClick={togglePlayPause}
-              className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center hover:bg-foreground/90 transition-colors"
-            >
-              {(typeof isPlayingOverride === "boolean" ? isPlayingOverride : isPlaying) ? (
-                <Pause className="w-5 h-5" />
-              ) : (
-                <Play className="w-5 h-5 ml-0.5" />
-              )}
-            </button>
+            {/* Play/Pause or Generating */}
+            {isGenerating ? (
+              <div className="w-12 h-12 rounded-full bg-muted text-muted-foreground flex items-center justify-center">
+                <Loader2 className="w-5 h-5 animate-spin" />
+              </div>
+            ) : (
+              <button
+                onClick={togglePlayPause}
+                className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center hover:bg-foreground/90 transition-colors"
+              >
+                {(typeof isPlayingOverride === "boolean" ? isPlayingOverride : isPlaying) ? (
+                  <Pause className="w-5 h-5" />
+                ) : (
+                  <Play className="w-5 h-5 ml-0.5" />
+                )}
+              </button>
+            )}
 
             {/* Skip Forward */}
             {!hideSkipControls && (
@@ -227,6 +235,7 @@ const AudioPlayerBar = ({
                 variant="outline"
                 size="sm"
                 onClick={onSaveVoice}
+                disabled={isGenerating}
                 className="gap-1.5"
               >
                 <Save className="w-4 h-4" />
@@ -238,7 +247,8 @@ const AudioPlayerBar = ({
               variant="ghost"
               size="icon"
               onClick={handleDownload}
-              className="text-muted-foreground hover:text-foreground"
+              disabled={isGenerating}
+              className="text-muted-foreground hover:text-foreground disabled:opacity-50"
             >
               <Download className="w-5 h-5" />
             </Button>
@@ -247,7 +257,8 @@ const AudioPlayerBar = ({
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="text-muted-foreground hover:text-foreground"
+              disabled={isGenerating}
+              className="text-muted-foreground hover:text-foreground disabled:opacity-50"
             >
               <ChevronDown className="w-5 h-5" />
             </Button>

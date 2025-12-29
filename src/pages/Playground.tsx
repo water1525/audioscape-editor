@@ -153,6 +153,7 @@ const Playground = () => {
   const [editPlayingSentenceId, setEditPlayingSentenceId] = useState<number | null>(null);
   const [editCurrentTime, setEditCurrentTime] = useState(0);
   const [editDuration, setEditDuration] = useState(0);
+  const [editIsGenerating, setEditIsGenerating] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Get current voice name for display
@@ -552,12 +553,22 @@ const Playground = () => {
                   setCurrentAudioTitle(title);
                   setCurrentVoiceDisplayName("编辑音频");
                   setShowPlayerBar(true);
+                  setEditIsGenerating(false);
                 }}
                 onAudioDeleted={() => {
                   setShowPlayerBar(false);
                   setEditSentences([]);
+                  setEditIsGenerating(false);
                 }}
                 onSentencesChange={setEditSentences}
+                onGeneratingChange={(generating, title) => {
+                  setEditIsGenerating(generating);
+                  if (generating && title) {
+                    setCurrentAudioTitle(title);
+                    setCurrentVoiceDisplayName("编辑音频");
+                    setShowPlayerBar(true);
+                  }
+                }}
               />
             )}
           </div>
@@ -687,7 +698,7 @@ const Playground = () => {
         hideProgressBar={activeTab === "edit"}
         hideSkipControls={activeTab === "edit"}
         onTogglePlay={
-          activeTab === "edit"
+          activeTab === "edit" && !editIsGenerating
             ? () => sentenceTimelineRef.current?.togglePlayFrom(editSelectedSentenceId)
             : undefined
         }
@@ -696,6 +707,7 @@ const Playground = () => {
         }
         durationOverride={activeTab === "edit" ? editDuration : undefined}
         currentTimeOverride={activeTab === "edit" ? editCurrentTime : undefined}
+        isGenerating={activeTab === "edit" && editIsGenerating}
       />
     </div>
   );
