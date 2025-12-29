@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown, MessageSquareText, Copy, Wand2, RefreshCw, X, BookOpen, Cpu, Headphones, Mic, GraduationCap, Sparkles, HeadphonesIcon, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import VoiceCloneTab from "@/components/VoiceCloneTab";
-import VoiceEditTab from "@/components/VoiceEditTab";
+import VoiceEditTab, { SentenceSegment } from "@/components/VoiceEditTab";
+import SentenceTimeline from "@/components/SentenceTimeline";
 import { Slider } from "@/components/ui/slider";
 import AudioPlayerBar from "@/components/AudioPlayerBar";
 import {
@@ -128,6 +129,7 @@ const Playground = () => {
     setShowPlayerBar(false);
     setShowSaveVoice(false);
     setSaveVoiceCallback(null);
+    setEditSentences([]);
   };
   const [text, setText] = useState("");
   const [voice, setVoice] = useState("tianmeinvsheng");
@@ -141,6 +143,7 @@ const Playground = () => {
   const [showPlayerBar, setShowPlayerBar] = useState(false);
   const [showSaveVoice, setShowSaveVoice] = useState(false);
   const [saveVoiceCallback, setSaveVoiceCallback] = useState<(() => void) | null>(null);
+  const [editSentences, setEditSentences] = useState<SentenceSegment[]>([]);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Get current voice name for display
@@ -541,7 +544,9 @@ const Playground = () => {
                 }}
                 onAudioDeleted={() => {
                   setShowPlayerBar(false);
+                  setEditSentences([]);
                 }}
+                onSentencesChange={setEditSentences}
               />
             )}
           </div>
@@ -635,7 +640,18 @@ const Playground = () => {
       </div>
 
       {/* Bottom padding when player bar is visible */}
-      {showPlayerBar && <div className="h-20" />}
+      {showPlayerBar && <div className={editSentences.length > 0 ? "h-36" : "h-20"} />}
+
+      {/* Sentence Timeline for Edit tab */}
+      {activeTab === "edit" && editSentences.length > 0 && (
+        <SentenceTimeline
+          sentences={editSentences}
+          onEditSentence={(id) => {
+            (window as any).__voiceEditOpenModal?.(id);
+          }}
+          onSentencesUpdate={setEditSentences}
+        />
+      )}
 
       {/* Fixed Bottom Audio Player Bar */}
       <AudioPlayerBar

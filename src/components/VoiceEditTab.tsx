@@ -23,7 +23,7 @@ const styleTags = [
 ];
 const speedTags = ["快速", "慢速", "更快", "更慢"];
 
-interface SentenceSegment {
+export interface SentenceSegment {
   id: number;
   text: string;
   isEdited: boolean;
@@ -34,9 +34,10 @@ interface SentenceSegment {
 interface VoiceEditTabProps {
   onAudioGenerated?: (audioUrl: string, title: string) => void;
   onAudioDeleted?: () => void;
+  onSentencesChange?: (sentences: SentenceSegment[]) => void;
 }
 
-const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted }: VoiceEditTabProps) => {
+const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange }: VoiceEditTabProps) => {
   // Upload/Record state
   const [audioSource, setAudioSource] = useState<"none" | "upload" | "record">("none");
   const [originalAudioBlob, setOriginalAudioBlob] = useState<Blob | null>(null);
@@ -50,9 +51,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted }: VoiceEditTabProps) =
   
   // Sentence segments state
   const [sentences, setSentences] = useState<SentenceSegment[]>([]);
-  const [selectedSentenceId, setSelectedSentenceId] = useState<number | null>(null);
   const [editingSentenceId, setEditingSentenceId] = useState<number | null>(null);
-  const [playingSentenceId, setPlayingSentenceId] = useState<number | null>(null);
   
   // Edit state
   const [showModal, setShowModal] = useState(false);
@@ -64,8 +63,11 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted }: VoiceEditTabProps) =
   const audioChunksRef = useRef<Blob[]>([]);
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const sentenceAudioRef = useRef<HTMLAudioElement | null>(null);
-  const timelineRef = useRef<HTMLDivElement | null>(null);
+
+  // Notify parent when sentences change
+  useEffect(() => {
+    onSentencesChange?.(sentences);
+  }, [sentences, onSentencesChange]);
 
   // Split text into sentences
   const splitIntoSentences = (text: string): string[] => {
@@ -142,6 +144,9 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted }: VoiceEditTabProps) =
           currentVersionIndex: -1,
         }));
         setSentences(newSentences);
+        
+        // Notify parent with the first audio
+        onAudioGenerated?.(url, "录制音频");
       };
 
       mediaRecorder.start();
@@ -192,16 +197,22 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted }: VoiceEditTabProps) =
     setOriginalFileName("");
     setAudioSource("none");
     setSentences([]);
-    setPlayingSentenceId(null);
-    setSelectedSentenceId(null);
     onAudioDeleted?.();
   };
 
-  // Open edit modal for a sentence
+  // Open edit modal for a sentence (called from parent)
   const openEditModal = (sentenceId: number) => {
     setEditingSentenceId(sentenceId);
     setShowModal(true);
   };
+
+  // Expose openEditModal to parent
+  useEffect(() => {
+    (window as any).__voiceEditOpenModal = openEditModal;
+    return () => {
+      delete (window as any).__voiceEditOpenModal;
+    };
+  }, []);
 
   // Toggle tag selection
   const toggleTag = (tag: string) => {
@@ -277,56 +288,6 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted }: VoiceEditTabProps) =
     }
   };
 
-  // Navigate sentence versions
-  const navigateVersion = (sentenceId: number, direction: "prev" | "next") => {
-    setSentences(prev => prev.map(s => {
-      if (s.id === sentenceId && s.versions.length > 0) {
-        let newIndex = s.currentVersionIndex;
-        if (direction === "prev") {
-          newIndex = Math.max(0, newIndex - 1);
-        } else {
-          newIndex = Math.min(s.versions.length - 1, newIndex + 1);
-        }
-        return { ...s, currentVersionIndex: newIndex };
-      }
-      return s;
-    }));
-  };
-
-  // Play sentence audio
-  const playSentenceAudio = (sentence: SentenceSegment) => {
-    if (sentence.versions.length === 0 || sentence.currentVersionIndex < 0) return;
-    
-    const currentVersion = sentence.versions[sentence.currentVersionIndex];
-    if (!currentVersion) return;
-    
-    if (sentenceAudioRef.current) {
-      sentenceAudioRef.current.pause();
-    }
-    
-    if (playingSentenceId === sentence.id) {
-      setPlayingSentenceId(null);
-      return;
-    }
-    
-    const audio = new Audio(currentVersion.url);
-    sentenceAudioRef.current = audio;
-    
-    audio.onplay = () => setPlayingSentenceId(sentence.id);
-    audio.onended = () => setPlayingSentenceId(null);
-    audio.onpause = () => setPlayingSentenceId(null);
-    
-    audio.play();
-  };
-
-  // Select sentence
-  const handleSentenceClick = (sentence: SentenceSegment) => {
-    setSelectedSentenceId(sentence.id);
-    if (sentence.isEdited) {
-      playSentenceAudio(sentence);
-    }
-  };
-
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -341,20 +302,6 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted }: VoiceEditTabProps) =
       });
     };
   }, []);
-
-  // Generate waveform bars for visual effect
-  const generateWaveformBars = (count: number) => {
-    return Array.from({ length: count }, (_, i) => {
-      const height = 20 + Math.random() * 30;
-      return (
-        <div
-          key={i}
-          className="w-0.5 bg-current opacity-40 rounded-full"
-          style={{ height: `${height}%` }}
-        />
-      );
-    });
-  };
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -491,195 +438,19 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted }: VoiceEditTabProps) =
         </div>
       )}
 
-      {/* Recorded content with sentence timeline */}
+      {/* Recorded content header */}
       {originalAudioUrl && sentences.length > 0 && (
-        <div className="space-y-4">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-foreground">录制内容</h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 text-destructive/60 hover:text-destructive hover:bg-destructive/10 gap-1"
-              onClick={deleteAudio}
-            >
-              <Trash2 className="h-4 w-4" />
-              删除
-            </Button>
-          </div>
-
-          {/* Selected sentence detail panel */}
-          {selectedSentenceId !== null && (
-            <div className="bg-secondary/50 border border-border/50 rounded-lg p-4">
-              {(() => {
-                const sentence = sentences.find(s => s.id === selectedSentenceId);
-                if (!sentence) return null;
-                return (
-                  <div className="space-y-3">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-xs text-muted-foreground">句子 {sentence.id + 1}</span>
-                          {sentence.isEdited && (
-                            <span className="px-2 py-0.5 text-xs bg-primary/10 text-primary rounded-full">
-                              已编辑
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-foreground leading-relaxed">
-                          {sentence.text}
-                        </p>
-                      </div>
-                      
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEditModal(sentence.id)}
-                        disabled={isGenerating && editingSentenceId === sentence.id}
-                        className="gap-1 shrink-0"
-                      >
-                        {isGenerating && editingSentenceId === sentence.id ? (
-                          <>
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                            生成中
-                          </>
-                        ) : (
-                          <>
-                            <Pencil className="h-3 w-3" />
-                            编辑
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                    
-                    {/* Version navigation */}
-                    {sentence.isEdited && sentence.versions.length > 0 && (
-                      <div className="flex items-center gap-2 pt-2 border-t border-border/50">
-                        <Button
-                          variant="ghost"
-                          size="iconSm"
-                          onClick={() => navigateVersion(sentence.id, "prev")}
-                          disabled={sentence.currentVersionIndex <= 0}
-                          className="h-7 w-7"
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <span className="text-xs text-muted-foreground min-w-[60px] text-center">
-                          版本 {sentence.currentVersionIndex + 1}/{sentence.versions.length}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="iconSm"
-                          onClick={() => navigateVersion(sentence.id, "next")}
-                          disabled={sentence.currentVersionIndex >= sentence.versions.length - 1}
-                          className="h-7 w-7"
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => playSentenceAudio(sentence)}
-                          className="h-7 gap-1 ml-2"
-                        >
-                          {playingSentenceId === sentence.id ? (
-                            <>
-                              <Pause className="h-3 w-3" />
-                              暂停
-                            </>
-                          ) : (
-                            <>
-                              <Play className="h-3 w-3" />
-                              播放
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
-            </div>
-          )}
-
-          {/* Horizontal sentence timeline */}
-          <div className="bg-muted/30 border border-border/50 rounded-lg p-3">
-            <div 
-              ref={timelineRef}
-              className="flex gap-1 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
-            >
-              {sentences.map((sentence) => {
-                const isSelected = selectedSentenceId === sentence.id;
-                const isPlaying = playingSentenceId === sentence.id;
-                
-                return (
-                  <div
-                    key={sentence.id}
-                    onClick={() => handleSentenceClick(sentence)}
-                    className={`
-                      relative flex-shrink-0 min-w-[120px] max-w-[200px] h-14 rounded-md cursor-pointer
-                      transition-all duration-200 overflow-hidden group
-                      ${isSelected || isPlaying
-                        ? 'bg-primary/20 border-2 border-primary' 
-                        : sentence.isEdited 
-                          ? 'bg-primary/10 border border-primary/30 hover:border-primary/50'
-                          : 'bg-secondary/50 border border-border/50 hover:border-border'
-                      }
-                    `}
-                  >
-                    {/* Waveform background */}
-                    <div className={`absolute inset-0 flex items-center justify-center gap-0.5 px-2 ${
-                      isSelected || isPlaying ? 'text-primary' : 'text-muted-foreground'
-                    }`}>
-                      {generateWaveformBars(20)}
-                    </div>
-                    
-                    {/* Text overlay */}
-                    <div className="absolute inset-0 flex items-center px-2 bg-gradient-to-t from-background/80 via-background/40 to-transparent">
-                      <p className={`text-xs line-clamp-2 leading-tight ${
-                        isSelected || isPlaying ? 'text-foreground font-medium' : 'text-muted-foreground'
-                      }`}>
-                        {sentence.text}
-                      </p>
-                    </div>
-                    
-                    {/* Edited badge */}
-                    {sentence.isEdited && (
-                      <div className="absolute top-1 right-1">
-                        <span className="px-1.5 py-0.5 text-[10px] bg-primary text-primary-foreground rounded">
-                          已编辑
-                        </span>
-                      </div>
-                    )}
-                    
-                    {/* Playing indicator */}
-                    {isPlaying && (
-                      <div className="absolute bottom-1 left-1">
-                        <div className="flex items-center gap-0.5">
-                          {[1, 2, 3].map((i) => (
-                            <div
-                              key={i}
-                              className="w-0.5 bg-primary rounded-full animate-pulse"
-                              style={{
-                                height: `${8 + i * 2}px`,
-                                animationDelay: `${i * 0.1}s`,
-                              }}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-            
-            {/* Tip */}
-            <p className="text-xs text-muted-foreground mt-2 text-center">
-              点击选中句子进行编辑，编辑后的句子可切换版本播放
-            </p>
-          </div>
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium text-foreground">录制内容</h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 text-destructive/60 hover:text-destructive hover:bg-destructive/10 gap-1"
+            onClick={deleteAudio}
+          >
+            <Trash2 className="h-4 w-4" />
+            删除
+          </Button>
         </div>
       )}
 
@@ -690,8 +461,14 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted }: VoiceEditTabProps) =
           <div className="relative group bg-gradient-to-br from-secondary via-secondary/80 to-secondary rounded-xl p-4 border border-border/50">
             <div className="relative flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1 h-8">
-                  {generateWaveformBars(15)}
+                <div className="flex items-center gap-1 h-8 text-muted-foreground">
+                  {Array.from({ length: 15 }, (_, i) => (
+                    <div
+                      key={i}
+                      className="w-0.5 bg-current opacity-40 rounded-full"
+                      style={{ height: `${20 + Math.random() * 30}%` }}
+                    />
+                  ))}
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-foreground">
