@@ -6,9 +6,10 @@ import {
   useRef,
   useState,
 } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SentenceSegment } from "@/components/VoiceEditTab";
+import { toast } from "sonner";
 
 export type SentenceTimelineHandle = {
   togglePlayFrom: (sentenceId?: number | null) => void;
@@ -21,6 +22,7 @@ interface SentenceTimelineProps {
   onSentencesUpdate: (sentences: SentenceSegment[]) => void;
   onSelectionChange?: (sentenceId: number | null) => void;
   onPlayingChange?: (playingSentenceId: number | null) => void;
+  onTimeChange?: (currentTime: number, duration: number) => void;
 }
 
 const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProps>(
@@ -30,19 +32,23 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
     onSentencesUpdate,
     onSelectionChange,
     onPlayingChange,
+    onTimeChange,
   }, ref) => {
     const [selectedId, setSelectedId] = useState<number | null>(null);
     const [playingId, setPlayingId] = useState<number | null>(null);
+    const [generatingId, setGeneratingId] = useState<number | null>(null);
 
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const playQueueRef = useRef<number[]>([]);
     const sentencesRef = useRef(sentences);
+    const audioUrlCacheRef = useRef<Map<number, string>>(new Map());
+    const totalDurationRef = useRef(0);
+    const playedDurationRef = useRef(0);
 
     useEffect(() => {
       sentencesRef.current = sentences;
     }, [sentences]);
 
-    // Keep parent in sync
     useEffect(() => {
       onSelectionChange?.(selectedId);
     }, [selectedId, onSelectionChange]);
@@ -51,7 +57,6 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
       onPlayingChange?.(playingId);
     }, [playingId, onPlayingChange]);
 
-    // Auto-select first sentence when available
     useEffect(() => {
       if (selectedId === null && sentences.length > 0) {
         setSelectedId(sentences[0].id);
@@ -65,11 +70,64 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
       }
       playQueueRef.current = [];
       setPlayingId(null);
+      setGeneratingId(null);
     }, []);
 
-    const playNextInQueue = useCallback(() => {
+    // Generate audio for a sentence via TTS
+    const generateAudioForSentence = useCallback(async (sentence: SentenceSegment): Promise<string | null> => {
+      // Check cache first
+      const cached = audioUrlCacheRef.current.get(sentence.id);
+      if (cached) return cached;
+
+      // If already has edited version, use that
+      if (sentence.isEdited && sentence.versions.length > 0) {
+        const url = sentence.versions[sentence.currentVersionIndex]?.url;
+        if (url) {
+          audioUrlCacheRef.current.set(sentence.id, url);
+          return url;
+        }
+      }
+
+      setGeneratingId(sentence.id);
+
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            },
+            body: JSON.stringify({
+              text: sentence.text,
+              voice: "tianmeinvsheng",
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to generate audio");
+        }
+
+        const audioBlob = await response.blob();
+        const url = URL.createObjectURL(audioBlob);
+        audioUrlCacheRef.current.set(sentence.id, url);
+        return url;
+      } catch (error) {
+        console.error("Error generating audio for sentence:", error);
+        toast.error(`生成分句音频失败: ${sentence.text.slice(0, 10)}...`);
+        return null;
+      } finally {
+        setGeneratingId(null);
+      }
+    }, []);
+
+    const playNextInQueue = useCallback(async () => {
       if (playQueueRef.current.length === 0) {
         setPlayingId(null);
+        onTimeChange?.(0, totalDurationRef.current);
         return;
       }
 
@@ -77,13 +135,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
       const currentSentences = sentencesRef.current;
       const sentence = currentSentences.find((s) => s.id === nextId);
 
-      if (!sentence || !sentence.isEdited || sentence.versions.length === 0) {
-        playNextInQueue();
-        return;
-      }
-
-      const currentVersion = sentence.versions[sentence.currentVersionIndex];
-      if (!currentVersion) {
+      if (!sentence) {
         playNextInQueue();
         return;
       }
@@ -91,38 +143,62 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
       setSelectedId(nextId);
       setPlayingId(nextId);
 
+      // Get or generate audio
+      const audioUrl = await generateAudioForSentence(sentence);
+      if (!audioUrl) {
+        playNextInQueue();
+        return;
+      }
+
       if (audioRef.current) {
         audioRef.current.pause();
       }
 
-      const audio = new Audio(currentVersion.url);
+      const audio = new Audio(audioUrl);
       audioRef.current = audio;
 
-      audio.onended = () => playNextInQueue();
-      audio.onerror = () => playNextInQueue();
+      audio.onloadedmetadata = () => {
+        // Update total duration estimation
+      };
+
+      audio.ontimeupdate = () => {
+        const current = playedDurationRef.current + (audio.currentTime || 0);
+        onTimeChange?.(current, totalDurationRef.current);
+      };
+
+      audio.onended = () => {
+        playedDurationRef.current += audio.duration || 0;
+        playNextInQueue();
+      };
+
+      audio.onerror = () => {
+        playNextInQueue();
+      };
 
       audio.play().catch(() => playNextInQueue());
-    }, []);
+    }, [generateAudioForSentence, onTimeChange]);
 
     const startQueueFrom = useCallback(
-      (startId: number) => {
+      async (startId: number) => {
         stop();
 
         const currentSentences = sentencesRef.current;
         const startIndex = currentSentences.findIndex((s) => s.id === startId);
         if (startIndex === -1) return;
 
-        const playable = currentSentences
-          .slice(startIndex)
-          .filter((s) => s.isEdited && s.versions.length > 0)
-          .map((s) => s.id);
+        // Include all sentences from startId to end
+        const queue = currentSentences.slice(startIndex).map((s) => s.id);
 
-        if (playable.length === 0) {
+        if (queue.length === 0) {
           setPlayingId(null);
           return;
         }
 
-        playQueueRef.current = playable;
+        // Estimate total duration (rough: 2 seconds per sentence as placeholder)
+        totalDurationRef.current = queue.length * 2;
+        playedDurationRef.current = 0;
+
+        playQueueRef.current = queue;
         playNextInQueue();
       },
       [playNextInQueue, stop]
@@ -130,7 +206,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
 
     const togglePlayFrom = useCallback(
       (sentenceId?: number | null) => {
-        if (playingId !== null) {
+        if (playingId !== null || generatingId !== null) {
           stop();
           return;
         }
@@ -142,7 +218,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
         setSelectedId(startId);
         startQueueFrom(startId);
       },
-      [playingId, selectedId, startQueueFrom, stop]
+      [playingId, generatingId, selectedId, startQueueFrom, stop]
     );
 
     useImperativeHandle(
@@ -178,6 +254,8 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
           } else {
             newIndex = Math.min(s.versions.length - 1, newIndex + 1);
           }
+          // Clear cache for this sentence when version changes
+          audioUrlCacheRef.current.delete(sentenceId);
           return { ...s, currentVersionIndex: newIndex };
         }
         return s;
@@ -187,7 +265,6 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
 
     const handleClick = (sentence: SentenceSegment) => {
       setSelectedId(sentence.id);
-      // If user selects another sentence during playback, jump to it.
       if (playingId !== null) {
         startQueueFrom(sentence.id);
       }
@@ -196,6 +273,11 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
     useEffect(() => {
       return () => {
         stop();
+        // Clean up cached URLs
+        audioUrlCacheRef.current.forEach((url) => {
+          URL.revokeObjectURL(url);
+        });
+        audioUrlCacheRef.current.clear();
       };
     }, [stop]);
 
@@ -259,6 +341,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
             {sentences.map((sentence) => {
               const isSelected = selectedId === sentence.id;
               const isPlaying = playingId === sentence.id;
+              const isGenerating = generatingId === sentence.id;
 
               return (
                 <div
@@ -302,8 +385,15 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
                     </div>
                   )}
 
+                  {/* Generating indicator */}
+                  {isGenerating && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-background/60">
+                      <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                    </div>
+                  )}
+
                   {/* Playing indicator */}
-                  {isPlaying && (
+                  {isPlaying && !isGenerating && (
                     <div className="absolute bottom-1 left-1">
                       <div className="flex items-center gap-0.5">
                         {[1, 2, 3].map((i) => (

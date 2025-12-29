@@ -15,6 +15,8 @@ interface AudioPlayerBarProps {
   hideSkipControls?: boolean;
   onTogglePlay?: () => void;
   isPlayingOverride?: boolean;
+  durationOverride?: number;
+  currentTimeOverride?: number;
 }
 
 const AudioPlayerBar = ({
@@ -29,6 +31,8 @@ const AudioPlayerBar = ({
   hideSkipControls,
   onTogglePlay,
   isPlayingOverride,
+  durationOverride,
+  currentTimeOverride,
 }: AudioPlayerBarProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -184,7 +188,7 @@ const AudioPlayerBar = ({
           {!hideProgressBar && (
             <div className="flex items-center gap-3 flex-1 max-w-md">
               <span className="text-xs text-muted-foreground min-w-[40px] text-right">
-                {formatTime(currentTime)}
+                {formatTime(typeof currentTimeOverride === "number" ? currentTimeOverride : currentTime)}
               </span>
               <div
                 className="flex-1 h-1.5 bg-muted rounded-full cursor-pointer group"
@@ -198,7 +202,20 @@ const AudioPlayerBar = ({
                 </div>
               </div>
               <span className="text-xs text-muted-foreground min-w-[40px]">
-                {formatTime(duration)}
+                {formatTime(typeof durationOverride === "number" ? durationOverride : duration)}
+              </span>
+            </div>
+          )}
+
+          {/* Duration only (no progress bar) */}
+          {hideProgressBar && (typeof durationOverride === "number" || duration > 0) && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">
+                {formatTime(typeof currentTimeOverride === "number" ? currentTimeOverride : currentTime)}
+              </span>
+              <span className="text-xs text-muted-foreground">/</span>
+              <span className="text-xs text-muted-foreground">
+                {formatTime(typeof durationOverride === "number" ? durationOverride : duration)}
               </span>
             </div>
           )}
