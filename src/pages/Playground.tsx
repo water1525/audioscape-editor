@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import VoiceCloneTab from "@/components/VoiceCloneTab";
 import VoiceEditTab, { SentenceSegment } from "@/components/VoiceEditTab";
-import SentenceTimeline from "@/components/SentenceTimeline";
+import SentenceTimeline, { SentenceTimelineHandle } from "@/components/SentenceTimeline";
 import { Slider } from "@/components/ui/slider";
 import AudioPlayerBar from "@/components/AudioPlayerBar";
 import {
@@ -123,13 +123,18 @@ const Playground = () => {
   
   const [activeTab, setActiveTab] = useState("tts");
 
+  const sentenceTimelineRef = useRef<SentenceTimelineHandle | null>(null);
+
   // Hide player bar when switching tabs
   const handleTabChange = (value: string) => {
+    sentenceTimelineRef.current?.stop();
     setActiveTab(value);
     setShowPlayerBar(false);
     setShowSaveVoice(false);
     setSaveVoiceCallback(null);
     setEditSentences([]);
+    setEditSelectedSentenceId(null);
+    setEditPlayingSentenceId(null);
   };
   const [text, setText] = useState("");
   const [voice, setVoice] = useState("tianmeinvsheng");
@@ -144,6 +149,8 @@ const Playground = () => {
   const [showSaveVoice, setShowSaveVoice] = useState(false);
   const [saveVoiceCallback, setSaveVoiceCallback] = useState<(() => void) | null>(null);
   const [editSentences, setEditSentences] = useState<SentenceSegment[]>([]);
+  const [editSelectedSentenceId, setEditSelectedSentenceId] = useState<number | null>(null);
+  const [editPlayingSentenceId, setEditPlayingSentenceId] = useState<number | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Get current voice name for display
@@ -300,6 +307,8 @@ const Playground = () => {
   };
 
   const handleClosePlayerBar = () => {
+    sentenceTimelineRef.current?.stop();
+    setEditPlayingSentenceId(null);
     setShowPlayerBar(false);
     setShowSaveVoice(false);
     setSaveVoiceCallback(null);
@@ -645,11 +654,14 @@ const Playground = () => {
       {/* Sentence Timeline for Edit tab */}
       {activeTab === "edit" && editSentences.length > 0 && (
         <SentenceTimeline
+          ref={sentenceTimelineRef}
           sentences={editSentences}
           onEditSentence={(id) => {
             (window as any).__voiceEditOpenModal?.(id);
           }}
           onSentencesUpdate={setEditSentences}
+          onSelectionChange={setEditSelectedSentenceId}
+          onPlayingChange={setEditPlayingSentenceId}
         />
       )}
 
@@ -663,6 +675,15 @@ const Playground = () => {
         showSaveVoice={showSaveVoice && activeTab === "clone"}
         onSaveVoice={saveVoiceCallback || undefined}
         hideProgressBar={activeTab === "edit"}
+        hideSkipControls={activeTab === "edit"}
+        onTogglePlay={
+          activeTab === "edit"
+            ? () => sentenceTimelineRef.current?.togglePlayFrom(editSelectedSentenceId)
+            : undefined
+        }
+        isPlayingOverride={
+          activeTab === "edit" ? editPlayingSentenceId !== null : undefined
+        }
       />
     </div>
   );

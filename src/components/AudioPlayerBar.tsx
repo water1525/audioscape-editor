@@ -12,6 +12,9 @@ interface AudioPlayerBarProps {
   showSaveVoice?: boolean;
   onSaveVoice?: () => void;
   hideProgressBar?: boolean;
+  hideSkipControls?: boolean;
+  onTogglePlay?: () => void;
+  isPlayingOverride?: boolean;
 }
 
 const AudioPlayerBar = ({
@@ -23,6 +26,9 @@ const AudioPlayerBar = ({
   showSaveVoice,
   onSaveVoice,
   hideProgressBar,
+  hideSkipControls,
+  onTogglePlay,
+  isPlayingOverride,
 }: AudioPlayerBarProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -38,6 +44,11 @@ const AudioPlayerBar = ({
   }, [audioUrl]);
 
   const togglePlayPause = async () => {
+    if (onTogglePlay) {
+      onTogglePlay();
+      return;
+    }
+
     if (!audioRef.current) return;
 
     if (isPlaying) {
@@ -135,20 +146,22 @@ const AudioPlayerBar = ({
           {/* Center: Playback Controls */}
           <div className="flex items-center gap-2">
             {/* Skip Back */}
-            <button
-              onClick={() => skipTime(-10)}
-              className="p-2 text-muted-foreground hover:text-foreground transition-colors relative"
-            >
-              <RotateCcw className="w-5 h-5" />
-              <span className="absolute -top-0.5 -right-0.5 text-[10px] font-medium">10</span>
-            </button>
+            {!hideSkipControls && (
+              <button
+                onClick={() => skipTime(-10)}
+                className="p-2 text-muted-foreground hover:text-foreground transition-colors relative"
+              >
+                <RotateCcw className="w-5 h-5" />
+                <span className="absolute -top-0.5 -right-0.5 text-[10px] font-medium">10</span>
+              </button>
+            )}
 
             {/* Play/Pause */}
             <button
               onClick={togglePlayPause}
               className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center hover:bg-foreground/90 transition-colors"
             >
-              {isPlaying ? (
+              {(typeof isPlayingOverride === "boolean" ? isPlayingOverride : isPlaying) ? (
                 <Pause className="w-5 h-5" />
               ) : (
                 <Play className="w-5 h-5 ml-0.5" />
@@ -156,13 +169,15 @@ const AudioPlayerBar = ({
             </button>
 
             {/* Skip Forward */}
-            <button
-              onClick={() => skipTime(10)}
-              className="p-2 text-muted-foreground hover:text-foreground transition-colors relative"
-            >
-              <RotateCcw className="w-5 h-5 scale-x-[-1]" />
-              <span className="absolute -top-0.5 -left-0.5 text-[10px] font-medium">10</span>
-            </button>
+            {!hideSkipControls && (
+              <button
+                onClick={() => skipTime(10)}
+                className="p-2 text-muted-foreground hover:text-foreground transition-colors relative"
+              >
+                <RotateCcw className="w-5 h-5 scale-x-[-1]" />
+                <span className="absolute -top-0.5 -left-0.5 text-[10px] font-medium">10</span>
+              </button>
+            )}
           </div>
 
           {/* Progress Bar - Conditionally visible */}
