@@ -67,20 +67,33 @@ serve(async (req) => {
 
         if (response.ok) {
           const contentType = response.headers.get("content-type") ?? "";
+          const contentLength = response.headers.get("content-length");
+          
+          console.log(
+            `Step TTS API response: status=${response.status}, content-type=${contentType}, content-length=${contentLength}`
+          );
 
-          // Some upstream failures can still return 200 with a JSON body.
-          if (contentType.includes("application/json")) {
-            const maybeError = await response.text();
-            console.error("Step TTS API returned JSON with 200:", maybeError);
+          // Always read as arrayBuffer first to avoid consuming the body twice
+          const audioBuffer = await response.arrayBuffer();
+          
+          // Check if response is too small to be valid audio (likely an error)
+          // A valid MP3 should be at least a few KB
+          if (audioBuffer.byteLength < 100) {
+            const decoder = new TextDecoder();
+            const bodyText = decoder.decode(audioBuffer);
+            console.error(
+              `Step TTS API returned small/empty response (${audioBuffer.byteLength} bytes):`,
+              bodyText
+            );
 
             if (attempt < maxAttempts - 1) {
-              await sleep(700 * (attempt + 1));
+              await sleep(1000 * (attempt + 1));
               continue;
             }
 
             return new Response(
               JSON.stringify({
-                error: `Step TTS API returned JSON with 200: ${maybeError}`,
+                error: `Step TTS API returned invalid response: ${bodyText || "(empty)"}`,
               }),
               {
                 status: 502,
@@ -89,28 +102,23 @@ serve(async (req) => {
             );
           }
 
-          // Return the audio as binary
-          const audioBuffer = await response.arrayBuffer();
-          console.log(
-            "Step TTS API response received successfully",
-            "content-length:",
-            response.headers.get("content-length"),
-            "bytes:",
-            audioBuffer.byteLength
-          );
-
-          // Occasionally the upstream returns 200 with an empty body.
-          // Treat as transient and retry.
-          if (audioBuffer.byteLength === 0) {
-            console.error("Step TTS API returned empty audio with 200");
+          // Check if it's actually JSON (error response) by looking at first byte
+          const firstByte = new Uint8Array(audioBuffer)[0];
+          // JSON typically starts with { (123) or [ (91)
+          if (firstByte === 123 || firstByte === 91) {
+            const decoder = new TextDecoder();
+            const bodyText = decoder.decode(audioBuffer);
+            console.error("Step TTS API returned JSON with 200:", bodyText);
 
             if (attempt < maxAttempts - 1) {
-              await sleep(700 * (attempt + 1));
+              await sleep(1000 * (attempt + 1));
               continue;
             }
 
             return new Response(
-              JSON.stringify({ error: "Step TTS API returned empty audio" }),
+              JSON.stringify({
+                error: `Step TTS API error: ${bodyText}`,
+              }),
               {
                 status: 502,
                 headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -118,10 +126,14 @@ serve(async (req) => {
             );
           }
 
+          console.log(
+            "Step TTS API audio received successfully, bytes:",
+            audioBuffer.byteLength
+          );
+
           return new Response(audioBuffer, {
             headers: {
               ...corsHeaders,
-              // functions-js treats octet-stream as binary and returns Blob on the client
               "Content-Type": "application/octet-stream",
               "Content-Disposition": "inline; filename=\"audio.mp3\"",
             },
