@@ -91,27 +91,22 @@ const SentenceItem = ({
       {isEditGenerating ? (
         // Show loading state during generation
         <div className="absolute top-0.5 right-0.5 z-10">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled
-            className="h-5 px-1.5 text-[10px] bg-background/90"
-          >
-            <Loader2 className="h-3 w-3 animate-spin mr-1" />
-            生成中
-          </Button>
+          <div className="h-5 px-1.5 text-[10px] bg-primary text-primary-foreground rounded-md flex items-center gap-1">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            <span>生成中</span>
+          </div>
         </div>
       ) : sentence.isEdited ? (
         // Always show "已编辑" button for edited sentences
         <div className="absolute top-0.5 right-0.5 z-10">
           <Button
-            variant="outline"
+            variant="default"
             size="sm"
             onClick={(e) => {
               e.stopPropagation();
               onEdit(sentence.id);
             }}
-            className="h-5 px-1.5 text-[10px] bg-primary/10 text-primary border-primary/30 hover:bg-primary/20"
+            className="h-5 px-1.5 text-[10px] bg-primary text-primary-foreground hover:bg-primary/90"
           >
             已编辑
           </Button>
