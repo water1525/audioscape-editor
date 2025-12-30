@@ -272,36 +272,10 @@ const Playground = () => {
     }
   };
 
-  const handleCaseClick = async (sample: typeof caseSamples[0]) => {
+  const handleCaseClick = (sample: typeof caseSamples[0]) => {
     setText(sample.text);
     setCurrentAudioTitle(sample.audioTitle);
-    
-    // Use pre-generated audio from storage for faster loading
-    const storagePath = storageFiles[sample.id];
-    if (storagePath) {
-      setIsGenerating(true);
-      setCurrentVoiceDisplayName("甜美女声");
-      try {
-        const audioUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/audio/${storagePath}`;
-        // Verify the audio exists by making a HEAD request
-        const response = await fetch(audioUrl, { method: 'HEAD' });
-        if (response.ok) {
-          setAudioUrl(audioUrl);
-          setShowPlayerBar(true);
-        } else {
-          // Fall back to generating if pre-generated audio not found
-          console.log("Pre-generated audio not found, will generate on demand");
-          setAudioUrl(null);
-        }
-      } catch (error) {
-        console.log("Error loading pre-generated audio:", error);
-        setAudioUrl(null);
-      } finally {
-        setIsGenerating(false);
-      }
-    } else {
-      setAudioUrl(null);
-    }
+    setAudioUrl(null);
   };
 
   const handleGenerateClick = () => {
