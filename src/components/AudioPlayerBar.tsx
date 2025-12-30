@@ -137,10 +137,10 @@ const AudioPlayerBar = ({
         }}
       />
 
-      <div className="px-6 py-3 relative">
+      <div className="px-6 py-3">
         <div className="flex items-center gap-4">
           {/* Left: Title and Voice Info */}
-          <div className="flex-1 min-w-0">
+          <div className="w-48 min-w-0 shrink-0">
             <p className="text-sm font-medium text-foreground truncate">
               {title || "未命名音频"}
             </p>
@@ -149,8 +149,8 @@ const AudioPlayerBar = ({
             </p>
           </div>
 
-          {/* Center: Playback Controls - Absolutely centered */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
+          {/* Center: Playback Controls */}
+          <div className="flex-1 flex items-center justify-center gap-2">
             {/* Skip Back */}
             {!hideSkipControls && (
               <button
@@ -192,44 +192,22 @@ const AudioPlayerBar = ({
             )}
           </div>
 
-          {/* Progress Bar - Conditionally visible */}
-          {!hideProgressBar && (
-            <div className="flex items-center gap-3 flex-1 max-w-md ml-auto">
-              <span className="text-xs text-muted-foreground min-w-[40px] text-right">
-                {formatTime(typeof currentTimeOverride === "number" ? currentTimeOverride : currentTime)}
-              </span>
-              <div
-                className="flex-1 h-1.5 bg-muted rounded-full cursor-pointer group"
-                onClick={handleSeek}
-              >
-                <div
-                  className="h-full bg-primary rounded-full transition-all duration-100 relative"
-                  style={{ width: `${progress}%` }}
-                >
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
+          {/* Right section */}
+          <div className="w-48 shrink-0 flex items-center justify-end gap-3">
+            {/* Duration display */}
+            {(typeof durationOverride === "number" || duration > 0) && (
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <span>
+                  {formatTime(typeof currentTimeOverride === "number" ? currentTimeOverride : currentTime)}
+                </span>
+                <span>/</span>
+                <span>
+                  {formatTime(typeof durationOverride === "number" ? durationOverride : duration)}
+                </span>
               </div>
-              <span className="text-xs text-muted-foreground min-w-[40px]">
-                {formatTime(typeof durationOverride === "number" ? durationOverride : duration)}
-              </span>
-            </div>
-          )}
+            )}
 
-          {/* Duration only (no progress bar) */}
-          {hideProgressBar && (typeof durationOverride === "number" || duration > 0) && (
-            <div className="flex items-center gap-2 ml-auto">
-              <span className="text-xs text-muted-foreground">
-                {formatTime(typeof currentTimeOverride === "number" ? currentTimeOverride : currentTime)}
-              </span>
-              <span className="text-xs text-muted-foreground">/</span>
-              <span className="text-xs text-muted-foreground">
-                {formatTime(typeof durationOverride === "number" ? durationOverride : duration)}
-              </span>
-            </div>
-          )}
-
-          {/* Right: Actions */}
-          <div className="flex items-center gap-2 shrink-0">
+            {/* Actions */}
             {showSaveVoice && onSaveVoice && (
               <Button
                 variant="outline"
