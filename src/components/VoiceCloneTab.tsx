@@ -23,23 +23,23 @@ interface VoiceCloneTabProps {
 
 // Sample texts for recording (20-30 characters each)
 const sampleTexts = [
-  "阳光透过窗帘洒落在地板上，形成金色的光斑。",
-  "科技的发展日新月异，正在改变我们的生活。",
-  "中华文化源远流长，承载着深厚的历史底蕴。",
-  "音乐是心灵的语言，能够触动每个人的内心。",
-  "大自然用四季更迭，绘制出一幅壮丽的画卷。",
+  "Sunlight streams through the curtains, casting golden patterns on the floor.",
+  "Technology advances rapidly, transforming our daily lives in countless ways.",
+  "Music is a universal language that touches hearts across all cultures.",
+  "Nature paints magnificent scenes with the changing of each season.",
+  "The morning breeze gently brushes your cheek, carrying the fragrance of flowers.",
 ];
 
 // AI generated target texts (20-30 characters each)
 const aiTargetTexts = [
-  "清晨的微风轻轻拂过脸颊，带来花朵的芬芳。",
-  "城市的霓虹灯在夜幕中闪烁，如繁星点点。",
-  "咖啡的香气弥漫在空气中，唤醒沉睡的灵魂。",
-  "书页翻动的声音，是知识最美的旋律。",
-  "雨滴敲打窗户的节奏，谱写一曲自然的乐章。",
-  "孩子们的笑声回荡在公园里，充满纯真与快乐。",
-  "夕阳将天空染成橘红色，美得令人心醉。",
-  "春天的樱花如粉色的雪花，飘落在小径上。",
+  "The morning dew glistens on petals, welcoming a brand new day.",
+  "City lights twinkle in the night sky like countless distant stars.",
+  "The aroma of coffee fills the air, awakening the sleeping soul.",
+  "The sound of turning pages is the most beautiful melody of knowledge.",
+  "Raindrops tap against the window, composing nature's own symphony.",
+  "Children's laughter echoes through the park, pure and joyful.",
+  "The sunset paints the sky in shades of orange, breathtakingly beautiful.",
+  "Spring cherry blossoms fall like pink snow upon the winding path.",
 ];
 
 const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: VoiceCloneTabProps) => {
@@ -125,10 +125,10 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
         setCountdown((prev) => prev - 1);
       }, 1000);
 
-      toast.success("开始录制，请朗读文本");
+      toast.success("Recording started. Please read the text.");
     } catch (error) {
       console.error("Error accessing microphone:", error);
-      toast.error("无法访问麦克风，请检查权限设置");
+      toast.error("Cannot access microphone. Please check permissions.");
     }
   };
 
@@ -141,7 +141,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
         clearInterval(countdownIntervalRef.current);
         countdownIntervalRef.current = null;
       }
-      toast.success("录制完成");
+      toast.success("Recording completed");
     }
   }, [isRecording]);
 
@@ -183,7 +183,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
   // Clone voice using Step TTS Mini
   const cloneVoice = async () => {
     if (!recordedAudio || !targetText.trim()) {
-      toast.error("请先录制音频并输入目标文本");
+      toast.error("Please record audio and enter target text first");
       return;
     }
 
@@ -207,7 +207,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
       });
 
       if (error) {
-        throw new Error((error as any)?.message || "音色复刻失败");
+        throw new Error((error as any)?.message || "Voice cloning failed");
       }
 
       // New function response: { audioBase64 }
@@ -215,10 +215,10 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
         const audioBlob = base64ToBlob(String((data as any).audioBase64), "audio/mpeg");
         const url = URL.createObjectURL(audioBlob);
         setClonedAudioUrl(url);
-        toast.success("音色复刻成功！使用您的声音生成了音频");
+        toast.success("Voice cloned successfully! Audio generated with your voice.");
 
         // Notify parent component to play in bottom bar
-        onAudioGenerated?.(url, "复刻音频");
+        onAudioGenerated?.(url, "Cloned Audio");
         return;
       }
 
@@ -226,13 +226,13 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
       const audioBlob = data instanceof Blob ? data : new Blob([data as any], { type: "audio/mpeg" });
       const url = URL.createObjectURL(audioBlob);
       setClonedAudioUrl(url);
-      toast.success("音色复刻成功！使用您的声音生成了音频");
+      toast.success("Voice cloned successfully! Audio generated with your voice.");
 
       // Notify parent component to play in bottom bar
-      onAudioGenerated?.(url, "复刻音频");
+      onAudioGenerated?.(url, "Cloned Audio");
     } catch (error) {
       console.error("Voice cloning error:", error);
-      toast.error(error instanceof Error ? error.message : "音色复刻失败，请重试");
+      toast.error(error instanceof Error ? error.message : "Voice cloning failed. Please try again.");
     } finally {
       setIsCloning(false);
     }
@@ -261,19 +261,19 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
     const trimmedName = voiceName.trim();
     
     if (trimmedName.length < 1) {
-      setVoiceNameError("音色名称至少需要1个字符");
+      setVoiceNameError("Voice name must be at least 1 character");
       return;
     }
     
     if (trimmedName.length > 20) {
-      setVoiceNameError("音色名称不能超过20个字符");
+      setVoiceNameError("Voice name cannot exceed 20 characters");
       return;
     }
 
     saveVoice(trimmedName);
     setIsSaveDialogOpen(false);
     setVoiceName("");
-    toast.success(`音色"${trimmedName}"保存成功！`);
+    toast.success(`Voice "${trimmedName}" saved successfully!`);
   };
 
   // Auto stop when countdown reaches 0
@@ -309,12 +309,12 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
     <div className="animate-fade-in space-y-6">
       {/* Step 1: Record Audio */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-foreground">step 1 录制音频</h3>
+        <h3 className="text-sm font-medium text-foreground">Step 1: Record Audio</h3>
         
         {!recordedAudioUrl ? (
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
             <p className="text-sm text-muted-foreground text-center mb-4">
-              请在安静环境下朗读以下文本，录制5-10秒语音
+              Please read the following text in a quiet environment, recording 5-10 seconds
             </p>
             
             <div className="flex items-center justify-center gap-2 mb-6">
@@ -341,16 +341,16 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
                   disabled={countdown > 5}
                   className="min-w-[120px]"
                 >
-                  结束录制
+                  Stop Recording
                 </Button>
                 {countdown > 5 && (
-                  <p className="text-xs text-muted-foreground">录制至少5秒后可手动结束</p>
+                  <p className="text-xs text-muted-foreground">Can stop manually after 5 seconds</p>
                 )}
               </div>
             ) : (
               <div className="flex justify-center">
                 <Button onClick={startRecording} className="min-w-[120px]">
-                  开始录制
+                  Start Recording
                 </Button>
               </div>
             )}
@@ -394,10 +394,10 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
 
       {/* Step 2: Target Text */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-foreground">step 2 输入目标音频文本</h3>
+        <h3 className="text-sm font-medium text-foreground">Step 2: Enter Target Text</h3>
         <div className="relative">
           <Textarea
-            placeholder="点此输入想要生成的音频文本"
+            placeholder="Enter the text you want to generate audio for"
             value={targetText}
             onChange={(e) => setTargetText(e.target.value.slice(0, 1000))}
             className="min-h-[120px] resize-none pr-16"
@@ -414,7 +414,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
               )}
             </button>
             <span className="text-xs text-muted-foreground">
-              {targetText.length}/1000字符
+              {targetText.length}/1000 chars
             </span>
           </div>
         </div>
@@ -428,7 +428,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
             disabled={isCloning}
             className="min-w-[120px]"
           >
-            {isCloning ? "复刻中..." : "复刻音色"}
+            {isCloning ? "Cloning..." : "Clone Voice"}
           </Button>
         </div>
       )}
@@ -438,15 +438,15 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
       <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>保存音色</DialogTitle>
+            <DialogTitle>Save Voice</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
-                音色名称
+                Voice Name
               </label>
               <Input
-                placeholder="请输入音色名称（1-20个字符）"
+                placeholder="Enter voice name (1-20 characters)"
                 value={voiceName}
                 onChange={(e) => {
                   setVoiceName(e.target.value);
@@ -458,16 +458,16 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
                 <p className="text-sm text-destructive">{voiceNameError}</p>
               )}
               <p className="text-xs text-muted-foreground">
-                {voiceName.length}/20 字符
+                {voiceName.length}/20 characters
               </p>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsSaveDialogOpen(false)}>
-              取消
+              Cancel
             </Button>
             <Button onClick={handleSaveVoice}>
-              保存
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>

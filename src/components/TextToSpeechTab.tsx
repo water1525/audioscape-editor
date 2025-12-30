@@ -13,29 +13,29 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const voiceConfigs: Record<string, { voice: string; text: string }> = {
   case1: {
     voice: "cixingnansheng",
-    text: "阶跃星辰近日正式发布新一代基础大模型Step 3，兼顾智能与效率，面向推理时代打造最适合应用的模型。Step 3将面向全球企业和开发者开源，为开源世界贡献最强多模态推理模型。",
+    text: "Step Star has officially released the new Step 3 large language model, combining intelligence and efficiency, creating the most suitable model for applications in the reasoning era. Step 3 will be open-sourced globally for enterprises and developers, contributing the most powerful multimodal reasoning model to the open-source world.",
   },
   case2: {
     voice: "tianmeinvsheng", 
-    text: "深夜，老宅的钟敲响十二下。她推开尘封的阁楼门，发现一封泛黄的信——收件人竟是自己的名字，落款日期却是明天。信上只有一句话：不要回头。她的心跳骤然加速，身后传来轻微的脚步声。她屏住呼吸，缓缓转身，却只看见空荡荡的走廊和一面落满灰尘的镜子。镜中的自己正微笑着，但她此刻分明没有笑。",
+    text: "Late at night, the old mansion's clock struck twelve. She pushed open the dusty attic door and found a yellowed letter—the recipient was her own name, but the date was tomorrow. There was only one sentence: Do not look back. Her heart raced as footsteps echoed softly behind her. She held her breath and slowly turned around, only to see an empty hallway and a dusty mirror. In the reflection, she was smiling, but she wasn't smiling at all.",
   },
 };
 
 const dialogueLines = [
-  { speaker: "客服小美", text: "您好，欢迎致电智能客服中心，请问有什么可以帮您？", voice: "tianmeinvsheng" },
-  { speaker: "客户先生", text: "你好，我昨天下的订单显示已发货，但物流信息一直没更新。", voice: "cixingnansheng" },
-  { speaker: "客服小美", text: "好的，请您提供一下订单号，我帮您查询。", voice: "tianmeinvsheng" },
-  { speaker: "客户先生", text: "订单号是202412250001。", voice: "cixingnansheng" },
-  { speaker: "客服小美", text: "已查到，您的包裹目前在转运中，预计明天送达，请您耐心等待。", voice: "tianmeinvsheng" },
-  { speaker: "客户先生", text: "好的，谢谢！", voice: "cixingnansheng" },
+  { speaker: "Agent May", text: "Hello, welcome to our Smart Customer Service Center. How may I help you?", voice: "tianmeinvsheng" },
+  { speaker: "Mr. Customer", text: "Hi, my order from yesterday shows shipped, but the tracking hasn't updated.", voice: "cixingnansheng" },
+  { speaker: "Agent May", text: "Sure, please provide your order number and I'll look it up for you.", voice: "tianmeinvsheng" },
+  { speaker: "Mr. Customer", text: "The order number is 202412250001.", voice: "cixingnansheng" },
+  { speaker: "Agent May", text: "Found it. Your package is currently in transit and expected to arrive tomorrow. Please be patient.", voice: "tianmeinvsheng" },
+  { speaker: "Mr. Customer", text: "Great, thank you!", voice: "cixingnansheng" },
 ];
 
 const cases = [
   {
     id: "case1",
-    label: "新闻播报",
-    description: "Step 3模型发布",
-    audioTitle: "Step 3发布",
+    label: "News Broadcast",
+    description: "Step 3 Model Release",
+    audioTitle: "Step 3 Release",
     icon: "📰",
     gradient: "from-blue-400 to-cyan-400",
     text: voiceConfigs.case1.text,
@@ -43,9 +43,9 @@ const cases = [
   },
   {
     id: "case2",
-    label: "有声读物",
-    description: "悬疑故事",
-    audioTitle: "午夜来信",
+    label: "Audiobook",
+    description: "Mystery Story",
+    audioTitle: "Midnight Letter",
     icon: "📖",
     gradient: "from-purple-400 to-pink-400",
     text: voiceConfigs.case2.text,
@@ -53,12 +53,12 @@ const cases = [
   },
   {
     id: "case3",
-    label: "客服助手",
-    description: "智能客服对话",
-    audioTitle: "订单查询",
+    label: "Customer Service",
+    description: "AI Assistant Dialog",
+    audioTitle: "Order Inquiry",
     icon: "🎧",
     gradient: "from-green-400 to-emerald-400",
-    text: dialogueLines.map(line => `${line.speaker}：${line.text}`).join("\n"),
+    text: dialogueLines.map(line => `${line.speaker}: ${line.text}`).join("\n"),
     isDialogue: true,
   },
 ];
@@ -147,12 +147,12 @@ const TextToSpeechTab = () => {
     
     if (!audioUrl) {
       setIsGenerating(true);
-      toast.info("正在生成音频...");
+      toast.info("Generating audio...");
       audioUrl = await generateSingleAudio(config.text, config.voice);
       setIsGenerating(false);
       
       if (!audioUrl) {
-        toast.error("音频生成失败");
+        toast.error("Audio generation failed");
         return;
       }
       
@@ -175,7 +175,7 @@ const TextToSpeechTab = () => {
     audio.onerror = () => {
       setIsPlaying(false);
       audioRef.current = null;
-      toast.error("音频播放失败");
+      toast.error("Audio playback failed");
     };
 
     audio.play();
@@ -187,7 +187,7 @@ const TextToSpeechTab = () => {
     dialogueIndexRef.current = 0;
     setIsPlaying(true);
     setIsGenerating(true);
-    toast.info("正在生成对话音频...");
+    toast.info("Generating dialogue audio...");
 
     const playNext = async () => {
       if (dialogueIndexRef.current >= dialogueLines.length) {
@@ -204,7 +204,7 @@ const TextToSpeechTab = () => {
       if (!audioUrl) {
         audioUrl = await generateSingleAudio(line.text, line.voice);
         if (!audioUrl) {
-          toast.error("对话音频生成失败");
+          toast.error("Dialogue audio generation failed");
           setIsPlaying(false);
           setIsGenerating(false);
           return;
@@ -232,7 +232,7 @@ const TextToSpeechTab = () => {
       audio.onerror = () => {
         setIsPlaying(false);
         audioRef.current = null;
-        toast.error("音频播放失败");
+        toast.error("Audio playback failed");
       };
 
       audio.play();
@@ -310,7 +310,7 @@ const TextToSpeechTab = () => {
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
           <span className="text-foreground font-medium">@Step-tts-2</span>{" "}
-          生成效具有人感、拥有丰富情绪、风格的语音
+          Generate hyper-realistic speech with rich emotions and styles
         </p>
         <Button 
           className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
@@ -324,7 +324,7 @@ const TextToSpeechTab = () => {
           ) : (
             <Play className="h-4 w-4" />
           )}
-          {isGenerating ? "生成中..." : isPlaying ? "播放中" : "播放"}
+          {isGenerating ? "Generating..." : isPlaying ? "Playing" : "Play"}
         </Button>
       </div>
     </div>

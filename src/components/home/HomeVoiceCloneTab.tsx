@@ -116,12 +116,12 @@ const HomeVoiceCloneTab = () => {
                 {playingId === `${sample.id}-original` ? (
                   <>
                     <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
-                    <span className="ml-1">{sample.name} 原声</span>
+                    <span className="ml-1">{sample.name} Original</span>
                   </>
                 ) : (
                   <>
                     <Play className="h-4 w-4" />
-                    {sample.name} 原声
+                    {sample.name} Original
                   </>
                 )}
               </Button>
@@ -133,12 +133,12 @@ const HomeVoiceCloneTab = () => {
                 {playingId === `${sample.id}-cloned` ? (
                   <>
                     <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
-                    <span className="ml-1">{sample.name} 声音复刻</span>
+                    <span className="ml-1">{sample.name} Cloned</span>
                   </>
                 ) : (
                   <>
                     <Play className="h-4 w-4" />
-                    {sample.name} 声音复刻
+                    {sample.name} Cloned
                   </>
                 )}
               </Button>
@@ -149,7 +149,7 @@ const HomeVoiceCloneTab = () => {
 
       {/* Description */}
       <p className="text-left text-sm text-muted-foreground">
-        <span className="text-foreground font-medium">@Step-tts-2</span> 生成与原声音一模一样的语音复刻品
+        <span className="text-foreground font-medium">@Step-tts-2</span> Generate voice clones that sound identical to the original
       </p>
     </div>
   );

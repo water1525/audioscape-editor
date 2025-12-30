@@ -7,9 +7,9 @@ import HomeVoiceCloneTab from "@/components/home/HomeVoiceCloneTab";
 import HomeVoiceEditTab from "@/components/home/HomeVoiceEditTab";
 
 const tabs = [
-  { id: "tts", label: "文本转语音", icon: MessageSquareText },
-  { id: "clone", label: "语音复刻", icon: Mic2 },
-  { id: "edit", label: "语音编辑", icon: Wand2 },
+  { id: "tts", label: "Text to Speech", icon: MessageSquareText },
+  { id: "clone", label: "Voice Clone", icon: Mic2 },
+  { id: "edit", label: "Voice Edit", icon: Wand2 },
 ];
 
 const VoicePlatformSection = () => {
@@ -33,10 +33,10 @@ const VoicePlatformSection = () => {
       {/* Header */}
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3 tracking-tight">
-          探索AI语音的更多可能
+          Explore More Possibilities with AI Voice
         </h2>
         <p className="text-muted-foreground text-base md:text-lg">
-          领先的模型和工具助力行业变革
+          Leading models and tools driving industry transformation
         </p>
       </div>
 
@@ -101,11 +101,11 @@ const VoicePlatformSection = () => {
         {/* Footer CTA */}
         <div className="flex flex-col items-center justify-center gap-4 mt-8 px-2">
           <p className="text-lg font-semibold text-foreground">
-            前往体验中心体验完整能力
+            Visit the Playground for full capabilities
           </p>
           <Link to="/playground">
             <Button className="px-6 py-2.5 h-auto text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300">
-              立即体验
+              Try Now
             </Button>
           </Link>
         </div>

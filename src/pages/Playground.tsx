@@ -27,16 +27,16 @@ import {
 import { useCustomVoices } from "@/hooks/useCustomVoices";
 
 const sidebarTabs = [
-  { id: "tts", label: "文本转语音", icon: MessageSquareText },
-  { id: "clone", label: "语音复刻", icon: Copy },
-  { id: "edit", label: "语音编辑", icon: Wand2 },
+  { id: "tts", label: "Text to Speech", icon: MessageSquareText },
+  { id: "clone", label: "Voice Clone", icon: Copy },
+  { id: "edit", label: "Voice Edit", icon: Wand2 },
 ];
 
 const voiceOptions = [
-  { value: "qingchunshaoniu", label: "清纯少女" },
-  { value: "tianmeinvsheng", label: "甜美女声" },
-  { value: "cixingnansheng", label: "磁性男声" },
-  { value: "wenzhongnansheng", label: "稳重男声" },
+  { value: "qingchunshaoniu", label: "Pure Girl" },
+  { value: "tianmeinvsheng", label: "Sweet Female" },
+  { value: "cixingnansheng", label: "Magnetic Male" },
+  { value: "wenzhongnansheng", label: "Steady Male" },
 ];
 
 const formatOptions = [
@@ -58,63 +58,63 @@ const storageFiles: Record<number, string> = {
 const caseSamples = [
   {
     id: 1,
-    title: "新闻播报",
-    description: "Step 3模型发布",
-    audioTitle: "Step 3发布",
+    title: "News Broadcast",
+    description: "Step 3 Model Release",
+    audioTitle: "Step 3 Release",
     icon: Cpu,
     iconColor: "text-emerald-500",
     bgColor: "bg-emerald-500/10",
-    text: "各位观众朋友们，大家好！欢迎收看今日科技快讯。今天我们要报道一则重磅消息：阶跃星辰正式发布了全新的Step 3大语言模型，该模型在多项基准测试中取得了突破性成绩，在逻辑推理、代码生成和多语言理解等核心能力上均达到了业界领先水平，标志着国产大模型迈入了新的里程碑。",
+    text: "Hello everyone, welcome to today's tech news. Today we are reporting breaking news: Step Star has officially released the new Step 3 large language model. This model has achieved breakthrough results in multiple benchmark tests, reaching industry-leading levels in core capabilities such as logical reasoning, code generation, and multilingual understanding, marking a new milestone for domestic large models.",
   },
   {
     id: 2,
-    title: "有声读物",
-    description: "悬疑故事",
-    audioTitle: "午夜来信",
+    title: "Audiobook",
+    description: "Mystery Story",
+    audioTitle: "Midnight Letter",
     icon: BookOpen,
     iconColor: "text-amber-500",
     bgColor: "bg-amber-500/10",
-    text: "午夜时分，老宅的钟声敲响了十二下。李探长站在书房门前，手中的手电筒微微颤抖。书架后面传来奇怪的响动，像是有人在翻动书页。他深吸一口气，推开了那扇尘封已久的暗门。眼前的景象让他倒吸一口凉气——墙上挂满了泛黄的照片，每一张都是同一个人，而那个人，三十年前就已经失踪了。",
+    text: "At midnight, the old mansion's clock struck twelve. Detective Li stood before the study door, his flashlight trembling slightly. Strange sounds came from behind the bookshelf, like someone flipping through pages. He took a deep breath and pushed open the dusty hidden door. The sight before him made him gasp—the walls were covered with yellowed photographs, each showing the same person, someone who had disappeared thirty years ago.",
   },
   {
     id: 3,
-    title: "客服助手",
-    description: "智能客服对话",
-    audioTitle: "智能客服",
+    title: "Customer Service",
+    description: "AI Assistant Dialog",
+    audioTitle: "Smart Assistant",
     icon: Headphones,
     iconColor: "text-rose-500",
     bgColor: "bg-rose-500/10",
-    text: "您好，欢迎致电阶跃星辰客户服务中心，我是您的智能语音助理小星。很高兴为您服务！请问有什么可以帮助您的吗？您可以咨询产品功能、技术支持、账户问题或商务合作等事宜。我会尽我所能为您提供专业、高效的解答。如果需要转接人工客服，请随时告诉我。",
+    text: "Hello, welcome to the Step Star Customer Service Center. I am your intelligent voice assistant, Star. I'm happy to serve you! How may I help you today? You can inquire about product features, technical support, account issues, or business cooperation. I will do my best to provide you with professional and efficient answers. If you need to transfer to a human agent, please let me know.",
   },
   {
     id: 4,
-    title: "广告配音",
-    description: "品牌宣传片",
-    audioTitle: "品牌宣传",
+    title: "Ad Voiceover",
+    description: "Brand Promotion",
+    audioTitle: "Brand Promo",
     icon: Mic,
     iconColor: "text-violet-500",
     bgColor: "bg-violet-500/10",
-    text: "在这个瞬息万变的时代，我们始终相信科技的力量。阶跃星辰，以创新为引擎，以梦想为翼，致力于打造最前沿的人工智能技术。从语音合成到智能对话，从文本理解到多模态交互，我们用技术连接未来，让每一次交流都充满温度。阶跃星辰，与您一起，跨越星辰大海。",
+    text: "In this rapidly changing era, we always believe in the power of technology. Step Star, with innovation as the engine and dreams as wings, is committed to creating cutting-edge artificial intelligence technology. From speech synthesis to intelligent dialogue, from text understanding to multimodal interaction, we use technology to connect the future and make every communication warm. Step Star, together with you, crossing the stars and seas.",
   },
   {
     id: 5,
-    title: "教育朗读",
-    description: "古诗词赏析",
-    audioTitle: "静夜思",
+    title: "Education",
+    description: "Poetry Reading",
+    audioTitle: "Quiet Night",
     icon: GraduationCap,
     iconColor: "text-sky-500",
     bgColor: "bg-sky-500/10",
-    text: "床前明月光，疑是地上霜。举头望明月，低头思故乡。这首《静夜思》是唐代诗人李白创作的一首脍炙人口的五言绝句。诗人通过描绘月夜思乡的场景，以简洁而深刻的语言，表达了游子对故乡的深切思念之情。全诗意境清幽，情感真挚，千百年来感动了无数漂泊在外的游子。",
+    text: "Before my bed, the moonlight gleams, like frost upon the ground it seems. I raise my head to watch the moon, then lower it, thinking of home. This poem 'Quiet Night Thoughts' is a famous five-character quatrain by the Tang Dynasty poet Li Bai. Through depicting a moonlit scene of homesickness, the poet expresses deep longing for his hometown with simple yet profound language. The poem has moved countless wanderers for thousands of years.",
   },
   {
     id: 6,
-    title: "情感电台",
-    description: "深夜治愈",
-    audioTitle: "深夜治愈",
+    title: "Emotional Radio",
+    description: "Late Night Healing",
+    audioTitle: "Night Healing",
     icon: Sparkles,
     iconColor: "text-pink-500",
     bgColor: "bg-pink-500/10",
-    text: "亲爱的听众朋友，欢迎来到星辰夜话。在这个安静的夜晚，让我陪伴你度过这段温柔的时光。生活或许不总是一帆风顺，但请相信，每一个黎明都会带来新的希望。无论今天经历了什么，都请记得对自己温柔一些。闭上眼睛，深呼吸，让我的声音伴你入眠，祝你好梦。",
+    text: "Dear listeners, welcome to Starlight Night Talk. On this quiet night, let me accompany you through this gentle time. Life may not always be smooth sailing, but please believe that every dawn brings new hope. No matter what you experienced today, remember to be gentle with yourself. Close your eyes, take a deep breath, and let my voice accompany you to sleep. Sweet dreams.",
   },
 ];
 
@@ -165,7 +165,7 @@ const Playground = () => {
     if (systemVoice) return systemVoice.label;
     const customVoice = customVoices.find(v => v.id === voice);
     if (customVoice) return customVoice.name;
-    return "未知音色";
+    return "Unknown Voice";
   };
 
   // Refresh custom voices when switching to TTS tab
@@ -220,7 +220,7 @@ const Playground = () => {
           String(msg).includes("quota_exceeded") ||
           String(msg).includes(" 402")
         ) {
-          toast.error("额度已用完，请更新密钥或升级套餐");
+          toast.error("Quota exceeded. Please update your key or upgrade your plan.");
         } else {
           toast.error(msg);
         }
@@ -230,14 +230,14 @@ const Playground = () => {
       // The function may return JSON { error } (e.g. quota exceeded) with 200
       if (data && typeof data === "object" && "error" in (data as any)) {
         const upstreamStatus = (data as any).upstream_status;
-        const message = String((data as any).error || "音频生成失败");
+        const message = String((data as any).error || "Audio generation failed");
 
         if (
           upstreamStatus === 402 ||
           message.includes("quota") ||
           message.includes("quota_exceeded")
         ) {
-          toast.error("额度已用完，请更新密钥或升级套餐");
+          toast.error("Quota exceeded. Please update your key or upgrade your plan.");
         } else {
           toast.error(message);
         }
@@ -249,7 +249,7 @@ const Playground = () => {
       console.log("Audio blob size:", audioBlob.size);
 
       if (audioBlob.size === 0) {
-        throw new Error("生成的音频为空");
+        throw new Error("Generated audio is empty");
       }
 
       const url = URL.createObjectURL(audioBlob);
@@ -262,7 +262,7 @@ const Playground = () => {
         return;
       }
       console.error("TTS error:", error);
-      toast.error(error instanceof Error ? error.message : "音频生成失败，请重试");
+      toast.error(error instanceof Error ? error.message : "Audio generation failed. Please try again.");
     } finally {
       // Only update state if not aborted
       if (!abortController.signal.aborted) {
@@ -281,12 +281,12 @@ const Playground = () => {
   const handleGenerateClick = () => {
     if (text.trim()) {
       if (!currentAudioTitle) {
-        setCurrentAudioTitle("自定义音频");
+        setCurrentAudioTitle("Custom Audio");
       }
       // Set voice name from current TTS settings
       const voiceName = voiceOptions.find(v => v.value === voice)?.label || 
                         customVoices.find(v => v.id === voice)?.name || 
-                        "未知音色";
+                        "Unknown Voice";
       setCurrentVoiceDisplayName(voiceName);
       generateAudio(text);
     }
@@ -329,35 +329,35 @@ const Playground = () => {
             {/* Left: Logo */}
             <div className="flex items-center gap-3">
               <Link to="/" className="flex items-center gap-3">
-                <span className="text-lg font-bold text-foreground">阶跃星辰</span>
+                <span className="text-lg font-bold text-foreground">Step Star</span>
                 <span className="text-muted-foreground">|</span>
-                <span className="text-sm text-muted-foreground">开放平台</span>
+                <span className="text-sm text-muted-foreground">Open Platform</span>
               </Link>
             </div>
 
             {/* Center: Navigation Links */}
             <div className="hidden md:flex items-center gap-8">
               <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                首页
+                Home
               </Link>
               <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                文档中心
+                Documentation
               </a>
               <Link to="/playground" className="flex items-center gap-1 text-sm text-primary font-medium">
-                体验中心
+                Playground
                 <ChevronDown size={14} />
               </Link>
               <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                繁星计划
+                Star Program
               </a>
               <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                阶跃星辰官网
+                Official Website
               </a>
             </div>
 
             {/* Right: User Center */}
             <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
-              用户中心
+              User Center
               <ChevronDown size={14} />
             </button>
           </div>
@@ -395,12 +395,12 @@ const Playground = () => {
             <HoverCardTrigger asChild>
               <Button variant="outline" className="mt-auto gap-2 cursor-pointer">
                 <HeadphonesIcon className="w-4 h-4" />
-                联系我们
+                Contact Us
               </Button>
             </HoverCardTrigger>
             <HoverCardContent className="w-64 p-4" side="top" align="start">
               <div className="space-y-4">
-                <h4 className="font-medium text-sm text-foreground">联系方式</h4>
+                <h4 className="font-medium text-sm text-foreground">Contact Info</h4>
                 
                 {/* Discord */}
                 <a 
@@ -414,7 +414,7 @@ const Playground = () => {
                       <path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.905 3.0581 26.1886 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.3294 0.41542C20.2584 1.2888 15.4057 2.8186 10.8776 4.8978C10.8384 4.9147 10.8048 4.9429 10.7825 4.9795C1.57795 18.7309 -0.943561 32.1443 0.293408 45.3914C0.299005 45.4562 0.335386 45.5182 0.385761 45.5576C6.45866 50.0174 12.3413 52.7249 18.1147 54.5195C18.2071 54.5477 18.305 54.5139 18.3638 54.4378C19.7295 52.5728 20.9469 50.6063 21.9907 48.5383C22.0523 48.4172 21.9935 48.2735 21.8676 48.2256C19.9366 47.4931 18.0979 46.6 16.3292 45.5858C16.1893 45.5041 16.1781 45.304 16.3068 45.2082C16.679 44.9293 17.0513 44.6391 17.4067 44.3461C17.471 44.2926 17.5606 44.2813 17.6362 44.3151C29.2558 49.6202 41.8354 49.6202 53.3179 44.3151C53.3935 44.2785 53.4831 44.2898 53.5765 44.3433C53.9319 44.6363 54.3041 44.9293 54.6791 45.2082C54.8078 45.304 54.7994 45.5041 54.6595 45.5858C52.8909 46.6197 51.0522 47.4931 49.1183 48.2228C48.9924 48.2707 48.9364 48.4172 48.998 48.5383C50.0624 50.6034 51.2798 52.5699 52.6221 54.435C52.6781 54.5139 52.7788 54.5477 52.8712 54.5195C58.6726 52.7249 64.5553 50.0174 70.6282 45.5576C70.6814 45.5182 70.715 45.459 70.7206 45.3942C72.2165 30.0252 68.2127 16.7119 60.1963 4.9823C60.1768 4.9429 60.1437 4.9147 60.1045 4.8978ZM23.7259 37.3253C20.2276 37.3253 17.3451 34.1136 17.3451 30.1693C17.3451 26.225 20.1717 23.0133 23.7259 23.0133C27.308 23.0133 30.1626 26.2532 30.1066 30.1693C30.1066 34.1136 27.28 37.3253 23.7259 37.3253ZM47.3178 37.3253C43.8196 37.3253 40.9371 34.1136 40.9371 30.1693C40.9371 26.225 43.7636 23.0133 47.3178 23.0133C50.9 23.0133 53.7545 26.2532 53.6986 30.1693C53.6986 34.1136 50.9 37.3253 47.3178 37.3253Z" fill="white"/>
                     </svg>
                   </div>
-                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">Discord 社区</span>
+                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">Discord Community</span>
                 </a>
 
                 {/* Email */}
@@ -426,7 +426,7 @@ const Playground = () => {
                     <Mail className="w-4 h-4 text-primary" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">邮箱联系</span>
+                    <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">Email</span>
                     <span className="text-xs text-muted-foreground">platform@stepfun.com</span>
                   </div>
                 </a>
@@ -451,14 +451,14 @@ const Playground = () => {
                     </button>
                   )}
                   <Textarea
-                    placeholder="点此输入您想要生成音频的文本..."
+                    placeholder="Enter the text you want to convert to audio..."
                     value={text}
                     onChange={handleTextChange}
                     maxLength={10000}
                     className="min-h-[300px] bg-transparent border-0 resize-none focus-visible:ring-0 text-foreground placeholder:text-muted-foreground pb-8 pr-10"
                   />
                   <div className="absolute bottom-3 right-4 text-sm text-muted-foreground">
-                    {text.length}/10000字符
+                    {text.length}/10000 chars
                   </div>
                 </div>
 
@@ -469,7 +469,7 @@ const Playground = () => {
                       onClick={handleGenerateClick}
                       className="gap-2 h-11 px-12"
                     >
-                      生成音频
+                      Generate Audio
                     </Button>
                   </div>
                 )}
@@ -482,7 +482,7 @@ const Playground = () => {
                       className="gap-2 h-11 px-12"
                     >
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                      正在生成...
+                      Generating...
                     </Button>
                   </div>
                 )}
@@ -497,7 +497,7 @@ const Playground = () => {
                       className="gap-2"
                     >
                       <RefreshCw className="w-4 h-4" />
-                      重新生成
+                      Regenerate
                     </Button>
                   </div>
                 )}
@@ -505,7 +505,7 @@ const Playground = () => {
                 {/* Case Samples - Compact horizontal tags */}
                 {!text.trim() && (
                   <div>
-                    <p className="text-sm text-muted-foreground mb-4">选择一个场景案例体验语音合成</p>
+                    <p className="text-sm text-muted-foreground mb-4">Select a scenario to experience voice synthesis</p>
                     <div className="flex flex-wrap gap-3">
                       {caseSamples.map((sample) => {
                         const IconComponent = sample.icon;
@@ -535,7 +535,7 @@ const Playground = () => {
                 onAudioGenerated={(url, title) => {
                   setAudioUrl(url);
                   setCurrentAudioTitle(title);
-                  setCurrentVoiceDisplayName("复刻音色");
+                  setCurrentVoiceDisplayName("Cloned Voice");
                   setShowPlayerBar(true);
                   setShowSaveVoice(true);
                 }}
@@ -554,7 +554,7 @@ const Playground = () => {
                 onAudioGenerated={(url, title) => {
                   setAudioUrl(url);
                   setCurrentAudioTitle(title);
-                  setCurrentVoiceDisplayName("编辑音频");
+                  setCurrentVoiceDisplayName("Edited Audio");
                   setShowPlayerBar(true);
                   setEditIsGenerating(false);
                 }}
@@ -571,7 +571,7 @@ const Playground = () => {
                   setEditIsGenerating(generating);
                   if (generating && title) {
                     setCurrentAudioTitle(title);
-                    setCurrentVoiceDisplayName("编辑音频");
+                    setCurrentVoiceDisplayName("Edited Audio");
                     setShowPlayerBar(true);
                   }
                 }}
@@ -598,7 +598,7 @@ const Playground = () => {
                   </SelectTrigger>
                   <SelectContent className="bg-popover">
                     <SelectGroup>
-                      <SelectLabel className="text-xs text-muted-foreground">系统音色</SelectLabel>
+                      <SelectLabel className="text-xs text-muted-foreground">System Voices</SelectLabel>
                       {voiceOptions.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
                           {option.label}
@@ -607,7 +607,7 @@ const Playground = () => {
                     </SelectGroup>
                     {customVoices.length > 0 && (
                       <SelectGroup>
-                        <SelectLabel className="text-xs text-muted-foreground">我的音色</SelectLabel>
+                        <SelectLabel className="text-xs text-muted-foreground">My Voices</SelectLabel>
                         {customVoices.map((cv) => (
                           <SelectItem key={cv.id} value={cv.id}>
                             {cv.name}
