@@ -77,12 +77,6 @@ const HeroSection = () => {
       {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-[hsl(220,25%,8%)] via-[hsl(220,25%,8%)/0.7] to-transparent" />
 
-      {/* Waveform Animation positioned in the circle area */}
-      <div className="absolute right-[15%] top-1/2 -translate-y-1/2 z-10 hidden md:block animate-fade-in" style={{
-      animationDelay: "0.5s"
-    }}>
-        {currentBanner.animation === "waveform" ? <HeroWaveform /> : <HeroParticles />}
-      </div>
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-6 md:px-12 lg:px-20">
