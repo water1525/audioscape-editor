@@ -144,15 +144,15 @@
 
   .btn-hero-primary {
     @apply px-8 py-3 rounded-lg font-semibold text-base;
-    background: hsl(var(--hero-accent));
-    color: hsl(var(--hero-bg));
+    background: hsl(221 100% 43%);
+    color: hsl(0 0% 100%);
   }
 
   .btn-hero-secondary {
     @apply px-8 py-3 rounded-lg font-medium text-base;
     background: transparent;
     color: hsl(var(--hero-foreground));
-    border: 1px solid hsl(220 15% 30%);
+    border: 1px solid hsl(0 0% 100%);
   }
 }
 
