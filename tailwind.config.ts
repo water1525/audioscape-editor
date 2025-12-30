@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        'hero-title': ['"Barlow Condensed"', 'sans-serif'],
+        'hero-subtitle': ['"Oswald"', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
