@@ -121,10 +121,18 @@
   }
 
   .hero-title {
-    background: linear-gradient(180deg, hsl(195 100% 55%) 0%, hsl(195 100% 45%) 100%);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-style: italic;
+    background: linear-gradient(180deg, hsl(190 100% 75%) 0%, hsl(195 100% 60%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  .hero-subtitle {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    color: hsl(0 0% 100%);
   }
 
   .hero-tag {
