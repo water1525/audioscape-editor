@@ -72,7 +72,7 @@ const HeroSection = () => {
       {/* Background Image */}
       <div className="absolute inset-0 bg-cover bg-no-repeat" style={{
       backgroundImage: "url(\"/lovable-uploads/5ca799c8-b722-4910-aa42-d558e6723392.png\")",
-      backgroundPosition: "60% center"
+      backgroundPosition: "70% center"
     }} />
 
       {/* Overlay */}
