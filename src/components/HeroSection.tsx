@@ -70,8 +70,9 @@ const HeroSection = () => {
   const currentBanner = banners[activeIndex];
   return <section className="hero-section relative min-h-screen flex items-center overflow-hidden">
       {/* Background Image */}
-      <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{
-      backgroundImage: "url(\"/lovable-uploads/5ca799c8-b722-4910-aa42-d558e6723392.png\")"
+      <div className="absolute inset-0 bg-cover bg-no-repeat" style={{
+      backgroundImage: "url(\"/lovable-uploads/5ca799c8-b722-4910-aa42-d558e6723392.png\")",
+      backgroundPosition: "60% center"
     }} />
 
       {/* Overlay */}
