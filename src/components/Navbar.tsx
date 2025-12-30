@@ -9,35 +9,35 @@ const Navbar = () => {
           {/* Left: Logo */}
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-3">
-              <span className="text-lg font-bold text-[hsl(0,0%,100%)]">阶跃星辰</span>
+              <span className="text-lg font-bold text-[hsl(0,0%,100%)]">Step Star</span>
               <span className="text-[hsl(220,10%,40%)]">|</span>
-              <span className="text-sm text-[hsl(220,10%,60%)]">开放平台</span>
+              <span className="text-sm text-[hsl(220,10%,60%)]">Open Platform</span>
             </Link>
           </div>
 
           {/* Center: Navigation Links */}
           <div className="hidden md:flex items-center gap-8">
             <Link to="/" className="text-sm text-[hsl(0,0%,100%)] hover:text-[hsl(195,100%,50%)] transition-colors">
-              首页
+              Home
             </Link>
             <a href="#" className="text-sm text-[hsl(220,10%,70%)] hover:text-[hsl(0,0%,100%)] transition-colors">
-              文档中心
+              Documentation
             </a>
             <Link to="/playground" className="flex items-center gap-1 text-sm text-[hsl(220,10%,70%)] hover:text-[hsl(0,0%,100%)] transition-colors">
-              体验中心
+              Playground
               <ChevronDown size={14} />
             </Link>
             <a href="#" className="text-sm text-[hsl(220,10%,70%)] hover:text-[hsl(0,0%,100%)] transition-colors">
-              繁星计划
+              Star Program
             </a>
             <a href="#" className="text-sm text-[hsl(220,10%,70%)] hover:text-[hsl(0,0%,100%)] transition-colors">
-              阶跃星辰官网
+              Official Website
             </a>
           </div>
 
           {/* Right: User Center */}
           <button className="flex items-center gap-1 text-sm text-[hsl(220,10%,70%)] hover:text-[hsl(0,0%,100%)] transition-colors">
-            用户中心
+            User Center
             <ChevronDown size={14} />
           </button>
         </div>

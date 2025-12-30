@@ -119,7 +119,7 @@ const HeroSection = () => {
 
       {/* Banner indicators - moved to left side */}
       <div className="absolute bottom-20 left-6 md:left-12 lg:left-20 flex items-center gap-2 z-20">
-        {banners.map((_, index) => <button key={index} onClick={() => setActiveIndex(index)} className={`h-1 rounded-full transition-all duration-300 ${index === activeIndex ? 'w-8 bg-primary' : 'w-4 bg-muted-foreground/40 hover:bg-muted-foreground/60'}`} aria-label={`切换到第${index + 1}个banner`} />)}
+        {banners.map((_, index) => <button key={index} onClick={() => setActiveIndex(index)} className={`h-1 rounded-full transition-all duration-300 ${index === activeIndex ? 'w-8 bg-primary' : 'w-4 bg-muted-foreground/40 hover:bg-muted-foreground/60'}`} aria-label={`Switch to banner ${index + 1}`} />)}
       </div>
 
       {/* Scroll indicator */}
