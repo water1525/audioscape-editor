@@ -88,7 +88,7 @@ const HeroSection = () => {
       <div className="relative z-10 container mx-auto px-6 md:px-12 lg:px-20">
         <div className="max-w-2xl">
           {/* Title */}
-          <h1 key={currentBanner.id} className="hero-title text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 animate-fade-in">
+          <h1 key={currentBanner.id} className="hero-title text-5xl md:text-6xl lg:text-7xl font-extrabold italic tracking-tight mb-4 animate-fade-in">
             {currentBanner.title}
           </h1>
 
