@@ -274,9 +274,9 @@ const TextToSpeechTab = () => {
     <div className="animate-fade-in">
       {/* Text Display Area */}
       <div className="bg-card border border-border rounded-lg p-6 mb-4 min-h-[160px] shadow-soft">
-        <pre className="text-foreground font-mono text-sm whitespace-pre-wrap leading-relaxed">
+        <p className="text-foreground text-sm whitespace-pre-wrap leading-relaxed">
           {currentCase.text}
-        </pre>
+        </p>
       </div>
 
       {/* Case Selector */}
