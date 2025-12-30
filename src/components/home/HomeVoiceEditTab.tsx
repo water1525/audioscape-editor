@@ -7,16 +7,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import WaveformAnimation from "@/components/ui/WaveformAnimation";
 
-// 参数设置分类
-const emotionTags = ["高兴", "愤怒", "悲伤", "幽默", "困惑", "厌恶", "共情", "尴尬", "恐惧", "惊讶", "兴奋", "沮丧", "冷漠", "钦佩"];
+// Parameter settings categories
+const emotionTags = ["Happy", "Angry", "Sad", "Humorous", "Confused", "Disgusted", "Empathetic", "Awkward", "Fearful", "Surprised", "Excited", "Frustrated", "Indifferent", "Admiring"];
 const styleTags = [
-  "严肃", "傲慢", "儿童", "单纯", "夸张", "少女", "御姐", "朗诵",
-  "甜美", "空灵", "豪爽", "撒娇", "温暖", "害羞", "安慰", "权威",
-  "闲聊", "电台", "深情", "温柔", "磁性", "中老年", "悄悄话",
-  "气泡音", "讲故事", "绘声绘色", "节目主持", "新闻播报", "广告营销",
-  "娱乐八卦", "吼叫", "小声", "大声", "低沉", "高亢"
+  "Serious", "Arrogant", "Childlike", "Innocent", "Exaggerated", "Youthful", "Mature", "Reciting",
+  "Sweet", "Ethereal", "Bold", "Coy", "Warm", "Shy", "Comforting", "Authoritative",
+  "Casual", "Radio", "Affectionate", "Gentle", "Magnetic", "Elderly", "Whispering",
+  "Bubble", "Storytelling", "Vivid", "Hosting", "News", "Advertising",
+  "Gossip", "Shouting", "Soft", "Loud", "Deep", "High-pitched"
 ];
-const speedTags = ["快速", "慢速", "更快", "更慢"];
+const speedTags = ["Fast", "Slow", "Faster", "Slower"];
 
 const HomeVoiceEditTab = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -64,7 +64,7 @@ const HomeVoiceEditTab = () => {
     audio.onerror = () => {
       setIsPlaying(false);
       audioRef.current = null;
-      toast.error("音频播放失败");
+      toast.error("Audio playback failed");
     };
 
     audio.play().catch(() => {
@@ -103,7 +103,7 @@ const HomeVoiceEditTab = () => {
 
     audio.play().catch(() => {
       setIsPlayingEdited(false);
-      toast.error("音频播放失败");
+      toast.error("Audio playback failed");
     });
     
     setIsPlayingEdited(true);
@@ -119,19 +119,19 @@ const HomeVoiceEditTab = () => {
 
 const handleConfirm = async () => {
     if (selectedTags.length === 0) {
-      toast.error("请至少选择一个编辑参数");
+      toast.error("Please select at least one edit parameter");
       return;
     }
     
-    // 立即关闭弹窗并显示生成中状态
+    // Close modal immediately and show generating state
     setShowModal(false);
     setIsGenerating(true);
     const tagsCount = selectedTags.length;
     setSelectedTags([]);
     
     try {
-      // 星星人冒险的文案
-      const text = "在遥远的星空中，住着一群可爱的星星人。他们每天都在银河里冒险，寻找神秘的星尘宝藏。今天，小星星决定踏上一段全新的旅程，去探索那片从未有人到达过的星云深处。";
+      // Star adventure story text
+      const text = "In the distant starry sky, there lived a group of adorable star people. Every day they explored the galaxy, searching for mysterious stardust treasures. Today, little star decided to embark on a brand new journey to explore the depths of a nebula no one had ever reached before.";
       
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
@@ -163,10 +163,10 @@ const handleConfirm = async () => {
       
       setEditedAudioUrl(url);
       
-      toast.success(`音频编辑成功，已应用 ${tagsCount} 个风格标签`);
+      toast.success(`Audio edited successfully with ${tagsCount} style tags applied`);
     } catch (error) {
       console.error("Error generating edited audio:", error);
-      toast.error("音频编辑失败，请重试");
+      toast.error("Audio editing failed. Please try again.");
     } finally {
       setIsGenerating(false);
     }
@@ -207,20 +207,20 @@ const handleConfirm = async () => {
 
   return (
     <div className="animate-fade-in space-y-4">
-      {/* 原始音频标签 */}
+      {/* Original audio label */}
       <div className="flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-muted-foreground" />
-        <p className="text-sm text-muted-foreground">原始音频</p>
+        <p className="text-sm text-muted-foreground">Original Audio</p>
       </div>
 
-      {/* 原始音频卡片 */}
+      {/* Original audio card */}
       <div className="bg-card border border-border/50 rounded-xl p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={handlePlayPause}
             className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center transition-colors hover:bg-primary/20"
-            aria-label={isPlaying ? "暂停" : "播放"}
+            aria-label={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? (
               <Pause className="h-5 w-5 text-primary" />
@@ -229,7 +229,7 @@ const handleConfirm = async () => {
             )}
           </button>
 
-          {/* 音频波形 */}
+          {/* Audio waveform */}
           <WaveformAnimation 
             isPlaying={isPlaying} 
             variant="default" 
@@ -238,8 +238,8 @@ const handleConfirm = async () => {
           />
 
           <div className="ml-2">
-            <p className="text-sm font-medium text-foreground">星星人冒险.wav</p>
-            <p className="text-xs text-muted-foreground">时长 00:10</p>
+            <p className="text-sm font-medium text-foreground">Star Adventure.wav</p>
+            <p className="text-xs text-muted-foreground">Duration 00:10</p>
           </div>
         </div>
 
@@ -253,34 +253,34 @@ const handleConfirm = async () => {
           {isGenerating ? (
             <>
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              生成中
+              Generating
             </>
           ) : (
             <>
               <ArrowRight className="h-3.5 w-3.5" />
-              编辑
+              Edit
             </>
           )}
         </Button>
       </div>
 
-      {/* 编辑后的音频 - 只在有编辑音频时显示 */}
+      {/* Edited audio - only show when available */}
       {editedAudioUrl && (
         <>
-          {/* 编辑后的音频标签 */}
+          {/* Edited audio label */}
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-primary" />
-            <p className="text-sm text-muted-foreground">编辑后的音频</p>
+            <p className="text-sm text-muted-foreground">Edited Audio</p>
           </div>
 
-          {/* 编辑后的音频卡片 */}
+          {/* Edited audio card */}
           <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={handlePlayEditedPause}
                 className="w-12 h-12 rounded-full flex items-center justify-center transition-colors bg-primary/20 hover:bg-primary/30"
-                aria-label={isPlayingEdited ? "暂停" : "播放"}
+                aria-label={isPlayingEdited ? "Pause" : "Play"}
               >
                 {isPlayingEdited ? (
                   <Pause className="h-5 w-5 text-primary" />
@@ -289,7 +289,7 @@ const handleConfirm = async () => {
                 )}
               </button>
 
-            {/* 音频波形 */}
+            {/* Audio waveform */}
             <WaveformAnimation 
               isPlaying={isPlayingEdited} 
               variant="primary" 
@@ -298,10 +298,10 @@ const handleConfirm = async () => {
             />
 
               <div className="ml-2">
-                <p className="text-sm font-medium text-foreground">星星人冒险_edited.wav</p>
+                <p className="text-sm font-medium text-foreground">Star Adventure_edited.wav</p>
                 <div className="flex items-center gap-2">
-                  <p className="text-xs text-muted-foreground">时长 00:10</p>
-                  <span className="text-xs text-primary font-medium">已编辑</span>
+                  <p className="text-xs text-muted-foreground">Duration 00:10</p>
+                  <span className="text-xs text-primary font-medium">Edited</span>
                 </div>
               </div>
             </div>
@@ -316,10 +316,10 @@ const handleConfirm = async () => {
                 }
                 URL.revokeObjectURL(editedAudioUrl);
                 setEditedAudioUrl(null);
-                toast.success("已删除编辑后的音频");
+                toast.success("Edited audio deleted");
               }}
               className="p-2 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-              aria-label="删除"
+              aria-label="Delete"
             >
               <Trash2 className="h-4 w-4" />
             </button>
@@ -328,10 +328,10 @@ const handleConfirm = async () => {
       )}
 
       <p className="text-sm text-muted-foreground">
-        <span className="text-foreground font-medium">@Step-Audio-EditX</span> 编辑原音频的情绪、风格、速度
+        <span className="text-foreground font-medium">@Step-Audio-EditX</span> Edit emotion, style, and speed of original audio
       </p>
 
-      {/* 参数设置弹窗 */}
+      {/* Parameter settings modal */}
       {showModal && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div 
@@ -339,9 +339,9 @@ const handleConfirm = async () => {
             onClick={() => !isGenerating && setShowModal(false)}
           />
           <div className="relative bg-card border border-border rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
-            {/* 标题 */}
+            {/* Title */}
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold text-foreground">参数设置</h3>
+              <h3 className="text-lg font-semibold text-foreground">Parameter Settings</h3>
               <button
                 onClick={() => !isGenerating && setShowModal(false)}
                 className="text-muted-foreground hover:text-foreground transition-colors"
@@ -351,20 +351,20 @@ const handleConfirm = async () => {
               </button>
             </div>
 
-            {/* 副标题 */}
+            {/* Subtitle */}
             <p className="text-sm text-muted-foreground mb-6">
-              选择您想要的音色特征
+              Select your desired voice characteristics
             </p>
 
-            {/* 标签分类 */}
+            {/* Tag categories */}
             <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-              {renderTagSection("情绪", emotionTags)}
-              {renderTagSection("风格", styleTags)}
-              {renderTagSection("速度控制", speedTags)}
+              {renderTagSection("Emotion", emotionTags)}
+              {renderTagSection("Style", styleTags)}
+              {renderTagSection("Speed Control", speedTags)}
             </div>
 
 
-            {/* 按钮 */}
+            {/* Buttons */}
             <div className="flex gap-3 mt-4">
               <Button
                 variant="outline"
@@ -372,7 +372,7 @@ const handleConfirm = async () => {
                 onClick={() => setShowModal(false)}
                 disabled={isGenerating}
               >
-                取消
+                Cancel
               </Button>
               <Button
                 className="flex-1"
@@ -382,10 +382,10 @@ const handleConfirm = async () => {
                 {isGenerating ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    生成中...
+                    Generating...
                   </>
                 ) : (
-                  "确认"
+                  "Confirm"
                 )}
               </Button>
             </div>
