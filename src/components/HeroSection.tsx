@@ -103,14 +103,14 @@ const HeroSection = () => {
               </span>)}
           </div>
 
-          {/* Buttons */}
-          <div className="flex flex-wrap gap-4 animate-fade-in" style={{
+          {/* Buttons - Toggle style */}
+          <div className="inline-flex rounded-[3px] overflow-hidden animate-fade-in" style={{
           animationDelay: "0.3s"
         }}>
-            <button className="btn-hero-primary hover:opacity-90 transition-opacity duration-200">
+            <button className="px-10 py-4 bg-[#AD0606] text-white font-semibold text-lg hover:bg-[#8B0505] transition-colors duration-200">
               Use now
             </button>
-            <button className="btn-hero-secondary hover:bg-white/30 transition-colors duration-200">
+            <button className="px-10 py-4 bg-white text-foreground font-semibold text-lg hover:bg-gray-100 transition-colors duration-200">
               Introduction
             </button>
           </div>
