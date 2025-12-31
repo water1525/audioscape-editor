@@ -55,7 +55,7 @@ const VoicePlatformSection = () => {
                     className={`
                       relative flex-1 cursor-pointer transition-all duration-300
                       ${isActive 
-                        ? 'bg-[#C23A2B]' 
+                        ? 'bg-[#AD0606]' 
                         : 'bg-white hover:bg-gray-50'
                       }
                     `}
@@ -64,7 +64,7 @@ const VoicePlatformSection = () => {
                       flex items-center justify-center gap-2.5 py-4 px-4
                       transition-all duration-300
                       ${isActive 
-                        ? 'text-white' 
+                        ? 'text-white font-semibold' 
                         : 'text-foreground'
                       }
                     `}>
@@ -72,7 +72,7 @@ const VoicePlatformSection = () => {
                         w-4 h-4 transition-all duration-300
                         ${isActive ? 'text-white' : 'text-muted-foreground'}
                       `} />
-                      <span className="text-sm font-semibold tracking-wide transition-all duration-300">
+                      <span className="text-sm tracking-wide transition-all duration-300">
                         {tab.label}
                       </span>
                     </div>
