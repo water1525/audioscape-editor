@@ -41,9 +41,9 @@ const VoicePlatformSection = () => {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto flex flex-col" style={{ minHeight: 'calc(100vh - 200px)' }}>
-        <div className="bg-white/80 border border-border/50 rounded-t-[3px] shadow-xl flex-1 flex flex-col">
+        <div className="bg-white/80 rounded-t-[3px] shadow-xl flex-1 flex flex-col">
           {/* Top Tabs */}
-          <div className="border-b border-border/30 bg-white rounded-t-[3px]">
+          <div className="bg-white rounded-t-[3px]">
             <div className="flex items-center">
               {tabs.map((tab) => {
                 const IconComponent = tab.icon;
@@ -72,10 +72,7 @@ const VoicePlatformSection = () => {
                         w-4 h-4 transition-all duration-300
                         ${isActive ? 'text-white' : 'text-muted-foreground'}
                       `} />
-                      <span className={`
-                        text-sm tracking-wide transition-all duration-300
-                        ${isActive ? 'font-medium' : 'font-normal'}
-                      `}>
+                      <span className="text-sm font-semibold tracking-wide transition-all duration-300">
                         {tab.label}
                       </span>
                     </div>
