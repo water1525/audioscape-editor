@@ -527,28 +527,28 @@ const Playground = () => {
                     <div className="flex flex-wrap gap-3">
                       {caseSamples.map((sample) => {
                         const bgColorMap: Record<string, string> = {
-                          "text-blue-500": "bg-blue-500 hover:bg-blue-600",
-                          "text-pink-500": "bg-pink-500 hover:bg-pink-600",
-                          "text-green-500": "bg-green-500 hover:bg-green-600",
-                          "text-violet-500": "bg-violet-500 hover:bg-violet-600",
-                          "text-sky-500": "bg-sky-500 hover:bg-sky-600",
+                          "text-blue-500": "bg-blue-100 hover:bg-blue-200",
+                          "text-pink-500": "bg-pink-100 hover:bg-pink-200",
+                          "text-green-500": "bg-green-100 hover:bg-green-200",
+                          "text-violet-500": "bg-violet-100 hover:bg-violet-200",
+                          "text-sky-500": "bg-sky-100 hover:bg-sky-200",
                         };
-                        const bgColor = bgColorMap[sample.iconColor] || "bg-primary hover:bg-primary/90";
+                        const bgColor = bgColorMap[sample.iconColor] || "bg-primary/10 hover:bg-primary/20";
                         return (
                           <button
                             key={sample.id}
                             onClick={() => handleCaseClick(sample)}
-                            className={`group flex items-center gap-2 px-4 py-2.5 rounded-[3px] ${bgColor} transition-all duration-200 shadow-sm hover:shadow-md`}
+                            className={`group flex items-center gap-2 px-4 py-2.5 rounded-[3px] ${bgColor} transition-all duration-200`}
                           >
-                            {sample.icon === "news" && <NewsIcon className="w-5 h-5 text-white shrink-0" />}
-                            {sample.icon === "book" && <BookIcon className="w-5 h-5 text-white shrink-0" />}
-                            {sample.icon === "service" && <CustomerServiceIcon className="w-5 h-5 text-white shrink-0" />}
-                            {sample.icon === "mic" && <Mic className="w-5 h-5 text-white shrink-0" />}
-                            {sample.icon === "education" && <GraduationCap className="w-5 h-5 text-white shrink-0" />}
-                            {sample.icon === "sparkles" && <Sparkles className="w-5 h-5 text-white shrink-0" />}
-                            <span className="font-medium text-sm text-white">{sample.title}</span>
-                            <span className="text-white/50">|</span>
-                            <span className="text-sm text-white/80">{sample.description}</span>
+                            {sample.icon === "news" && <NewsIcon className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
+                            {sample.icon === "book" && <BookIcon className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
+                            {sample.icon === "service" && <CustomerServiceIcon className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
+                            {sample.icon === "mic" && <Mic className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
+                            {sample.icon === "education" && <GraduationCap className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
+                            {sample.icon === "sparkles" && <Sparkles className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
+                            <span className={`font-medium text-sm ${sample.iconColor}`}>{sample.title}</span>
+                            <span className="text-muted-foreground/50">|</span>
+                            <span className={`text-sm ${sample.iconColor}`}>{sample.description}</span>
                           </button>
                         );
                       })}
