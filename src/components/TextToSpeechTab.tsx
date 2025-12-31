@@ -42,6 +42,21 @@ const NewsIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// Custom Book Icon component (Audiobook)
+const BookIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 1024 1024" className={className} fill="currentColor">
+    <path d="M846.848 925.696H179.2c-15.872 0-28.672-12.8-28.672-28.672V125.44c0-15.872 12.8-28.672 28.672-28.672h667.648c15.872 0 28.672 12.8 28.672 28.672v772.096c0 15.36-12.8 28.16-28.672 28.16zM212.992 863.744h600.064V159.232H212.992v704.512z" />
+    <path d="M704.512 488.96c-4.096 0-7.68-0.512-11.264-2.048l-95.744-40.96-92.672 40.96c-9.216 4.096-18.944 2.56-27.136-2.048a28.672 28.672 0 0 1-12.8-24.064V125.44c0-15.872 12.8-28.672 28.672-28.672h210.944c15.872 0 28.672 12.8 28.672 28.672v334.848c0 9.728-5.12 18.432-12.8 24.064-5.12 3.072-10.24 4.608-15.872 4.608z m-107.52-102.912c4.096 0 7.68 0.512 11.264 2.048l67.072 28.672V153.6h-154.112v263.168l64-28.16c4.096-1.536 7.68-2.56 11.776-2.56z m-7.168 259.072H312.832c-15.872 0-28.672-12.8-28.672-28.672 0-15.872 12.8-28.672 28.672-28.672h276.48c15.872 0 28.672 12.8 28.672 28.672 0 15.872-12.288 28.672-28.16 28.672z m-137.216 139.264H312.832c-15.872 0-28.672-12.8-28.672-28.672 0-15.872 12.8-28.672 28.672-28.672h139.264c15.872 0 28.672 12.8 28.672 28.672 0 15.872-12.288 28.672-28.16 28.672z" />
+  </svg>
+);
+
+// Custom Customer Service Icon component
+const CustomerServiceIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 1024 1024" className={className} fill="currentColor">
+    <path d="M554.666667 810.666667v-42.666667h85.333333v42.666667h128v-384c-12.8-119.466667-110.933333-213.333333-234.666667-213.333334S311.466667 307.2 298.666667 426.666667v426.666666H213.333333v-298.666666h42.666667v-106.666667C256 294.4 379.733333 170.666667 533.333333 170.666667S810.666667 294.4 810.666667 448V554.666667h42.666666v298.666666h-298.666666v-42.666666z" />
+  </svg>
+);
+
 const cases = [
   {
     id: "case1",
@@ -49,6 +64,7 @@ const cases = [
     description: "Step 3 Model Release",
     audioTitle: "Step 3 Release",
     icon: "news" as const,
+    iconColor: "text-blue-500",
     gradient: "from-blue-400 to-cyan-400",
     text: voiceConfigs.case1.text,
     isDialogue: false,
@@ -58,7 +74,8 @@ const cases = [
     label: "Audiobook",
     description: "Mystery Story",
     audioTitle: "Midnight Letter",
-    icon: "📖",
+    icon: "book" as const,
+    iconColor: "text-pink-500",
     gradient: "from-purple-400 to-pink-400",
     text: voiceConfigs.case2.text,
     isDialogue: false,
@@ -68,7 +85,8 @@ const cases = [
     label: "Customer Service",
     description: "AI Assistant Dialog",
     audioTitle: "Order Inquiry",
-    icon: "🎧",
+    icon: "service" as const,
+    iconColor: "text-green-500",
     gradient: "from-green-400 to-emerald-400",
     text: dialogueLines.map(line => `${line.speaker}: ${line.text}`).join("\n"),
     isDialogue: true,
@@ -305,16 +323,9 @@ const TextToSpeechTab = () => {
               }
             `}
           >
-            {caseItem.icon === "news" ? (
-              <NewsIcon className="w-6 h-6 text-blue-500" />
-            ) : (
-              <span className={`
-                w-6 h-6 rounded-[3px] bg-gradient-to-br ${caseItem.gradient} 
-                flex items-center justify-center text-xs shadow-sm
-              `}>
-                {caseItem.icon}
-              </span>
-            )}
+            {caseItem.icon === "news" && <NewsIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
+            {caseItem.icon === "book" && <BookIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
+            {caseItem.icon === "service" && <CustomerServiceIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
             <span className="text-sm font-medium text-foreground">{caseItem.label}</span>
             <span className="text-muted-foreground/50">|</span>
             <span className="text-sm text-muted-foreground">{caseItem.description}</span>
