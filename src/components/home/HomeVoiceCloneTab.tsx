@@ -110,7 +110,7 @@ const HomeVoiceCloneTab = () => {
             <div className="flex flex-col gap-2 w-full">
               <Button
                 variant="default"
-                className="w-full gap-2 h-10 rounded-[3px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white"
+                className="w-full gap-2 h-10 rounded-[3px] bg-[#AD0606] hover:bg-[#8a0505] text-white"
                 onClick={() => handlePlay(sample.id, "original")}
               >
                 {playingId === `${sample.id}-original` ? (
@@ -127,7 +127,7 @@ const HomeVoiceCloneTab = () => {
               </Button>
               <Button
                 variant="default"
-                className="w-full gap-2 h-10 rounded-[3px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white"
+                className="w-full gap-2 h-10 rounded-[3px] bg-[#AD0606] hover:bg-[#8a0505] text-white"
                 onClick={() => handlePlay(sample.id, "cloned")}
               >
                 {playingId === `${sample.id}-cloned` ? (
