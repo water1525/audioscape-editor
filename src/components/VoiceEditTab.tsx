@@ -1,10 +1,43 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Upload, Mic, RefreshCw, Trash2, X, Loader2, ChevronLeft, ChevronRight, Pencil } from "lucide-react";
+import { Play, Pause, Upload, Mic, RefreshCw, Trash2, X, Loader2, ChevronLeft, ChevronRight, Pencil, GraduationCap, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
-import { Headphones, MessageSquare, Megaphone, GraduationCap, Radio, Newspaper } from "lucide-react";
+// Custom News Icon component (matching homepage/playground)
+const NewsIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 1024 1024" className={className} fill="currentColor">
+    <path d="M895.582235 290.577005c-0.002047-0.040932-0.007163-0.080841-0.00921-0.121773-0.033769-0.627287-0.092098-1.251503-0.164752-1.87265-0.019443-0.165776-0.039909-0.331551-0.061398-0.49835-0.085958-0.649799-0.186242-1.297552-0.313132-1.938142-0.001023-0.007163-0.002047-0.013303-0.00307-0.020466-0.12996-0.652869-0.288572-1.299599-0.459464-1.941212-0.041956-0.156566-0.085958-0.312108-0.12996-0.468674-0.169869-0.596588-0.353041-1.190105-0.558725-1.774413-0.016373-0.046049-0.029676-0.092098-0.046049-0.138146-0.220011-0.61603-0.465604-1.222851-0.724501-1.823532-0.069585-0.162706-0.14224-0.323365-0.214894-0.485047-0.243547-0.540306-0.500397-1.075495-0.775666-1.601474-0.035816-0.067538-0.066515-0.137123-0.102331-0.204661-0.305969-0.575098-0.636496-1.136893-0.979304-1.692548-0.095167-0.153496-0.191358-0.305969-0.289596-0.457418-0.333598-0.518816-0.678452-1.030469-1.043772-1.529843-0.032746-0.044002-0.062422-0.091074-0.095167-0.135076-0.398066-0.539282-0.820692-1.061169-1.255597-1.574868-0.107447-0.12689-0.215918-0.251733-0.325411-0.3776-0.451278-0.515746-0.913812-1.023306-1.400906-1.5104L688.452781 72.233138c-0.485047-0.485047-0.989537-0.945535-1.503237-1.393743-0.12996-0.113587-0.260943-0.227174-0.39295-0.338714-0.509606-0.430812-1.028423-0.850367-1.562589-1.245364-0.053212-0.038886-0.107447-0.074701-0.160659-0.112564-0.48914-0.357134-0.99056-0.695848-1.49812-1.022283-0.158612-0.102331-0.318248-0.203638-0.477884-0.301875-0.550539-0.339738-1.107217-0.667196-1.676176-0.970094-0.076748-0.040932-0.155543-0.076748-0.232291-0.116657-0.514723-0.26913-1.038656-0.51984-1.566682-0.759293-0.168846-0.075725-0.336668-0.151449-0.506537-0.224104-0.595564-0.255827-1.197268-0.499373-1.807159-0.717338-0.056282-0.019443-0.112564-0.036839-0.168846-0.056282-0.573051-0.200568-1.153266-0.38067-1.738597-0.547469-0.162706-0.046049-0.325411-0.092098-0.48914-0.1361-0.63752-0.169869-1.278109-0.327458-1.926886-0.456395-0.016373-0.00307-0.033769-0.005117-0.050142-0.00921-0.630357-0.124843-1.267876-0.223081-1.907443-0.308015-0.169869-0.022513-0.339738-0.044002-0.51063-0.063445-0.61296-0.070608-1.227967-0.127913-1.847068-0.161682-0.048095-0.00307-0.097214-0.008186-0.145309-0.011256-0.51063-0.025583-1.023306-0.038886-1.537006-0.038886L159.900803 63.24237c-16.95516 0-30.699186 13.744026-30.699186 30.699186l0 834.942133c0 16.954137 13.744026 30.699186 30.699186 30.699186L864.922958 959.582875c16.954137 0 30.699186-13.745049 30.699186-30.699186L895.622144 292.119127C895.622144 291.603381 895.607818 291.089681 895.582235 290.577005zM697.444573 168.05553l93.363388 93.363388-93.363388 0L697.444573 168.05553zM190.599989 898.184503 190.599989 124.640742l445.446211 0 0 167.478386c0 16.954137 13.745049 30.699186 30.699186 30.699186L834.223772 322.818313l0 575.36619L190.599989 898.184503z" />
+    <path d="M287.332101 381.480364l197.455117 0c16.954137 0 30.699186-13.745049 30.699186-30.699186s-13.745049-30.699186-30.699186-30.699186L287.332101 320.081992c-16.954137 0-30.699186 13.745049-30.699186 30.699186S270.377964 381.480364 287.332101 381.480364z" />
+    <path d="M287.332101 542.235628l259.913635 0c16.954137 0 30.699186-13.745049 30.699186-30.699186s-13.745049-30.699186-30.699186-30.699186L287.332101 480.837256c-16.954137 0-30.699186 13.745049-30.699186 30.699186S270.377964 542.235628 287.332101 542.235628z" />
+    <path d="M679.258375 640.444371l-391.926274 0c-16.954137 0-30.699186 13.745049-30.699186 30.699186s13.745049 30.699186 30.699186 30.699186l391.926274 0c16.954137 0 30.699186-13.745049 30.699186-30.699186S696.212512 640.444371 679.258375 640.444371z" />
+  </svg>
+);
+
+// Custom Book Icon component (Audiobook - matching homepage/playground)
+const BookIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 1024 1024" className={className} fill="currentColor">
+    <path d="M846.848 925.696H179.2c-15.872 0-28.672-12.8-28.672-28.672V125.44c0-15.872 12.8-28.672 28.672-28.672h667.648c15.872 0 28.672 12.8 28.672 28.672v772.096c0 15.36-12.8 28.16-28.672 28.16zM212.992 863.744h600.064V159.232H212.992v704.512z" />
+    <path d="M704.512 488.96c-4.096 0-7.68-0.512-11.264-2.048l-95.744-40.96-92.672 40.96c-9.216 4.096-18.944 2.56-27.136-2.048a28.672 28.672 0 0 1-12.8-24.064V125.44c0-15.872 12.8-28.672 28.672-28.672h210.944c15.872 0 28.672 12.8 28.672 28.672v334.848c0 9.728-5.12 18.432-12.8 24.064-5.12 3.072-10.24 4.608-15.872 4.608z m-107.52-102.912c4.096 0 7.68 0.512 11.264 2.048l67.072 28.672V153.6h-154.112v263.168l64-28.16c4.096-1.536 7.68-2.56 11.776-2.56z m-7.168 259.072H312.832c-15.872 0-28.672-12.8-28.672-28.672 0-15.872 12.8-28.672 28.672-28.672h276.48c15.872 0 28.672 12.8 28.672 28.672 0 15.872-12.288 28.672-28.16 28.672z m-137.216 139.264H312.832c-15.872 0-28.672-12.8-28.672-28.672 0-15.872 12.8-28.672 28.672-28.672h139.264c15.872 0 28.672 12.8 28.672 28.672 0 15.872-12.288 28.672-28.16 28.672z" />
+  </svg>
+);
+
+// Custom Customer Service Icon component (matching homepage/playground)
+const CustomerServiceIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 1024 1024" className={className} fill="currentColor">
+    <path d="M554.666667 810.666667v-42.666667h85.333333v42.666667h128v-384c-12.8-119.466667-110.933333-213.333333-234.666667-213.333334S311.466667 307.2 298.666667 426.666667v426.666666H213.333333v-298.666666h42.666667v-106.666667C256 294.4 379.733333 170.666667 533.333333 170.666667S810.666667 294.4 810.666667 448V554.666667h42.666666v298.666666h-298.666666v-42.666666z" />
+  </svg>
+);
+
+// Preset scenarios for quick generation
+const presetScenarios = [
+  { id: "news", icon: "news" as const, title: "News Broadcast", subtitle: "Step 3 Release", color: "text-blue-500", text: "Breaking news: Step 3 voice model is officially released, supporting natural speech synthesis with various emotional styles, bringing users a more realistic voice experience." },
+  { id: "audiobook", icon: "book" as const, title: "Audiobook", subtitle: "Mystery Story", color: "text-pink-500", text: "On that rainy night, he walked alone on the empty street. Suddenly, a flash of lightning split the night sky, and he saw a mysterious figure standing at the corner." },
+  { id: "service", icon: "service" as const, title: "Customer Service", subtitle: "AI Assistant", color: "text-green-500", text: "Hello, welcome to our Customer Service Center. I am your intelligent customer service assistant. How may I help you today?" },
+  { id: "ad", icon: "mic" as const, title: "Ad Voiceover", subtitle: "Brand Promo", color: "text-violet-500", text: "Explore infinite possibilities, create a brilliant future. We use technology to change lives and innovation to define tomorrow." },
+  { id: "education", icon: "education" as const, title: "Education", subtitle: "Poetry Reading", color: "text-sky-500", text: "Before my bed, the moonlight gleams, like frost upon the ground it seems. I raise my head to watch the moon, then lower it, thinking of home." },
+  { id: "radio", icon: "sparkles" as const, title: "Emotional Radio", subtitle: "Night Healing", color: "text-pink-500", text: "On this quiet night, let us slow down together and listen to the voice within. May you have sweet dreams tonight and still be filled with hope tomorrow." },
+];
 
 // Sample texts for recording (~50 characters each, 10-30s reading time)
 const sampleTexts = [
@@ -13,16 +46,6 @@ const sampleTexts = [
   "Artificial intelligence technology is profoundly changing various industries, from medical diagnosis to autonomous driving, its applications are becoming increasingly widespread.",
   "The city lights shine brilliantly at night, warm light emanates from the windows of tall buildings, while traffic flows through the streets as people hurry to their destinations.",
   "Music is a universal language that transcends cultural and geographical boundaries, touching the softest part of everyone's heart and bringing endless emotion and resonance.",
-];
-
-// Preset scenarios for quick generation
-const presetScenarios = [
-  { id: "news", icon: Newspaper, title: "News Broadcast", subtitle: "Step 3 Release", color: "text-emerald-500", bgColor: "bg-emerald-50", text: "Breaking news: Step 3 voice model is officially released, supporting natural speech synthesis with various emotional styles, bringing users a more realistic voice experience." },
-  { id: "audiobook", icon: Headphones, title: "Audiobook", subtitle: "Mystery Story", color: "text-purple-500", bgColor: "bg-purple-50", text: "On that rainy night, he walked alone on the empty street. Suddenly, a flash of lightning split the night sky, and he saw a mysterious figure standing at the corner." },
-  { id: "service", icon: MessageSquare, title: "Customer Service", subtitle: "AI Assistant", color: "text-orange-500", bgColor: "bg-orange-50", text: "Hello, welcome to our Customer Service Center. I am your intelligent customer service assistant. How may I help you today?" },
-  { id: "ad", icon: Megaphone, title: "Ad Voiceover", subtitle: "Brand Promo", color: "text-pink-500", bgColor: "bg-pink-50", text: "Explore infinite possibilities, create a brilliant future. We use technology to change lives and innovation to define tomorrow." },
-  { id: "education", icon: GraduationCap, title: "Education", subtitle: "Poetry Reading", color: "text-blue-500", bgColor: "bg-blue-50", text: "Before my bed, the moonlight gleams, like frost upon the ground it seems. I raise my head to watch the moon, then lower it, thinking of home." },
-  { id: "radio", icon: Radio, title: "Emotional Radio", subtitle: "Night Healing", color: "text-red-500", bgColor: "bg-red-50", text: "On this quiet night, let us slow down together and listen to the voice within. May you have sweet dreams tonight and still be filled with hope tomorrow." },
 ];
 
 const emotionTags = ["Happy", "Angry", "Sad", "Humorous", "Confused", "Disgusted", "Empathetic", "Embarrassed", "Fearful", "Surprised", "Excited", "Depressed", "Indifferent", "Admiring"];
@@ -556,24 +579,25 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                   key={scenario.id}
                   onClick={() => handlePresetClick(scenario)}
                   disabled={isGeneratingPreset !== null}
-                  className={`flex items-center gap-3 p-3 rounded-[3px] border border-border/50 bg-background hover:bg-secondary/50 transition-all text-left ${
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-[3px] border border-border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all text-left ${
                     isGeneratingPreset === scenario.id ? "opacity-70" : ""
                   }`}
                 >
-                  <div className={`w-10 h-10 rounded-[3px] ${scenario.bgColor} flex items-center justify-center shrink-0`}>
-                    {isGeneratingPreset === scenario.id ? (
-                      <Loader2 className={`h-5 w-5 ${scenario.color} animate-spin`} />
-                    ) : (
-                      <scenario.icon className={`h-5 w-5 ${scenario.color}`} />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-foreground text-sm">{scenario.title}</span>
-                      <span className="text-muted-foreground text-xs">|</span>
-                      <span className="text-muted-foreground text-xs truncate">{scenario.subtitle}</span>
-                    </div>
-                  </div>
+                  {isGeneratingPreset === scenario.id ? (
+                    <Loader2 className={`w-5 h-5 ${scenario.color} animate-spin shrink-0`} />
+                  ) : (
+                    <>
+                      {scenario.icon === "news" && <NewsIcon className={`w-5 h-5 ${scenario.color} shrink-0`} />}
+                      {scenario.icon === "book" && <BookIcon className={`w-5 h-5 ${scenario.color} shrink-0`} />}
+                      {scenario.icon === "service" && <CustomerServiceIcon className={`w-5 h-5 ${scenario.color} shrink-0`} />}
+                      {scenario.icon === "mic" && <Mic className={`w-5 h-5 ${scenario.color} shrink-0`} />}
+                      {scenario.icon === "education" && <GraduationCap className={`w-5 h-5 ${scenario.color} shrink-0`} />}
+                      {scenario.icon === "sparkles" && <Sparkles className={`w-5 h-5 ${scenario.color} shrink-0`} />}
+                    </>
+                  )}
+                  <span className="font-medium text-foreground text-sm">{scenario.title}</span>
+                  <span className="text-muted-foreground">|</span>
+                  <span className="text-muted-foreground text-sm truncate">{scenario.subtitle}</span>
                 </button>
               ))}
             </div>
