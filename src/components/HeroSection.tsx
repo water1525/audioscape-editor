@@ -88,7 +88,7 @@ const HeroSection = () => {
           </h1>
 
           {/* Subtitle */}
-          <p className="hero-subtitle text-xl md:text-2xl mb-6 animate-fade-in" style={{
+          <p className="hero-subtitle text-3xl md:text-4xl mb-6 animate-fade-in" style={{
           animationDelay: "0.1s"
         }}>
             {currentBanner.subtitle}
