@@ -5,13 +5,13 @@ import heroBg from "@/assets/hero-bg.jpg";
 const banners = [{
   id: 1,
   title: "Step-tts-2",
-  subtitle: "Text to speech large model",
+  subtitle: "MFA Fast-Large Model",
   tags: ["Hyper-realism", "Emotional mastery", "Instant cloning"],
   animation: "waveform"
 }, {
   id: 2,
   title: "Step-Audio-EditX",
-  subtitle: "Audio edit large model",
+  subtitle: "MFA Fast-Large Model",
   tags: ["Hyper-realism", "Emotional mastery", "Instant cloning"],
   animation: "spectrum"
 }];
