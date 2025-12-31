@@ -45,26 +45,32 @@ const VoicePlatformSection = () => {
           {/* Top Tabs */}
           <div className="border-b border-border/30 bg-white rounded-t-[3px]">
             <div className="flex items-center">
-              {tabs.map((tab, index) => {
+              {tabs.map((tab) => {
                 const IconComponent = tab.icon;
                 const isActive = activeTab === tab.id;
                 return (
                   <div
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className="relative flex-1 group cursor-pointer"
+                    className={`
+                      relative flex-1 cursor-pointer transition-all duration-300
+                      ${isActive 
+                        ? 'bg-[#C23A2B]' 
+                        : 'bg-white hover:bg-gray-50'
+                      }
+                    `}
                   >
                     <div className={`
                       flex items-center justify-center gap-2.5 py-4 px-4
                       transition-all duration-300
                       ${isActive 
-                        ? 'text-foreground' 
-                        : 'text-muted-foreground hover:text-foreground/80'
+                        ? 'text-white' 
+                        : 'text-foreground'
                       }
                     `}>
                       <IconComponent className={`
                         w-4 h-4 transition-all duration-300
-                        ${isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground/60'}
+                        ${isActive ? 'text-white' : 'text-muted-foreground'}
                       `} />
                       <span className={`
                         text-sm tracking-wide transition-all duration-300
@@ -73,20 +79,6 @@ const VoicePlatformSection = () => {
                         {tab.label}
                       </span>
                     </div>
-                    
-                    {/* Active indicator line */}
-                    <div
-                      className={`
-                        absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 rounded-full
-                        transition-all duration-300 ease-out
-                        ${isActive ? "w-10 bg-primary" : "w-0 bg-transparent"}
-                      `}
-                    />
-                    
-                    {/* Separator */}
-                    {index < tabs.length - 1 && (
-                      <div className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-px bg-border/30" />
-                    )}
                   </div>
                 );
               })}
