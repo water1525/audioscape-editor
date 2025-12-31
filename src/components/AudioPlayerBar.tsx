@@ -140,8 +140,8 @@ const AudioPlayerBar = ({
       <div className="px-6 py-3">
         <div className="flex items-center gap-4">
           {/* Left: Title and Voice Info */}
-          <div className="w-48 min-w-0 shrink-0">
-            <p className="text-sm font-medium text-foreground truncate">
+          <div className="w-64 min-w-0 shrink-0">
+            <p className="text-sm font-medium text-foreground">
               {title || "Untitled Audio"}
             </p>
             <p className="text-xs text-muted-foreground truncate">
