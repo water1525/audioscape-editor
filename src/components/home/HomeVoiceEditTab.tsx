@@ -245,7 +245,7 @@ const handleConfirm = async () => {
         <Button 
           variant="default" 
           size="sm" 
-          className="h-9 rounded-[3px] gap-1.5 px-4 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white"
+          className="h-9 rounded-[3px] gap-1.5 px-4 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
           onClick={() => setShowModal(true)}
           disabled={isGenerating}
         >
@@ -363,18 +363,17 @@ const handleConfirm = async () => {
             </div>
 
 
-            {/* Buttons */}
             <div className="flex gap-3 mt-4">
               <Button
                 variant="outline"
-                className="flex-1"
+                className="flex-1 font-semibold"
                 onClick={() => setShowModal(false)}
                 disabled={isGenerating}
               >
                 Cancel
               </Button>
               <Button
-                className="flex-1 bg-[#C23A2B] hover:bg-[#A83225] text-white"
+                className="flex-1 bg-[#C23A2B] hover:bg-[#A83225] text-white font-semibold"
                 onClick={handleConfirm}
                 disabled={isGenerating}
               >
