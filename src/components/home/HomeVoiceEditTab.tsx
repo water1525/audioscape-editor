@@ -219,7 +219,7 @@ const handleConfirm = async () => {
           <button
             type="button"
             onClick={handlePlayPause}
-            className="w-12 h-12 rounded-[3px] bg-primary/10 flex items-center justify-center transition-colors hover:bg-primary/20"
+            className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center transition-colors hover:bg-primary/20"
             aria-label={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? (
@@ -279,7 +279,7 @@ const handleConfirm = async () => {
               <button
                 type="button"
                 onClick={handlePlayEditedPause}
-                className="w-12 h-12 rounded-[3px] flex items-center justify-center transition-colors bg-primary/20 hover:bg-primary/30"
+                className="w-12 h-12 rounded-full flex items-center justify-center transition-colors bg-primary/20 hover:bg-primary/30"
                 aria-label={isPlayingEdited ? "Pause" : "Play"}
               >
                 {isPlayingEdited ? (
