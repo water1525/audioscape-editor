@@ -209,7 +209,6 @@ const handleConfirm = async () => {
     <div className="animate-fade-in space-y-4">
       {/* Original audio label */}
       <div className="flex items-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-muted-foreground" />
         <p className="text-sm text-muted-foreground">Original Audio</p>
       </div>
 
