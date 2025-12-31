@@ -42,9 +42,9 @@ const VoicePlatformSection = () => {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white border border-border/50 rounded-[3px] shadow-xl">
+        <div className="bg-white/80 border border-border/50 rounded-[3px] shadow-xl">
           {/* Top Tabs */}
-          <div className="border-b border-border/30 bg-white">
+          <div className="border-b border-border/30 bg-white/80">
             <div className="flex items-center">
               {tabs.map((tab, index) => {
                 const IconComponent = tab.icon;
