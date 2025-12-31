@@ -59,6 +59,7 @@ const HeroParticles = () => {
 };
 const HeroSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [activeButton, setActiveButton] = useState<'use' | 'intro'>('use');
 
   // Auto-rotate banners every 5 seconds
   useEffect(() => {
@@ -107,10 +108,24 @@ const HeroSection = () => {
           <div className="inline-flex rounded-[3px] overflow-hidden animate-fade-in" style={{
           animationDelay: "0.3s"
         }}>
-            <button className="px-10 py-4 bg-[#AD0606] text-white font-semibold text-lg hover:bg-[#8B0505] transition-colors duration-200">
+            <button 
+              onClick={() => setActiveButton('use')}
+              className={`px-10 py-4 text-lg transition-colors duration-200 ${
+                activeButton === 'use' 
+                  ? 'bg-[#AD0606] text-white font-semibold' 
+                  : 'bg-white text-foreground hover:bg-gray-100'
+              }`}
+            >
               Use now
             </button>
-            <button className="px-10 py-4 bg-white text-foreground text-lg hover:bg-gray-100 transition-colors duration-200">
+            <button 
+              onClick={() => setActiveButton('intro')}
+              className={`px-10 py-4 text-lg transition-colors duration-200 ${
+                activeButton === 'intro' 
+                  ? 'bg-[#AD0606] text-white font-semibold' 
+                  : 'bg-white text-foreground hover:bg-gray-100'
+              }`}
+            >
               Introduction
             </button>
           </div>
