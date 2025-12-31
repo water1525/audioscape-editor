@@ -590,7 +590,7 @@ const Playground = () => {
             <div className="space-y-6">
               {/* Voice Select */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">voice</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">Voice</label>
                 <Select value={voice} onValueChange={setVoice}>
                   <SelectTrigger className="w-full bg-background">
                     <SelectValue />
@@ -621,7 +621,7 @@ const Playground = () => {
               {/* Speed Slider */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-foreground">speed</label>
+                  <label className="text-sm font-medium text-foreground">Speed</label>
                   <span className="text-sm text-muted-foreground">{speed[0]}</span>
                 </div>
                 <Slider
@@ -637,7 +637,7 @@ const Playground = () => {
               {/* Volume Slider */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-foreground">volume</label>
+                  <label className="text-sm font-medium text-foreground">Volume</label>
                   <span className="text-sm text-muted-foreground">{volume[0]}</span>
                 </div>
                 <Slider
@@ -652,7 +652,7 @@ const Playground = () => {
 
               {/* Format Select */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">format</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">Format</label>
                 <Select value={format} onValueChange={setFormat}>
                   <SelectTrigger className="w-full bg-background">
                     <SelectValue />

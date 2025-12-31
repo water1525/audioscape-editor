@@ -96,15 +96,15 @@ const SentenceItem = ({
         <div className="absolute top-0.5 right-0.5 z-10">
           <div className="h-5 px-1.5 text-[10px] bg-primary text-primary-foreground rounded-[3px] flex items-center gap-1">
             <Loader2 className="h-3 w-3 animate-spin" />
-            <span>生成中</span>
+            <span>Generating</span>
           </div>
         </div>
       ) : (
         <div className="absolute top-0.5 right-0.5 z-10 flex items-center gap-1">
-          {/* Non-clickable "已编辑" badge for edited sentences */}
+          {/* Non-clickable "Edited" badge for edited sentences */}
           {sentence.isEdited && (
             <span className="h-5 px-1.5 text-[10px] bg-primary text-primary-foreground rounded-[3px] flex items-center">
-              已编辑
+              Edited
             </span>
           )}
           {/* Pencil edit button - show on hover or selected */}
