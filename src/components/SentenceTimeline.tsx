@@ -62,7 +62,7 @@ const SentenceItem = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`
-        relative flex-shrink-0 w-[200px] h-12 rounded-[3px] cursor-pointer
+        relative flex-shrink-0 w-[220px] h-20 rounded-[3px] cursor-pointer
         transition-all duration-200 overflow-hidden group
         ${isSelected || isPlaying
           ? "bg-primary/20 ring-2 ring-primary"
@@ -72,13 +72,8 @@ const SentenceItem = ({
         }
       `}
     >
-      {/* Waveform background */}
-      <div className="absolute inset-0 flex items-center justify-center gap-0.5 px-1">
-        {generateWaveformBars(16, isSelected || isPlaying)}
-      </div>
-
-      {/* Text overlay */}
-      <div className="absolute inset-0 flex items-center px-2 bg-gradient-to-t from-background/90 via-background/50 to-transparent">
+      {/* Text at top */}
+      <div className="absolute top-2 left-2 right-2 z-10">
         <p
           className={`text-xs line-clamp-2 leading-tight ${
             isSelected || isPlaying
@@ -90,17 +85,22 @@ const SentenceItem = ({
         </p>
       </div>
 
-      {/* Edit button / loading / edited state */}
+      {/* Waveform in middle area */}
+      <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-0.5 px-2 h-6">
+        {generateWaveformBars(20, isSelected || isPlaying)}
+      </div>
+
+      {/* Edit button / loading / edited state - positioned at bottom right */}
       {isEditGenerating ? (
         // Show loading state during generation
-        <div className="absolute top-0.5 right-0.5 z-10">
+        <div className="absolute bottom-1.5 right-1.5 z-10">
           <div className="h-5 px-1.5 text-[10px] bg-primary text-primary-foreground rounded-[3px] flex items-center gap-1">
             <Loader2 className="h-3 w-3 animate-spin" />
             <span>Generating</span>
           </div>
         </div>
       ) : (
-        <div className="absolute top-0.5 right-0.5 z-10 flex items-center gap-1">
+        <div className="absolute bottom-1.5 right-1.5 z-10 flex items-center gap-1">
           {/* Non-clickable "Edited" badge for edited sentences */}
           {sentence.isEdited && (
             <span className="h-5 px-1.5 text-[10px] bg-primary text-primary-foreground rounded-[3px] flex items-center">
@@ -131,9 +131,9 @@ const SentenceItem = ({
         </div>
       )}
 
-      {/* Playing indicator */}
+      {/* Playing indicator - bottom left */}
       {isPlaying && !isGenerating && !isHovered && (
-        <div className="absolute bottom-1 left-1">
+        <div className="absolute bottom-1.5 left-1.5">
           <div className="flex items-center gap-0.5">
             {[1, 2, 3].map((i) => (
               <div
