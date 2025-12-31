@@ -312,7 +312,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
   // Handle edit confirm for a sentence or batch
   const handleConfirm = async () => {
     if (selectedTags.length === 0) {
-      toast.error("请至少选择一个编辑参数");
+      toast.error("Please select at least one parameter");
       return;
     }
     
