@@ -324,9 +324,9 @@ const TextToSpeechTab = () => {
             {caseItem.icon === "news" && <NewsIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
             {caseItem.icon === "book" && <BookIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
             {caseItem.icon === "service" && <CustomerServiceIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
-            <span className="text-sm font-medium text-foreground">{caseItem.label}</span>
+            <span className={`text-sm font-medium ${caseItem.iconColor}`}>{caseItem.label}</span>
             <span className="text-muted-foreground/50">|</span>
-            <span className="text-sm text-muted-foreground">{caseItem.description}</span>
+            <span className={`text-sm ${caseItem.iconColor.replace('500', '400')}`}>{caseItem.description}</span>
           </button>
         ))}
       </div>
