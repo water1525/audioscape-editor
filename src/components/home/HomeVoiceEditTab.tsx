@@ -213,7 +213,7 @@ const handleConfirm = async () => {
       </div>
 
       {/* Original audio card */}
-      <div className="bg-[#E8F4FC] border border-border/30 rounded-[3px] flex items-stretch overflow-hidden">
+      <div className="bg-white border border-border/30 rounded-[3px] flex items-stretch overflow-hidden">
         <div className="flex-1 flex items-center gap-3 p-4">
           <button
             type="button"
