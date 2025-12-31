@@ -183,7 +183,7 @@ const handleConfirm = async () => {
 
   const renderTagSection = (title: string, tags: string[]) => (
     <div>
-      <p className="text-sm font-medium text-foreground mb-2">{title}</p>
+      <p className="text-sm font-semibold text-foreground mb-2">{title}</p>
       <div className="flex flex-wrap gap-2">
         {tags.map((tag, index) => (
           <button
