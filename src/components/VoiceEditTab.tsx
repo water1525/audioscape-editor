@@ -531,14 +531,14 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                 <Button
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
-                  className="gap-2"
+                  className="gap-2 font-semibold"
                 >
                   <Upload className="h-4 w-4" />
                   上传音频
                 </Button>
                 <Button
                   onClick={startRecording}
-                  className="gap-2"
+                  className="gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
                 >
                   <Mic className="h-4 w-4" />
                   开始录制
@@ -622,10 +622,9 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
             
             <div className="text-4xl font-bold text-primary">{countdown}S</div>
             <Button
-              variant="outline"
               onClick={stopRecording}
               disabled={countdown > 20}
-              className="min-w-[120px]"
+              className="min-w-[120px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
             >
               结束录制
             </Button>
@@ -765,10 +764,10 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
 
             {/* Action Buttons */}
             <div className="flex items-center justify-end gap-3">
-              <Button variant="outline" onClick={() => { setShowModal(false); setSelectedTags([]); setEditingSentenceId(null); setIsBatchEdit(false); }}>
+              <Button variant="outline" onClick={() => { setShowModal(false); setSelectedTags([]); setEditingSentenceId(null); setIsBatchEdit(false); }} className="font-semibold">
                 取消
               </Button>
-              <Button onClick={handleConfirm} disabled={isGenerating}>
+              <Button onClick={handleConfirm} disabled={isGenerating} className="bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold">
                 {isGenerating ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
