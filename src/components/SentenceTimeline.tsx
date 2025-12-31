@@ -62,7 +62,7 @@ const SentenceItem = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`
-        relative flex-shrink-0 w-[200px] h-12 rounded cursor-pointer
+        relative flex-shrink-0 w-[200px] h-12 rounded-[3px] cursor-pointer
         transition-all duration-200 overflow-hidden group
         ${isSelected || isPlaying
           ? "bg-primary/20 ring-2 ring-primary"
@@ -94,7 +94,7 @@ const SentenceItem = ({
       {isEditGenerating ? (
         // Show loading state during generation
         <div className="absolute top-0.5 right-0.5 z-10">
-          <div className="h-5 px-1.5 text-[10px] bg-primary text-primary-foreground rounded-md flex items-center gap-1">
+          <div className="h-5 px-1.5 text-[10px] bg-primary text-primary-foreground rounded-[3px] flex items-center gap-1">
             <Loader2 className="h-3 w-3 animate-spin" />
             <span>生成中</span>
           </div>
@@ -103,7 +103,7 @@ const SentenceItem = ({
         <div className="absolute top-0.5 right-0.5 z-10 flex items-center gap-1">
           {/* Non-clickable "已编辑" badge for edited sentences */}
           {sentence.isEdited && (
-            <span className="h-5 px-1.5 text-[10px] bg-primary text-primary-foreground rounded-md flex items-center">
+            <span className="h-5 px-1.5 text-[10px] bg-primary text-primary-foreground rounded-[3px] flex items-center">
               已编辑
             </span>
           )}
@@ -158,7 +158,7 @@ const SentenceItem = ({
               onNavigateVersion(sentence.id, "prev");
             }}
             disabled={sentence.currentVersionIndex <= 0}
-            className="h-4 w-4 flex items-center justify-center rounded bg-background/80 text-muted-foreground hover:text-foreground disabled:opacity-30"
+            className="h-4 w-4 flex items-center justify-center rounded-[3px] bg-background/80 text-muted-foreground hover:text-foreground disabled:opacity-30"
           >
             <ChevronLeft className="h-2.5 w-2.5" />
           </button>
@@ -171,7 +171,7 @@ const SentenceItem = ({
               onNavigateVersion(sentence.id, "next");
             }}
             disabled={sentence.currentVersionIndex >= sentence.versions.length - 1}
-            className="h-4 w-4 flex items-center justify-center rounded bg-background/80 text-muted-foreground hover:text-foreground disabled:opacity-30"
+            className="h-4 w-4 flex items-center justify-center rounded-[3px] bg-background/80 text-muted-foreground hover:text-foreground disabled:opacity-30"
           >
             <ChevronRight className="h-2.5 w-2.5" />
           </button>
@@ -486,7 +486,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
     if (sentences.length === 0) return null;
 
     return (
-      <div className="fixed bottom-[68px] left-56 right-0 z-40 bg-card border-t border-l border-border rounded-tl-xl">
+      <div className="fixed bottom-[68px] left-56 right-0 z-40 bg-card border-t border-l border-border rounded-tl-[3px]">
         {/* Horizontal sentence segments with navigation */}
         <div className="px-6 py-3 flex items-center gap-2">
           {/* Left scroll button */}

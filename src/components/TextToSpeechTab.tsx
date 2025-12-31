@@ -273,7 +273,7 @@ const TextToSpeechTab = () => {
   return (
     <div className="animate-fade-in">
       {/* Text Display Area */}
-      <div className="bg-card border border-border rounded-lg p-6 mb-4 min-h-[160px] shadow-soft">
+      <div className="bg-card border border-border rounded-[3px] p-6 mb-4 min-h-[160px] shadow-soft">
         <p className="text-foreground text-sm whitespace-pre-wrap leading-relaxed">
           {currentCase.text}
         </p>
@@ -286,7 +286,7 @@ const TextToSpeechTab = () => {
             key={caseItem.id}
             onClick={() => handleCaseChange(caseItem.id)}
             className={`
-              flex items-center gap-2.5 px-4 py-2.5 rounded-lg border transition-all duration-200
+              flex items-center gap-2.5 px-4 py-2.5 rounded-[3px] border transition-all duration-200
               ${activeCase === caseItem.id 
                 ? 'bg-primary/10 border-primary/50 shadow-md shadow-primary/10' 
                 : 'bg-card/50 border-border/50 hover:bg-card hover:border-border'
@@ -294,7 +294,7 @@ const TextToSpeechTab = () => {
             `}
           >
             <span className={`
-              w-6 h-6 rounded-full bg-gradient-to-br ${caseItem.gradient} 
+              w-6 h-6 rounded-[3px] bg-gradient-to-br ${caseItem.gradient} 
               flex items-center justify-center text-xs shadow-sm
             `}>
               {caseItem.icon}

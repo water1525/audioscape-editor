@@ -481,7 +481,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
       {audioSource === "none" && !isRecording && (
         <div className="space-y-6">
           {/* Upload/Record Section */}
-          <div className="bg-primary/5 border border-primary/20 rounded-lg p-8">
+          <div className="bg-primary/5 border border-primary/20 rounded-[3px] p-8">
             <div className="flex flex-col items-center gap-4">
               <div className="relative">
                 <svg 
@@ -556,11 +556,11 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                   key={scenario.id}
                   onClick={() => handlePresetClick(scenario)}
                   disabled={isGeneratingPreset !== null}
-                  className={`flex items-center gap-3 p-3 rounded-xl border border-border/50 bg-background hover:bg-secondary/50 transition-all text-left ${
+                  className={`flex items-center gap-3 p-3 rounded-[3px] border border-border/50 bg-background hover:bg-secondary/50 transition-all text-left ${
                     isGeneratingPreset === scenario.id ? "opacity-70" : ""
                   }`}
                 >
-                  <div className={`w-10 h-10 rounded-lg ${scenario.bgColor} flex items-center justify-center shrink-0`}>
+                  <div className={`w-10 h-10 rounded-[3px] ${scenario.bgColor} flex items-center justify-center shrink-0`}>
                     {isGeneratingPreset === scenario.id ? (
                       <Loader2 className={`h-5 w-5 ${scenario.color} animate-spin`} />
                     ) : (
@@ -583,7 +583,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
 
       {/* Recording State */}
       {isRecording && (
-        <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
+        <div className="bg-primary/5 border border-primary/20 rounded-[3px] p-6">
           <p className="text-sm text-muted-foreground text-center mb-4">
             请在安静环境下朗读以下文本，需录制10-30秒语音
           </p>
@@ -642,7 +642,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
       {originalAudioUrl && audioSource === "upload" && (
         <div className="space-y-3">
           <h3 className="text-sm font-medium text-foreground">上传的音频</h3>
-          <div className="relative group bg-gradient-to-br from-secondary via-secondary/80 to-secondary rounded-xl p-4 border border-border/50">
+          <div className="relative group bg-gradient-to-br from-secondary via-secondary/80 to-secondary rounded-[3px] p-4 border border-border/50">
             <div className="relative flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1 h-8 text-muted-foreground">
@@ -677,7 +677,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
       {/* Edit Modal */}
       {showModal && createPortal(
         <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm flex items-center justify-center z-[9999] animate-fade-in">
-          <div className="bg-card border border-border rounded-xl p-6 w-full max-w-lg shadow-elevated animate-scale-in mx-4">
+          <div className="bg-card border border-border rounded-[3px] p-6 w-full max-w-lg shadow-elevated animate-scale-in mx-4">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-lg font-semibold text-foreground">参数设置</h3>
@@ -696,7 +696,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
 
             {/* Show sentence text being edited */}
             {editingSentenceId !== null && (
-              <div className="bg-secondary/50 rounded-lg p-3 mb-4">
+              <div className="bg-secondary/50 rounded-[3px] p-3 mb-4">
                 <p className="text-sm text-foreground">
                   {sentences.find(s => s.id === editingSentenceId)?.text}
                 </p>
@@ -712,7 +712,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                     <span
                       key={i}
                       onClick={() => toggleTag(tag)}
-                      className={`px-3 py-1 text-xs rounded-full cursor-pointer transition-colors ${
+                      className={`px-3 py-1 text-xs rounded-[3px] cursor-pointer transition-colors ${
                         selectedTags.includes(tag)
                           ? "bg-primary text-primary-foreground"
                           : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
@@ -731,7 +731,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                     <span
                       key={i}
                       onClick={() => toggleTag(tag)}
-                      className={`px-3 py-1 text-xs rounded-full cursor-pointer transition-colors ${
+                      className={`px-3 py-1 text-xs rounded-[3px] cursor-pointer transition-colors ${
                         selectedTags.includes(tag)
                           ? "bg-primary text-primary-foreground"
                           : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
@@ -750,7 +750,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                     <span
                       key={i}
                       onClick={() => toggleTag(tag)}
-                      className={`px-3 py-1 text-xs rounded-full cursor-pointer transition-colors ${
+                      className={`px-3 py-1 text-xs rounded-[3px] cursor-pointer transition-colors ${
                         selectedTags.includes(tag)
                           ? "bg-primary text-primary-foreground"
                           : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
