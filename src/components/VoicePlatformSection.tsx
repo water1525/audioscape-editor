@@ -100,7 +100,7 @@ const VoicePlatformSection = () => {
 
         {/* Footer CTA */}
         <div className="flex flex-col items-center justify-center gap-4 mt-8 px-2">
-          <p className="text-lg font-semibold text-foreground">
+          <p className="text-lg font-semibold text-white">
             Visit the Playground for full capabilities
           </p>
           <Link to="/playground">
