@@ -246,7 +246,7 @@ const handleConfirm = async () => {
         <Button 
           variant="default" 
           size="sm" 
-          className="h-9 rounded-[3px] gap-1.5 px-4 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white"
+          className="h-9 rounded-[3px] gap-1.5 px-4 bg-[#AD0606] hover:bg-[#8a0505] text-white"
           onClick={() => setShowModal(true)}
           disabled={isGenerating}
         >
