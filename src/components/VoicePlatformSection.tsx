@@ -5,6 +5,7 @@ import { MessageSquareText, Mic2, Wand2 } from "lucide-react";
 import TextToSpeechTab from "@/components/TextToSpeechTab";
 import HomeVoiceCloneTab from "@/components/home/HomeVoiceCloneTab";
 import HomeVoiceEditTab from "@/components/home/HomeVoiceEditTab";
+import voicePlatformBg from "@/assets/voice-platform-bg.png";
 
 const tabs = [
   { id: "tts", label: "Text to Speech", icon: MessageSquareText },
@@ -29,7 +30,7 @@ const VoicePlatformSection = () => {
   };
 
   return (
-    <section className="bg-[#1246D9] py-20 px-4">
+    <section className="relative py-20 px-4 overflow-hidden" style={{ backgroundImage: `url(${voicePlatformBg})`, backgroundSize: 'cover', backgroundPosition: 'left bottom' }}>
       {/* Header */}
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">
