@@ -5,7 +5,7 @@ const PlaygroundCTASection = () => {
   return (
     <section className="bg-[#5E8DFB] py-20 px-4">
       <div className="max-w-4xl mx-auto flex flex-col items-center justify-center gap-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-white text-center tracking-tight" style={{ fontFamily: 'HFTerse, sans-serif' }}>
+        <h2 className="text-3xl md:text-4xl font-medium text-white text-center tracking-tight" style={{ fontFamily: 'HFTerse, sans-serif' }}>
           Visit the Playground for full capabilities
         </h2>
         <Link to="/playground">
