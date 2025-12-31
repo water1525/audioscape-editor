@@ -544,12 +544,12 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
               {isBatchGenerating ? (
                 <>
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  生成中 ({batchProgress?.current || 0}/{batchProgress?.total || 0})
+                  Generating ({batchProgress?.current || 0}/{batchProgress?.total || 0})
                 </>
               ) : (
                 <>
                   <Pencil className="h-3.5 w-3.5" />
-                  编辑全部
+                  Edit All
                 </>
               )}
             </Button>
@@ -565,7 +565,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
               className="h-8 text-destructive/60 hover:text-destructive hover:bg-destructive/10 gap-1.5 shrink-0"
             >
               <Trash2 className="h-4 w-4" />
-              删除
+              Delete
             </Button>
           )}
         </div>
