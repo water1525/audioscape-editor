@@ -31,7 +31,7 @@ const VoicePlatformSection = () => {
     <section className="relative min-h-screen px-4 pt-20 pb-0 overflow-hidden" style={{ backgroundImage: `url(${voicePlatformBg})`, backgroundSize: 'cover', backgroundPosition: 'left bottom' }}>
       {/* Header */}
       <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight" style={{ fontFamily: 'HFTerse, sans-serif' }}>
           Explore More Possibilities with AI Voice
         </h2>
         <p className="text-white text-base md:text-lg">
