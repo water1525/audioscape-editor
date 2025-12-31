@@ -312,7 +312,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
         <h3 className="text-sm font-medium text-foreground">Step 1: Record Audio</h3>
         
         {!recordedAudioUrl ? (
-          <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
+          <div className="bg-primary/5 border border-primary/20 rounded-[3px] p-6">
             <p className="text-sm text-muted-foreground text-center mb-4">
               Please read the following text in a quiet environment, recording 5-10 seconds
             </p>
@@ -356,12 +356,12 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
             )}
           </div>
         ) : (
-          <div className="bg-card border border-border rounded-lg p-4">
+          <div className="bg-card border border-border rounded-[3px] p-4">
             <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 rounded-full bg-primary/10"
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 rounded-[3px] bg-primary/10"
                 onClick={togglePlayRecorded}
               >
                 {isPlayingRecorded ? (

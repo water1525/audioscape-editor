@@ -124,7 +124,7 @@ const AudioPlayerBar = ({
   if (!isVisible || (!audioUrl && !isGenerating)) return null;
 
   return (
-    <div className="fixed bottom-0 left-56 right-0 z-50 bg-card border-t border-l border-border shadow-lg rounded-tl-xl">
+    <div className="fixed bottom-0 left-56 right-0 z-50 bg-card border-t border-l border-border shadow-lg rounded-tl-[3px]">
       <audio
         ref={audioRef}
         src={audioUrl}
@@ -164,13 +164,13 @@ const AudioPlayerBar = ({
 
             {/* Play/Pause or Generating */}
             {isGenerating ? (
-              <div className="w-12 h-12 rounded-full bg-muted text-muted-foreground flex items-center justify-center">
+              <div className="w-12 h-12 rounded-[3px] bg-muted text-muted-foreground flex items-center justify-center">
                 <Loader2 className="w-5 h-5 animate-spin" />
               </div>
             ) : (
               <button
                 onClick={togglePlayPause}
-                className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center hover:bg-foreground/90 transition-colors"
+                className="w-12 h-12 rounded-[3px] bg-foreground text-background flex items-center justify-center hover:bg-foreground/90 transition-colors"
               >
                 {(typeof isPlayingOverride === "boolean" ? isPlayingOverride : isPlaying) ? (
                   <Pause className="w-5 h-5" />
