@@ -164,7 +164,7 @@
 
   .btn-hero-primary {
     @apply px-8 py-3 font-semibold text-base;
-    background: hsl(221 100% 43%);
+    background: #AD0606;
     color: hsl(0 0% 100%);
     border-radius: 3px;
   }
