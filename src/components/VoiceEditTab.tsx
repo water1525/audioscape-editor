@@ -574,32 +574,42 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">Select a scenario to experience voice editing</p>
             <div className="grid grid-cols-2 gap-3">
-              {presetScenarios.map((scenario) => (
-                <button
-                  key={scenario.id}
-                  onClick={() => handlePresetClick(scenario)}
-                  disabled={isGeneratingPreset !== null}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-[3px] border border-border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all text-left ${
-                    isGeneratingPreset === scenario.id ? "opacity-70" : ""
-                  }`}
-                >
-                  {isGeneratingPreset === scenario.id ? (
-                    <Loader2 className={`w-5 h-5 ${scenario.color} animate-spin shrink-0`} />
-                  ) : (
-                    <>
-                      {scenario.icon === "news" && <NewsIcon className={`w-5 h-5 ${scenario.color} shrink-0`} />}
-                      {scenario.icon === "book" && <BookIcon className={`w-5 h-5 ${scenario.color} shrink-0`} />}
-                      {scenario.icon === "service" && <CustomerServiceIcon className={`w-5 h-5 ${scenario.color} shrink-0`} />}
-                      {scenario.icon === "mic" && <Mic className={`w-5 h-5 ${scenario.color} shrink-0`} />}
-                      {scenario.icon === "education" && <GraduationCap className={`w-5 h-5 ${scenario.color} shrink-0`} />}
-                      {scenario.icon === "sparkles" && <Sparkles className={`w-5 h-5 ${scenario.color} shrink-0`} />}
-                    </>
-                  )}
-                  <span className={`font-medium text-sm ${scenario.color}`}>{scenario.title}</span>
-                  <span className="text-muted-foreground/50">|</span>
-                  <span className={`text-sm truncate ${scenario.color.replace('500', '400')}`}>{scenario.subtitle}</span>
-                </button>
-              ))}
+              {presetScenarios.map((scenario) => {
+                const bgColorMap: Record<string, string> = {
+                  "text-blue-500": "bg-blue-500 hover:bg-blue-600",
+                  "text-pink-500": "bg-pink-500 hover:bg-pink-600",
+                  "text-green-500": "bg-green-500 hover:bg-green-600",
+                  "text-violet-500": "bg-violet-500 hover:bg-violet-600",
+                  "text-sky-500": "bg-sky-500 hover:bg-sky-600",
+                };
+                const bgColor = bgColorMap[scenario.color] || "bg-primary hover:bg-primary/90";
+                return (
+                  <button
+                    key={scenario.id}
+                    onClick={() => handlePresetClick(scenario)}
+                    disabled={isGeneratingPreset !== null}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-[3px] ${bgColor} transition-all text-left shadow-sm hover:shadow-md ${
+                      isGeneratingPreset === scenario.id ? "opacity-70" : ""
+                    }`}
+                  >
+                    {isGeneratingPreset === scenario.id ? (
+                      <Loader2 className="w-5 h-5 text-white animate-spin shrink-0" />
+                    ) : (
+                      <>
+                        {scenario.icon === "news" && <NewsIcon className="w-5 h-5 text-white shrink-0" />}
+                        {scenario.icon === "book" && <BookIcon className="w-5 h-5 text-white shrink-0" />}
+                        {scenario.icon === "service" && <CustomerServiceIcon className="w-5 h-5 text-white shrink-0" />}
+                        {scenario.icon === "mic" && <Mic className="w-5 h-5 text-white shrink-0" />}
+                        {scenario.icon === "education" && <GraduationCap className="w-5 h-5 text-white shrink-0" />}
+                        {scenario.icon === "sparkles" && <Sparkles className="w-5 h-5 text-white shrink-0" />}
+                      </>
+                    )}
+                    <span className="font-medium text-sm text-white">{scenario.title}</span>
+                    <span className="text-white/50">|</span>
+                    <span className="text-sm truncate text-white/80">{scenario.subtitle}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
