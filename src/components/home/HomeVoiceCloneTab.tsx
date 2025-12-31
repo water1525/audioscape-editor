@@ -89,7 +89,7 @@ const HomeVoiceCloneTab = () => {
         {voiceSamples.map((sample) => (
           <div
             key={sample.id}
-            className="flex flex-col items-center gap-3 rounded-[3px] border border-border/50 bg-card/30 px-8 py-6"
+            className="flex flex-col items-center gap-3 rounded-[3px] border border-border/50 bg-white px-8 py-6"
           >
             {/* Avatar */}
             <div className="w-16 h-16 rounded-full overflow-hidden bg-background">

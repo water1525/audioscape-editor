@@ -316,8 +316,8 @@ const TextToSpeechTab = () => {
             className={`
               flex items-center gap-2.5 px-4 py-2.5 rounded-[3px] border transition-all duration-200
               ${activeCase === caseItem.id 
-                ? 'bg-primary/10 border-primary/50 shadow-md shadow-primary/10' 
-                : 'bg-card/50 border-border/50 hover:bg-card hover:border-border'
+                ? 'bg-white border-primary/50 shadow-md shadow-primary/10' 
+                : 'bg-white border-border/50 hover:border-border'
               }
             `}
           >
