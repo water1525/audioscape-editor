@@ -32,7 +32,7 @@ const dialogueLines = [
 
 // Custom News Icon component
 const NewsIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 1024 1024" className={className} fill="none" stroke="currentColor" strokeWidth="48">
+  <svg viewBox="0 0 1024 1024" className={className} fill="currentColor">
     <path d="M146.285714 292.571429l585.142857 0 0 73.142857-585.142857 0 0-73.142857Z" />
     <path d="M146.285714 475.428571l219.428571 0 0 256-219.428571 0 0-256Z" />
     <path d="M438.857143 475.428571l292.571429 0 0 36.571429-292.571429 0 0-36.571429Z" />
