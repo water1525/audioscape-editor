@@ -191,7 +191,7 @@ const handleConfirm = async () => {
             onClick={() => toggleTag(tag)}
             disabled={isGenerating}
             className={`
-              px-3 py-1.5 text-sm rounded-full border transition-all
+              px-3 py-1.5 text-sm rounded-[3px] border transition-all
               ${selectedTags.includes(tag)
                 ? "bg-primary text-primary-foreground border-primary"
                 : "bg-card border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
@@ -214,12 +214,12 @@ const handleConfirm = async () => {
       </div>
 
       {/* Original audio card */}
-      <div className="bg-card border border-border/50 rounded-xl p-4 flex items-center justify-between">
+      <div className="bg-card border border-border/50 rounded-[3px] p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={handlePlayPause}
-            className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center transition-colors hover:bg-primary/20"
+            className="w-12 h-12 rounded-[3px] bg-primary/10 flex items-center justify-center transition-colors hover:bg-primary/20"
             aria-label={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? (
@@ -246,7 +246,7 @@ const handleConfirm = async () => {
         <Button 
           variant="outline" 
           size="sm" 
-          className="h-9 rounded-full gap-1.5 px-4"
+          className="h-9 rounded-[3px] gap-1.5 px-4"
           onClick={() => setShowModal(true)}
           disabled={isGenerating}
         >
@@ -274,12 +274,12 @@ const handleConfirm = async () => {
           </div>
 
           {/* Edited audio card */}
-          <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-center justify-between">
+          <div className="bg-primary/5 border border-primary/20 rounded-[3px] p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={handlePlayEditedPause}
-                className="w-12 h-12 rounded-full flex items-center justify-center transition-colors bg-primary/20 hover:bg-primary/30"
+                className="w-12 h-12 rounded-[3px] flex items-center justify-center transition-colors bg-primary/20 hover:bg-primary/30"
                 aria-label={isPlayingEdited ? "Pause" : "Play"}
               >
                 {isPlayingEdited ? (
@@ -318,7 +318,7 @@ const handleConfirm = async () => {
                 setEditedAudioUrl(null);
                 toast.success("Edited audio deleted");
               }}
-              className="p-2 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+              className="p-2 rounded-[3px] text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
               aria-label="Delete"
             >
               <Trash2 className="h-4 w-4" />
@@ -338,7 +338,7 @@ const handleConfirm = async () => {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => !isGenerating && setShowModal(false)}
           />
-          <div className="relative bg-card border border-border rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
+          <div className="relative bg-card border border-border rounded-[3px] p-6 w-full max-w-md mx-4 shadow-2xl">
             {/* Title */}
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-semibold text-foreground">Parameter Settings</h3>
