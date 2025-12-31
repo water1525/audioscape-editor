@@ -30,7 +30,7 @@ const VoicePlatformSection = () => {
   };
 
   return (
-    <section className="relative py-20 px-4 overflow-hidden" style={{ backgroundImage: `url(${voicePlatformBg})`, backgroundSize: 'cover', backgroundPosition: 'left bottom' }}>
+    <section className="relative min-h-screen px-4 pt-20 pb-0 overflow-hidden" style={{ backgroundImage: `url(${voicePlatformBg})`, backgroundSize: 'cover', backgroundPosition: 'left bottom' }}>
       {/* Header */}
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">
@@ -42,10 +42,10 @@ const VoicePlatformSection = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white/80 border border-border/50 rounded-[3px] shadow-xl">
+      <div className="max-w-4xl mx-auto flex flex-col" style={{ minHeight: 'calc(100vh - 200px)' }}>
+        <div className="bg-white/80 border border-border/50 rounded-t-[3px] shadow-xl flex-1 flex flex-col">
           {/* Top Tabs */}
-          <div className="border-b border-border/30 bg-white/80">
+          <div className="border-b border-border/30 bg-white/80 rounded-t-[3px]">
             <div className="flex items-center">
               {tabs.map((tab, index) => {
                 const IconComponent = tab.icon;
@@ -96,19 +96,19 @@ const VoicePlatformSection = () => {
           </div>
 
           {/* Content Area */}
-          <div className="p-6 md:p-8">{renderTabContent()}</div>
-        </div>
+          <div className="p-6 md:p-8 flex-1">{renderTabContent()}</div>
 
-        {/* Footer CTA */}
-        <div className="flex flex-col items-center justify-center gap-4 mt-8 px-2">
-          <p className="text-lg font-semibold text-white">
-            Visit the Playground for full capabilities
-          </p>
-          <Link to="/playground">
-            <Button className="px-6 py-2.5 h-auto text-base font-semibold bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white shadow-lg shadow-[hsl(221,100%,43%)]/25 hover:shadow-xl hover:shadow-[hsl(221,100%,43%)]/30 transition-all duration-300">
-              Try Now
-            </Button>
-          </Link>
+          {/* Footer CTA - now inside the card */}
+          <div className="flex flex-col items-center justify-center gap-4 py-8 px-2 border-t border-border/30">
+            <p className="text-lg font-semibold text-foreground">
+              Visit the Playground for full capabilities
+            </p>
+            <Link to="/playground">
+              <Button className="px-6 py-2.5 h-auto text-base font-semibold bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white shadow-lg shadow-[hsl(221,100%,43%)]/25 hover:shadow-xl hover:shadow-[hsl(221,100%,43%)]/30 transition-all duration-300">
+                Try Now
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </section>
