@@ -305,16 +305,16 @@ const TextToSpeechTab = () => {
               }
             `}
           >
-            <span className={`
-              w-6 h-6 rounded-[3px] bg-gradient-to-br ${caseItem.gradient} 
-              flex items-center justify-center text-xs shadow-sm
-            `}>
-              {caseItem.icon === "news" ? (
-                <NewsIcon className="w-4 h-4 text-white" />
-              ) : (
-                caseItem.icon
-              )}
-            </span>
+            {caseItem.icon === "news" ? (
+              <NewsIcon className="w-6 h-6 text-blue-500" />
+            ) : (
+              <span className={`
+                w-6 h-6 rounded-[3px] bg-gradient-to-br ${caseItem.gradient} 
+                flex items-center justify-center text-xs shadow-sm
+              `}>
+                {caseItem.icon}
+              </span>
+            )}
             <span className="text-sm font-medium text-foreground">{caseItem.label}</span>
             <span className="text-muted-foreground/50">|</span>
             <span className="text-sm text-muted-foreground">{caseItem.description}</span>
