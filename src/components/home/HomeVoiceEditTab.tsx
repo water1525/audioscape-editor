@@ -213,8 +213,8 @@ const handleConfirm = async () => {
       </div>
 
       {/* Original audio card */}
-      <div className="bg-card border border-border/50 rounded-[3px] p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="bg-[#E8F4FC] border border-border/30 rounded-[3px] flex items-stretch overflow-hidden">
+        <div className="flex-1 flex items-center gap-3 p-4">
           <button
             type="button"
             onClick={handlePlayPause}
@@ -242,25 +242,23 @@ const handleConfirm = async () => {
           </div>
         </div>
 
-        <Button 
-          variant="default" 
-          size="sm" 
-          className="h-9 rounded-[3px] gap-1.5 px-4 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
+        <button 
+          className="w-24 flex items-center justify-center gap-1.5 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold transition-colors disabled:opacity-50"
           onClick={() => setShowModal(true)}
           disabled={isGenerating}
         >
           {isGenerating ? (
             <>
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              Generating
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm">Generating</span>
             </>
           ) : (
             <>
-              <ArrowRight className="h-3.5 w-3.5" />
-              Edit
+              <ArrowRight className="h-4 w-4" />
+              <span className="text-sm">Edit</span>
             </>
           )}
-        </Button>
+        </button>
       </div>
 
       {/* Edited audio - only show when available */}
