@@ -537,9 +537,9 @@ const Playground = () => {
                             {sample.icon === "mic" && <Mic className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
                             {sample.icon === "education" && <GraduationCap className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
                             {sample.icon === "sparkles" && <Sparkles className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
-                            <span className="font-medium text-sm text-foreground">{sample.title}</span>
-                            <span className="text-muted-foreground">|</span>
-                            <span className="text-sm text-muted-foreground">{sample.description}</span>
+                            <span className={`font-medium text-sm ${sample.iconColor}`}>{sample.title}</span>
+                            <span className="text-muted-foreground/50">|</span>
+                            <span className={`text-sm ${sample.iconColor.replace('500', '400')}`}>{sample.description}</span>
                           </button>
                         ))}
                     </div>

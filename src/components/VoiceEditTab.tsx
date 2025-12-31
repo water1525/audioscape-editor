@@ -595,9 +595,9 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                       {scenario.icon === "sparkles" && <Sparkles className={`w-5 h-5 ${scenario.color} shrink-0`} />}
                     </>
                   )}
-                  <span className="font-medium text-foreground text-sm">{scenario.title}</span>
-                  <span className="text-muted-foreground">|</span>
-                  <span className="text-muted-foreground text-sm truncate">{scenario.subtitle}</span>
+                  <span className={`font-medium text-sm ${scenario.color}`}>{scenario.title}</span>
+                  <span className="text-muted-foreground/50">|</span>
+                  <span className={`text-sm truncate ${scenario.color.replace('500', '400')}`}>{scenario.subtitle}</span>
                 </button>
               ))}
             </div>
