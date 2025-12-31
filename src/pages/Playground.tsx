@@ -514,9 +514,7 @@ const Playground = () => {
                             onClick={() => handleCaseClick(sample)}
                             className="group flex items-center gap-2 px-4 py-2.5 rounded-[3px] border border-border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200"
                           >
-                            <div className={`w-6 h-6 rounded-[3px] ${sample.bgColor} flex items-center justify-center shrink-0`}>
-                              <IconComponent className={`w-3.5 h-3.5 ${sample.iconColor}`} />
-                            </div>
+                            <IconComponent className={`w-5 h-5 ${sample.iconColor} shrink-0`} />
                             <span className="font-medium text-sm text-foreground">{sample.title}</span>
                             <span className="text-muted-foreground">|</span>
                             <span className="text-sm text-muted-foreground">{sample.description}</span>
