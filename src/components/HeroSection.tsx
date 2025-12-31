@@ -110,7 +110,7 @@ const HeroSection = () => {
             <button className="btn-hero-primary hover:opacity-90 transition-opacity duration-200">
               Use now
             </button>
-            <button className="btn-hero-secondary hover:bg-[hsl(220,20%,15%)] transition-colors duration-200">
+            <button className="btn-hero-secondary hover:bg-white/30 transition-colors duration-200">
               Introduction
             </button>
           </div>
