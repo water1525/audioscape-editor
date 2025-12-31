@@ -29,7 +29,7 @@ const VoicePlatformSection = () => {
   };
 
   return (
-    <section className="bg-background py-20 px-4">
+    <section className="bg-[#1246D9] py-20 px-4">
       {/* Header */}
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3 tracking-tight">
