@@ -321,9 +321,9 @@ const Playground = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc]">
+    <div className="min-h-screen bg-background">
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-white border-b border-border/50">
+      <nav className="sticky top-0 z-50 bg-card border-b border-border">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between h-14">
             {/* Left: Logo */}
@@ -366,7 +366,7 @@ const Playground = () => {
 
       <div className="flex">
         {/* Left Sidebar */}
-        <aside className="w-56 min-h-[calc(100vh-56px)] border-r border-border/50 bg-white p-4 flex flex-col">
+        <aside className="w-56 min-h-[calc(100vh-56px)] border-r border-border bg-card/50 p-4 flex flex-col">
           <h2 className="text-lg font-semibold text-foreground mb-6">Playground</h2>
           
           <nav className="space-y-1 flex-1">
@@ -379,7 +379,7 @@ const Playground = () => {
                   onClick={() => handleTabChange(tab.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[3px] text-sm transition-all duration-200 ${
                     isActive
-                      ? "bg-gradient-to-r from-[#e8e0ff] to-[#f0e8ff] text-[#7c3aed] font-medium border border-[#c4b5fd]/50"
+                      ? "bg-primary/10 text-primary font-medium"
                       : "text-muted-foreground hover:bg-accent hover:text-foreground"
                   }`}
                 >
@@ -441,7 +441,7 @@ const Playground = () => {
             {activeTab === "tts" && (
               <>
                 {/* Text Input Area */}
-                <div className="bg-white border border-[#e5e0f5] rounded-[3px] p-1 mb-6 relative shadow-sm">
+                <div className="bg-accent/30 border border-border rounded-[3px] p-1 mb-6 relative">
                   {text.length > 0 && (
                     <button
                       onClick={handleClear}
@@ -467,7 +467,7 @@ const Playground = () => {
                   <div className="mb-6 flex justify-center">
                     <Button
                       onClick={handleGenerateClick}
-                      className="gap-2 h-11 px-12 bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-semibold shadow-md"
+                      className="gap-2 h-11 px-12 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
                     >
                       Generate Audio
                     </Button>
@@ -479,7 +479,7 @@ const Playground = () => {
                   <div className="mb-6 flex justify-center">
                     <Button
                       disabled
-                      className="gap-2 h-11 px-12 bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-semibold shadow-md"
+                      className="gap-2 h-11 px-12 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
                     >
                       <RefreshCw className="w-4 h-4 animate-spin" />
                       Generating...
@@ -493,7 +493,7 @@ const Playground = () => {
                     <Button
                       onClick={handleGenerateClick}
                       disabled={isGenerating || !text.trim()}
-                      className="gap-2 bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-semibold shadow-md"
+                      className="gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
                     >
                       <RefreshCw className="w-4 h-4" />
                       Regenerate
@@ -512,7 +512,7 @@ const Playground = () => {
                           <button
                             key={sample.id}
                             onClick={() => handleCaseClick(sample)}
-                            className="group flex items-center gap-2 px-4 py-2.5 rounded-[3px] border border-[#e5e0f5] bg-white hover:bg-gradient-to-r hover:from-[#f8f5ff] hover:to-[#f0e8ff] hover:border-[#c4b5fd]/50 transition-all duration-200 shadow-sm"
+                            className="group flex items-center gap-2 px-4 py-2.5 rounded-[3px] border border-border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all duration-200"
                           >
                             <div className={`w-6 h-6 rounded-[3px] ${sample.bgColor} flex items-center justify-center shrink-0`}>
                               <IconComponent className={`w-3.5 h-3.5 ${sample.iconColor}`} />
@@ -586,7 +586,7 @@ const Playground = () => {
 
         {/* Right Sidebar - Controls (only for TTS tab) */}
         {activeTab === "tts" && (
-          <aside className="w-64 min-h-[calc(100vh-56px)] border-l border-border/50 bg-white p-6">
+          <aside className="w-64 min-h-[calc(100vh-56px)] border-l border-border bg-card/50 p-6">
             <div className="space-y-6">
               {/* Voice Select */}
               <div>
