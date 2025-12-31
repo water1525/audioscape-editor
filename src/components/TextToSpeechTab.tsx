@@ -30,25 +30,13 @@ const dialogueLines = [
   { speaker: "Mr. Customer", text: "Great, thank you!", voice: "cixingnansheng" },
 ];
 
-// Custom News Icon component
-const NewsIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 1024 1024" className={className} fill="currentColor">
-    <path d="M146.285714 292.571429l585.142857 0 0 73.142857-585.142857 0 0-73.142857Z" />
-    <path d="M146.285714 475.428571l219.428571 0 0 256-219.428571 0 0-256Z" />
-    <path d="M438.857143 475.428571l292.571429 0 0 36.571429-292.571429 0 0-36.571429Z" />
-    <path d="M438.857143 585.142857l292.571429 0 0 36.571429-292.571429 0 0-36.571429Z" />
-    <path d="M438.857143 694.857143l292.571429 0 0 36.571429-292.571429 0 0-36.571429Z" />
-    <path d="M987.428571 292.571429l-109.714286 0L877.714286 109.714286c0-20.196571-16.356571-36.571429-36.571429-36.571429L36.571429 73.142857C16.3584 73.142857 0 89.517714 0 109.714286l0 804.571429c0 20.214857 16.356571 36.571429 36.571429 36.571429l950.857143 0c20.214857 0 36.571429-16.356571 36.571429-36.571429L1024 329.142857C1024 308.946286 1007.643429 292.571429 987.428571 292.571429zM804.571429 877.714286 73.142857 877.714286 73.142857 146.285714l731.428571 0L804.571429 877.714286zM950.857143 877.714286l-73.142857 0L877.714286 365.714286l73.142857 0L950.857143 877.714286z" />
-  </svg>
-);
-
 const cases = [
   {
     id: "case1",
     label: "News Broadcast",
     description: "Step 3 Model Release",
     audioTitle: "Step 3 Release",
-    icon: NewsIcon,
+    icon: "📰",
     gradient: "from-blue-400 to-cyan-400",
     text: voiceConfigs.case1.text,
     isDialogue: false,
@@ -58,7 +46,7 @@ const cases = [
     label: "Audiobook",
     description: "Mystery Story",
     audioTitle: "Midnight Letter",
-    icon: NewsIcon,
+    icon: "📖",
     gradient: "from-purple-400 to-pink-400",
     text: voiceConfigs.case2.text,
     isDialogue: false,
@@ -68,7 +56,7 @@ const cases = [
     label: "Customer Service",
     description: "AI Assistant Dialog",
     audioTitle: "Order Inquiry",
-    icon: NewsIcon,
+    icon: "🎧",
     gradient: "from-green-400 to-emerald-400",
     text: dialogueLines.map(line => `${line.speaker}: ${line.text}`).join("\n"),
     isDialogue: true,
@@ -307,9 +295,9 @@ const TextToSpeechTab = () => {
           >
             <span className={`
               w-6 h-6 rounded-[3px] bg-gradient-to-br ${caseItem.gradient} 
-              flex items-center justify-center text-xs shadow-sm text-white
+              flex items-center justify-center text-xs shadow-sm
             `}>
-              <caseItem.icon className="w-3.5 h-3.5" />
+              {caseItem.icon}
             </span>
             <span className="text-sm font-medium text-foreground">{caseItem.label}</span>
             <span className="text-muted-foreground/50">|</span>
