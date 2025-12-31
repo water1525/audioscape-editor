@@ -309,26 +309,30 @@ const TextToSpeechTab = () => {
 
       {/* Case Selector */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        {cases.map((caseItem) => (
-          <button
-            key={caseItem.id}
-            onClick={() => handleCaseChange(caseItem.id)}
-            className={`
-              flex items-center gap-2.5 px-4 py-2.5 rounded-[3px] border transition-all duration-200
-              ${activeCase === caseItem.id 
-                ? 'bg-white border-primary/50 shadow-md shadow-primary/10' 
-                : 'bg-white border-border/50 hover:border-border'
-              }
-            `}
-          >
-            {caseItem.icon === "news" && <NewsIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
-            {caseItem.icon === "book" && <BookIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
-            {caseItem.icon === "service" && <CustomerServiceIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
-            <span className={`text-sm font-medium ${caseItem.iconColor}`}>{caseItem.label}</span>
-            <span className="text-muted-foreground/50">|</span>
-            <span className={`text-sm ${caseItem.iconColor.replace('500', '400')}`}>{caseItem.description}</span>
-          </button>
-        ))}
+        {cases.map((caseItem) => {
+          const bgColorMap: Record<string, string> = {
+            "text-blue-500": "bg-blue-500 hover:bg-blue-600",
+            "text-pink-500": "bg-pink-500 hover:bg-pink-600",
+            "text-green-500": "bg-green-500 hover:bg-green-600",
+          };
+          const bgColor = bgColorMap[caseItem.iconColor] || "bg-primary hover:bg-primary/90";
+          return (
+            <button
+              key={caseItem.id}
+              onClick={() => handleCaseChange(caseItem.id)}
+              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-[3px] transition-all duration-200 shadow-sm hover:shadow-md ${bgColor} ${
+                activeCase === caseItem.id ? 'ring-2 ring-offset-2 ring-offset-white ring-current' : ''
+              }`}
+            >
+              {caseItem.icon === "news" && <NewsIcon className="w-6 h-6 text-white" />}
+              {caseItem.icon === "book" && <BookIcon className="w-6 h-6 text-white" />}
+              {caseItem.icon === "service" && <CustomerServiceIcon className="w-6 h-6 text-white" />}
+              <span className="text-sm font-medium text-white">{caseItem.label}</span>
+              <span className="text-white/50">|</span>
+              <span className="text-sm text-white/80">{caseItem.description}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Description and Play */}
