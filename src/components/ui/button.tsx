@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[3px] text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -19,13 +19,13 @@ const buttonVariants = cva(
         tabActive: "bg-primary text-primary-foreground shadow-soft",
         case: "bg-card text-muted-foreground border border-border hover:border-primary hover:text-foreground",
         caseActive: "bg-accent text-accent-foreground border border-primary",
-        play: "bg-primary/10 text-primary border border-primary/30 hover:bg-primary hover:text-primary-foreground rounded-md transition-all duration-200",
-        audioSquare: "bg-gradient-to-br from-primary/20 to-primary/5 text-primary border border-primary/20 hover:from-primary hover:to-primary/80 hover:text-primary-foreground rounded-lg shadow-sm hover:shadow-md hover:shadow-primary/20 transition-all duration-300",
+        play: "bg-primary/10 text-primary border border-primary/30 hover:bg-primary hover:text-primary-foreground transition-all duration-200",
+        audioSquare: "bg-gradient-to-br from-primary/20 to-primary/5 text-primary border border-primary/20 hover:from-primary hover:to-primary/80 hover:text-primary-foreground shadow-sm hover:shadow-md hover:shadow-primary/20 transition-all duration-300",
       },
       size: {
         default: "h-10 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-11 rounded-lg px-8",
+        sm: "h-8 px-3 text-xs",
+        lg: "h-11 px-8",
         icon: "h-10 w-10",
         iconSm: "h-8 w-8",
       },
