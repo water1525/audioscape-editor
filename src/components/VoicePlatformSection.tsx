@@ -32,10 +32,10 @@ const VoicePlatformSection = () => {
     <section className="bg-[#1246D9] py-20 px-4">
       {/* Header */}
       <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3 tracking-tight">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">
           Explore More Possibilities with AI Voice
         </h2>
-        <p className="text-muted-foreground text-base md:text-lg">
+        <p className="text-white text-base md:text-lg">
           Leading models and tools driving industry transformation
         </p>
       </div>
