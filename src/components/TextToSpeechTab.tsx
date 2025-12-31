@@ -340,7 +340,7 @@ const TextToSpeechTab = () => {
           Generate hyper-realistic speech with rich emotions and styles
         </p>
         <Button 
-          className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
+          className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
           onClick={handlePlayPause}
           disabled={isGenerating}
         >
