@@ -193,8 +193,8 @@ const handleConfirm = async () => {
             className={`
               px-3 py-1.5 text-sm rounded-[3px] border transition-all
               ${selectedTags.includes(tag)
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-card border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                ? "bg-[hsl(221,100%,43%)] text-white border-[hsl(221,100%,43%)]"
+                : "bg-card border-border text-muted-foreground hover:border-[hsl(221,100%,43%)]/50 hover:text-foreground"
               }
             `}
           >
@@ -375,7 +375,7 @@ const handleConfirm = async () => {
                 Cancel
               </Button>
               <Button
-                className="flex-1"
+                className="flex-1 bg-[#C23A2B] hover:bg-[#A83225] text-white"
                 onClick={handleConfirm}
                 disabled={isGenerating}
               >
