@@ -8,32 +8,32 @@ import { Headphones, MessageSquare, Megaphone, GraduationCap, Radio, Newspaper }
 
 // Sample texts for recording (~50 characters each, 10-30s reading time)
 const sampleTexts = [
-  "在这个快速发展的时代，科技改变了我们的生活方式，让我们能够更加便捷地与世界各地的人们进行交流和互动。",
-  "春天的阳光温暖而明媚，万物复苏的季节里，花朵竞相绽放，鸟儿在枝头歌唱，一切都显得生机勃勃。",
-  "人工智能技术正在深刻地改变着各行各业，从医疗诊断到自动驾驶，它的应用范围越来越广泛，影响着每个人的日常生活。",
-  "夜晚的城市灯火辉煌，高楼大厦的窗户里透出温暖的光芒，街道上车水马龙，人们匆匆忙忙地赶往各自的目的地。",
-  "音乐是一种无国界的语言，它能够跨越文化和地域的限制，触动每个人心中最柔软的部分，带来无尽的感动与共鸣。",
+  "In this rapidly evolving era, technology has transformed our way of life, enabling us to communicate and interact with people around the world more conveniently.",
+  "The warm spring sunshine brightens the day as flowers bloom and birds sing on the branches, everything appears full of vitality in this season of renewal.",
+  "Artificial intelligence technology is profoundly changing various industries, from medical diagnosis to autonomous driving, its applications are becoming increasingly widespread.",
+  "The city lights shine brilliantly at night, warm light emanates from the windows of tall buildings, while traffic flows through the streets as people hurry to their destinations.",
+  "Music is a universal language that transcends cultural and geographical boundaries, touching the softest part of everyone's heart and bringing endless emotion and resonance.",
 ];
 
 // Preset scenarios for quick generation
 const presetScenarios = [
-  { id: "news", icon: Newspaper, title: "新闻播报", subtitle: "Step 3模型发布", color: "text-emerald-500", bgColor: "bg-emerald-50", text: "最新消息，Step 3语音模型正式发布，支持多种情感风格的自然语音合成，为用户带来更加真实的语音体验。" },
-  { id: "audiobook", icon: Headphones, title: "有声读物", subtitle: "悬疑故事", color: "text-purple-500", bgColor: "bg-purple-50", text: "那个雨夜，他独自走在空无一人的街道上。突然，一道闪电划破夜空，他看到了一个神秘的身影站在街角。" },
-  { id: "service", icon: MessageSquare, title: "客服助手", subtitle: "智能客服对话", color: "text-orange-500", bgColor: "bg-orange-50", text: "您好，欢迎致电客户服务中心。我是您的智能客服助手，请问有什么可以帮助您的吗？" },
-  { id: "ad", icon: Megaphone, title: "广告配音", subtitle: "品牌宣传片", color: "text-pink-500", bgColor: "bg-pink-50", text: "探索无限可能，创造精彩未来。我们用科技改变生活，用创新定义明天。" },
-  { id: "education", icon: GraduationCap, title: "教育朗读", subtitle: "古诗词赏析", color: "text-blue-500", bgColor: "bg-blue-50", text: "床前明月光，疑是地上霜。举头望明月，低头思故乡。这首诗表达了诗人对故乡的深深思念之情。" },
-  { id: "radio", icon: Radio, title: "情感电台", subtitle: "深夜治愈", color: "text-red-500", bgColor: "bg-red-50", text: "在这个安静的夜晚，让我们一起放慢脚步，聆听内心的声音。愿你今夜好梦，明天依然充满希望。" },
+  { id: "news", icon: Newspaper, title: "News Broadcast", subtitle: "Step 3 Release", color: "text-emerald-500", bgColor: "bg-emerald-50", text: "Breaking news: Step 3 voice model is officially released, supporting natural speech synthesis with various emotional styles, bringing users a more realistic voice experience." },
+  { id: "audiobook", icon: Headphones, title: "Audiobook", subtitle: "Mystery Story", color: "text-purple-500", bgColor: "bg-purple-50", text: "On that rainy night, he walked alone on the empty street. Suddenly, a flash of lightning split the night sky, and he saw a mysterious figure standing at the corner." },
+  { id: "service", icon: MessageSquare, title: "Customer Service", subtitle: "AI Assistant", color: "text-orange-500", bgColor: "bg-orange-50", text: "Hello, welcome to our Customer Service Center. I am your intelligent customer service assistant. How may I help you today?" },
+  { id: "ad", icon: Megaphone, title: "Ad Voiceover", subtitle: "Brand Promo", color: "text-pink-500", bgColor: "bg-pink-50", text: "Explore infinite possibilities, create a brilliant future. We use technology to change lives and innovation to define tomorrow." },
+  { id: "education", icon: GraduationCap, title: "Education", subtitle: "Poetry Reading", color: "text-blue-500", bgColor: "bg-blue-50", text: "Before my bed, the moonlight gleams, like frost upon the ground it seems. I raise my head to watch the moon, then lower it, thinking of home." },
+  { id: "radio", icon: Radio, title: "Emotional Radio", subtitle: "Night Healing", color: "text-red-500", bgColor: "bg-red-50", text: "On this quiet night, let us slow down together and listen to the voice within. May you have sweet dreams tonight and still be filled with hope tomorrow." },
 ];
 
-const emotionTags = ["高兴", "愤怒", "悲伤", "幽默", "困惑", "厌恶", "共情", "尴尬", "恐惧", "惊讶", "兴奋", "沮丧", "冷漠", "钦佩"];
+const emotionTags = ["Happy", "Angry", "Sad", "Humorous", "Confused", "Disgusted", "Empathetic", "Embarrassed", "Fearful", "Surprised", "Excited", "Depressed", "Indifferent", "Admiring"];
 const styleTags = [
-  "严肃", "傲慢", "儿童", "单纯", "夸张", "少女", "御姐", "朗诵",
-  "甜美", "空灵", "豪爽", "撒娇", "温暖", "害羞", "安慰", "权威",
-  "闲聊", "电台", "深情", "温柔", "磁性", "中老年", "悄悄话",
-  "气泡音", "讲故事", "绘声绘色", "节目主持", "新闻播报", "广告营销",
-  "娱乐八卦", "吼叫", "小声", "大声", "低沉", "高亢"
+  "Serious", "Arrogant", "Childlike", "Innocent", "Exaggerated", "Girlish", "Mature", "Reciting",
+  "Sweet", "Ethereal", "Bold", "Coquettish", "Warm", "Shy", "Comforting", "Authoritative",
+  "Casual", "Radio", "Affectionate", "Gentle", "Magnetic", "Elderly", "Whispering",
+  "Bubbly", "Storytelling", "Vivid", "Hosting", "News Anchor", "Advertising",
+  "Gossip", "Shouting", "Soft", "Loud", "Deep", "High-pitched"
 ];
-const speedTags = ["快速", "慢速", "更快", "更慢"];
+const speedTags = ["Fast", "Slow", "Faster", "Slower"];
 
 export interface SentenceSegment {
   id: number;
@@ -156,10 +156,10 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
       setOriginalFileName(`${scenario.title}_${scenario.subtitle}.wav`);
       
       onAudioGenerated?.(url, `${scenario.title} - ${scenario.subtitle}`);
-      toast.success(`${scenario.title}音频生成成功`);
+      toast.success(`${scenario.title} audio generated successfully`);
     } catch (error) {
       console.error("Error generating preset audio:", error);
-      toast.error("音频生成失败，请重试");
+      toast.error("Audio generation failed, please try again");
       // Reset state on error
       setSentences([]);
       setAudioSource("none");
@@ -175,12 +175,12 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
     if (!file) return;
 
     if (!file.type.startsWith("audio/")) {
-      toast.error("请上传音频文件（mp3, wav等）");
+      toast.error("Please upload an audio file (mp3, wav, etc.)");
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      toast.error("文件大小不能超过10MB");
+      toast.error("File size cannot exceed 10MB");
       return;
     }
 
@@ -190,7 +190,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
     setOriginalFileName(file.name);
     setAudioSource("upload");
     setSentences([]);
-    toast.success("音频上传成功");
+    toast.success("Audio uploaded successfully");
   };
 
   // Start recording
@@ -212,7 +212,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
         const url = URL.createObjectURL(audioBlob);
         setOriginalAudioBlob(audioBlob);
         setOriginalAudioUrl(url);
-        setOriginalFileName(`录制_${Date.now()}.wav`);
+        setOriginalFileName(`Recording_${Date.now()}.wav`);
         setAudioSource("record");
         stream.getTracks().forEach(track => track.stop());
         
@@ -228,7 +228,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
         setSentences(newSentences);
         
         // Notify parent with the first audio
-        onAudioGenerated?.(url, "录制音频");
+        onAudioGenerated?.(url, "Recorded Audio");
       };
 
       mediaRecorder.start();
@@ -239,10 +239,10 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
         setCountdown((prev) => prev - 1);
       }, 1000);
 
-      toast.success("开始录制，请朗读文本");
+      toast.success("Recording started, please read the text");
     } catch (error) {
       console.error("Error accessing microphone:", error);
-      toast.error("无法访问麦克风，请检查权限设置");
+      toast.error("Cannot access microphone, please check permissions");
     }
   };
 
@@ -255,7 +255,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
         clearInterval(countdownIntervalRef.current);
         countdownIntervalRef.current = null;
       }
-      toast.success("录制完成");
+      toast.success("Recording completed");
     }
   }, [isRecording]);
 
@@ -371,10 +371,10 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
           }));
         }
         
-        toast.success(`全部 ${sentences.length} 个句子编辑成功`);
+        toast.success(`All ${sentences.length} sentences edited successfully`);
       } catch (error) {
         console.error("Error in batch generation:", error);
-        toast.error("批量编辑失败，请重试");
+        toast.error("Batch editing failed, please try again");
       } finally {
         setIsBatchGenerating(false);
         setIsBatchEdit(false);
@@ -433,10 +433,10 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
       }));
       
       // Do not call onAudioGenerated for sentence edits - we don't want to change the title
-      toast.success(`句子编辑成功，已应用 ${currentTags.length} 个风格标签`);
+      toast.success(`Sentence edited successfully, applied ${currentTags.length} style tags`);
     } catch (error) {
       console.error("Error generating edited audio:", error);
-      toast.error("音频编辑失败，请重试");
+      toast.error("Audio editing failed, please try again");
     } finally {
       setIsGenerating(false);
       setEditingSentenceId(null);
@@ -521,10 +521,10 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
               </div>
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">
-                  请选择音频文件，可直接录制
+                  Select an audio file or record directly
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  支持mp3/wav格式，限制时长10-30S
+                  Supports mp3/wav format, duration 10-30s
                 </p>
               </div>
               <div className="flex items-center gap-3 mt-2">
@@ -534,14 +534,14 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                   className="gap-2 font-semibold"
                 >
                   <Upload className="h-4 w-4" />
-                  上传音频
+                  Upload Audio
                 </Button>
                 <Button
                   onClick={startRecording}
                   className="gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
                 >
                   <Mic className="h-4 w-4" />
-                  开始录制
+                  Start Recording
                 </Button>
               </div>
             </div>
@@ -549,7 +549,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
 
           {/* Preset Scenarios */}
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">选择一个场景案例体验语音编辑</p>
+            <p className="text-sm text-muted-foreground">Select a scenario to experience voice editing</p>
             <div className="grid grid-cols-2 gap-3">
               {presetScenarios.map((scenario) => (
                 <button
@@ -585,7 +585,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
       {isRecording && (
         <div className="bg-primary/5 border border-primary/20 rounded-[3px] p-6">
           <p className="text-sm text-muted-foreground text-center mb-4">
-            请在安静环境下朗读以下文本，需录制10-30秒语音
+            Please read the following text in a quiet environment, record 10-30 seconds
           </p>
           
           <div className="flex items-center justify-center gap-2 mb-6">
@@ -626,10 +626,10 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
               disabled={countdown > 20}
               className="min-w-[120px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
             >
-              结束录制
+              Stop Recording
             </Button>
             {countdown > 20 && (
-              <p className="text-xs text-muted-foreground">录制至少10秒后可手动结束</p>
+              <p className="text-xs text-muted-foreground">Can stop manually after 10 seconds</p>
             )}
           </div>
         </div>
@@ -640,7 +640,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
       {/* Upload mode - show simple player */}
       {originalAudioUrl && audioSource === "upload" && (
         <div className="space-y-3">
-          <h3 className="text-sm font-medium text-foreground">上传的音频</h3>
+          <h3 className="text-sm font-medium text-foreground">Uploaded Audio</h3>
           <div className="relative group bg-gradient-to-br from-secondary via-secondary/80 to-secondary rounded-[3px] p-4 border border-border/50">
             <div className="relative flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -679,9 +679,9 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
           <div className="bg-card border border-border rounded-[3px] p-6 w-full max-w-lg shadow-elevated animate-scale-in mx-4">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-foreground">参数设置</h3>
+                <h3 className="text-lg font-semibold text-foreground">Parameter Settings</h3>
                 <p className="text-sm text-muted-foreground">
-                  {isBatchEdit ? `编辑全部 ${sentences.length} 个句子` : `编辑句子 ${editingSentenceId !== null ? editingSentenceId + 1 : ''}`}
+                  {isBatchEdit ? `Edit all ${sentences.length} sentences` : `Edit sentence ${editingSentenceId !== null ? editingSentenceId + 1 : ''}`}
                 </p>
               </div>
               <Button
@@ -705,7 +705,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
             {/* Tags Section */}
             <div className="space-y-4 mb-6 max-h-[400px] overflow-y-auto pr-2">
               <div>
-                <p className="text-sm font-medium text-foreground mb-2">情绪</p>
+                <p className="text-sm font-semibold text-foreground mb-2">Emotion</p>
                 <div className="flex flex-wrap gap-2">
                   {emotionTags.map((tag, i) => (
                     <span
@@ -724,7 +724,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
               </div>
 
               <div>
-                <p className="text-sm font-medium text-foreground mb-2">风格</p>
+                <p className="text-sm font-semibold text-foreground mb-2">Style</p>
                 <div className="flex flex-wrap gap-2">
                   {styleTags.map((tag, i) => (
                     <span
@@ -743,7 +743,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
               </div>
 
               <div>
-                <p className="text-sm font-medium text-foreground mb-2">速度控制</p>
+                <p className="text-sm font-semibold text-foreground mb-2">Speed Control</p>
                 <div className="flex flex-wrap gap-2">
                   {speedTags.map((tag, i) => (
                     <span
@@ -765,15 +765,15 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
             {/* Action Buttons */}
             <div className="flex items-center justify-end gap-3">
               <Button variant="outline" onClick={() => { setShowModal(false); setSelectedTags([]); setEditingSentenceId(null); setIsBatchEdit(false); }} className="font-semibold">
-                取消
+                Cancel
               </Button>
               <Button onClick={handleConfirm} disabled={isGenerating} className="bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold">
                 {isGenerating ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    生成中...
+                    Generating...
                   </>
-                ) : isBatchEdit ? "确认编辑全部" : "确认"}
+                ) : isBatchEdit ? "Confirm Edit All" : "Confirm"}
               </Button>
             </div>
           </div>
