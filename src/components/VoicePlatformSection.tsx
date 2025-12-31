@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { MessageSquareText, Mic2, Wand2 } from "lucide-react";
 import TextToSpeechTab from "@/components/TextToSpeechTab";
 import HomeVoiceCloneTab from "@/components/home/HomeVoiceCloneTab";
@@ -97,18 +95,6 @@ const VoicePlatformSection = () => {
 
           {/* Content Area */}
           <div className="p-6 md:p-8 flex-1">{renderTabContent()}</div>
-
-          {/* Footer CTA - now inside the card */}
-          <div className="flex flex-col items-center justify-center gap-4 py-8 px-2 border-t border-border/30">
-            <p className="text-lg font-semibold text-foreground">
-              Visit the Playground for full capabilities
-            </p>
-            <Link to="/playground">
-              <Button className="px-6 py-2.5 h-auto text-base font-semibold bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white shadow-lg shadow-[hsl(221,100%,43%)]/25 hover:shadow-xl hover:shadow-[hsl(221,100%,43%)]/30 transition-all duration-300">
-                Try Now
-              </Button>
-            </Link>
-          </div>
         </div>
       </div>
     </section>
