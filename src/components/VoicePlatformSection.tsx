@@ -104,7 +104,7 @@ const VoicePlatformSection = () => {
             Visit the Playground for full capabilities
           </p>
           <Link to="/playground">
-            <Button className="px-6 py-2.5 h-auto text-base font-semibold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300">
+            <Button className="px-6 py-2.5 h-auto text-base font-semibold bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white shadow-lg shadow-[hsl(221,100%,43%)]/25 hover:shadow-xl hover:shadow-[hsl(221,100%,43%)]/30 transition-all duration-300">
               Try Now
             </Button>
           </Link>
