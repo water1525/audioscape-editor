@@ -338,7 +338,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
                 <Button
                   onClick={stopRecording}
                   disabled={countdown > 5}
-                  className="min-w-[120px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
+                  className="min-w-[120px] bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-semibold shadow-md"
                 >
                   Stop Recording
                 </Button>
@@ -348,7 +348,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
               </div>
             ) : (
               <div className="flex justify-center">
-                <Button onClick={startRecording} className="min-w-[120px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold">
+                <Button onClick={startRecording} className="min-w-[120px] bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-semibold shadow-md">
                   Start Recording
                 </Button>
               </div>
@@ -425,7 +425,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
           <Button
             onClick={cloneVoice}
             disabled={isCloning}
-            className="min-w-[120px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
+            className="min-w-[120px] bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-semibold shadow-md"
           >
             {isCloning ? "Cloning..." : "Clone Voice"}
           </Button>
@@ -465,7 +465,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
             <Button variant="outline" onClick={() => setIsSaveDialogOpen(false)} className="font-semibold">
               Cancel
             </Button>
-            <Button onClick={handleSaveVoice} className="bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold">
+            <Button onClick={handleSaveVoice} className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-semibold shadow-md">
               Save
             </Button>
           </DialogFooter>
