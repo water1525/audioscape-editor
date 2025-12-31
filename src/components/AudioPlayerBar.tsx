@@ -69,7 +69,7 @@ const AudioPlayerBar = ({
     } catch (err) {
       console.error("Audio play failed:", err);
       setIsPlaying(false);
-      toast.error("音频播放失败，请重试");
+      toast.error("Audio playback failed, please try again");
     }
   };
 
@@ -133,7 +133,7 @@ const AudioPlayerBar = ({
         onEnded={() => setIsPlaying(false)}
         onError={() => {
           setIsPlaying(false);
-          toast.error("音频加载失败，请重新生成");
+          toast.error("Audio loading failed, please regenerate");
         }}
       />
 
@@ -142,10 +142,10 @@ const AudioPlayerBar = ({
           {/* Left: Title and Voice Info */}
           <div className="w-48 min-w-0 shrink-0">
             <p className="text-sm font-medium text-foreground truncate">
-              {title || "未命名音频"}
+              {title || "Untitled Audio"}
             </p>
             <p className="text-xs text-muted-foreground truncate">
-              {voiceName} · 刚刚生成
+              {voiceName} · Just generated
             </p>
           </div>
 
@@ -217,7 +217,7 @@ const AudioPlayerBar = ({
                 className="gap-1.5"
               >
                 <Save className="w-4 h-4" />
-                保存音色
+                Save Voice
               </Button>
             )}
 

@@ -213,7 +213,7 @@ const Playground = () => {
       // Network/relay errors still come through here
       if (error) {
         const status = (error as any)?.context?.status ?? (error as any)?.status;
-        const msg = (error as any)?.message || "音频生成失败";
+        const msg = (error as any)?.message || "Audio generation failed";
 
         if (
           status === 402 ||
