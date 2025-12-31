@@ -301,7 +301,7 @@ const TextToSpeechTab = () => {
   return (
     <div className="animate-fade-in">
       {/* Text Display Area */}
-      <div className="bg-card border border-border rounded-[3px] p-6 mb-4 min-h-[160px] shadow-soft">
+      <div className="bg-white border border-[#e5e0f5] rounded-[3px] p-6 mb-4 min-h-[160px] shadow-sm">
         <p className="text-foreground text-sm whitespace-pre-wrap leading-relaxed">
           {currentCase.text}
         </p>
@@ -314,10 +314,10 @@ const TextToSpeechTab = () => {
             key={caseItem.id}
             onClick={() => handleCaseChange(caseItem.id)}
             className={`
-              flex items-center gap-2.5 px-4 py-2.5 rounded-[3px] border transition-all duration-200
+              flex items-center gap-2.5 px-4 py-2.5 rounded-[3px] border transition-all duration-200 shadow-sm
               ${activeCase === caseItem.id 
-                ? 'bg-white border-primary/50 shadow-md shadow-primary/10' 
-                : 'bg-white border-border/50 hover:border-border'
+                ? 'bg-gradient-to-r from-[#f8f5ff] to-[#f0e8ff] border-[#c4b5fd]/50' 
+                : 'bg-white border-[#e5e0f5] hover:border-[#c4b5fd]/50'
               }
             `}
           >
@@ -338,7 +338,7 @@ const TextToSpeechTab = () => {
           Generate hyper-realistic speech with rich emotions and styles
         </p>
         <Button 
-          className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white shadow-lg shadow-[hsl(221,100%,43%)]/25 hover:shadow-xl hover:shadow-[hsl(221,100%,43%)]/30 transition-all duration-300"
+          className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-[#7c3aed] hover:bg-[#6d28d9] text-white shadow-lg shadow-[#7c3aed]/25 hover:shadow-xl hover:shadow-[#7c3aed]/30 transition-all duration-300"
           onClick={handlePlayPause}
           disabled={isGenerating}
         >
