@@ -43,7 +43,7 @@ const VoicePlatformSection = () => {
       <div className="max-w-4xl mx-auto flex flex-col" style={{ minHeight: 'calc(100vh - 200px)' }}>
         <div className="bg-white/80 border border-border/50 rounded-t-[3px] shadow-xl flex-1 flex flex-col">
           {/* Top Tabs */}
-          <div className="border-b border-border/30 bg-white/80 rounded-t-[3px]">
+          <div className="border-b border-border/30 bg-white rounded-t-[3px]">
             <div className="flex items-center">
               {tabs.map((tab, index) => {
                 const IconComponent = tab.icon;
