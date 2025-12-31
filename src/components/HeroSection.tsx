@@ -110,7 +110,7 @@ const HeroSection = () => {
             <button className="px-10 py-4 bg-[#AD0606] text-white font-semibold text-lg hover:bg-[#8B0505] transition-colors duration-200">
               Use now
             </button>
-            <button className="px-10 py-4 bg-white text-foreground font-semibold text-lg hover:bg-gray-100 transition-colors duration-200">
+            <button className="px-10 py-4 bg-white text-foreground text-lg hover:bg-gray-100 transition-colors duration-200">
               Introduction
             </button>
           </div>
