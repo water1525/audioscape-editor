@@ -69,7 +69,7 @@ const HomeVoiceEditTab = () => {
 
     audio.play().catch(() => {
       setIsPlaying(false);
-      toast.error("音频播放失败");
+      toast.error("Audio playback failed");
     });
     
     setIsPlaying(true);
