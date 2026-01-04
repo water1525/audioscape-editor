@@ -103,7 +103,7 @@ const HomeVoiceCloneTab = () => {
             {/* Name and Gender */}
             <div className="text-center">
               <span className="text-base font-medium text-foreground">{sample.name}</span>
-              <div className="text-sm text-muted-foreground">{sample.gender}</div>
+              <div className="text-lg font-bold text-foreground">{sample.gender}</div>
             </div>
 
             {/* Play Buttons */}
