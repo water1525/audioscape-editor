@@ -591,7 +591,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                     key={scenario.id}
                     onClick={() => handlePresetClick(scenario)}
                     disabled={isGeneratingPreset !== null}
-                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-[3px] ${bgColor} transition-all ${
+                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-[3px] ${bgColor} transition-all duration-200 font-hfterse ${
                       isGeneratingPreset === scenario.id ? "opacity-70" : ""
                     }`}
                   >
@@ -608,7 +608,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                       </>
                     )}
                     <span className={`font-medium text-sm ${scenario.color}`}>{scenario.title}</span>
-                    <span className="text-muted-foreground/50">|</span>
+                    <span className={`${scenario.color}/50`}>|</span>
                     <span className={`text-sm ${scenario.color}`}>{scenario.subtitle}</span>
                   </button>
                 );
