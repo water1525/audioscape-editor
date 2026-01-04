@@ -9,18 +9,18 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft hover:shadow-medium",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        default: "bg-primary text-primary-foreground hover:bg-primary/80",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "border border-input bg-background hover:bg-[#CCCCCC]",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/70",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         tab: "bg-transparent text-muted-foreground hover:bg-accent hover:text-foreground border border-border",
-        tabActive: "bg-primary text-primary-foreground shadow-soft",
+        tabActive: "bg-primary text-primary-foreground",
         case: "bg-card text-muted-foreground border border-border hover:border-primary hover:text-foreground",
         caseActive: "bg-accent text-accent-foreground border border-primary",
-        play: "bg-primary/10 text-primary border border-primary/30 hover:bg-primary hover:text-primary-foreground transition-all duration-200",
-        audioSquare: "bg-gradient-to-br from-primary/20 to-primary/5 text-primary border border-primary/20 hover:from-primary hover:to-primary/80 hover:text-primary-foreground shadow-sm hover:shadow-md hover:shadow-primary/20 transition-all duration-300",
+        play: "bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 transition-all duration-200",
+        audioSquare: "bg-gradient-to-br from-primary/20 to-primary/5 text-primary border border-primary/20 hover:from-primary/30 hover:to-primary/15 transition-all duration-300",
       },
       size: {
         default: "h-10 px-4 py-2",
