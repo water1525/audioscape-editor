@@ -8,19 +8,19 @@ import avatarFemale from "@/assets/avatar-female.png";
 import avatarMale from "@/assets/avatar-male.png";
 
 const FemaleIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="12" cy="8" r="5" stroke="#AD0606" strokeWidth="2"/>
-    <line x1="12" y1="13" x2="12" y2="21" stroke="#AD0606" strokeWidth="2"/>
-    <line x1="8" y1="17" x2="16" y2="17" stroke="#AD0606" strokeWidth="2"/>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="9" r="6" stroke="#AD0606" strokeWidth="2.5"/>
+    <line x1="12" y1="15" x2="12" y2="23" stroke="#AD0606" strokeWidth="2.5"/>
+    <line x1="8" y1="19" x2="16" y2="19" stroke="#AD0606" strokeWidth="2.5"/>
   </svg>
 );
 
 const MaleIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="10" cy="14" r="5" stroke="hsl(221, 100%, 43%)" strokeWidth="2"/>
-    <line x1="14" y1="10" x2="20" y2="4" stroke="hsl(221, 100%, 43%)" strokeWidth="2"/>
-    <line x1="15" y1="4" x2="20" y2="4" stroke="hsl(221, 100%, 43%)" strokeWidth="2"/>
-    <line x1="20" y1="4" x2="20" y2="9" stroke="hsl(221, 100%, 43%)" strokeWidth="2"/>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="9" cy="15" r="6" stroke="hsl(221, 100%, 43%)" strokeWidth="2.5"/>
+    <line x1="13.5" y1="10.5" x2="21" y2="3" stroke="hsl(221, 100%, 43%)" strokeWidth="2.5"/>
+    <line x1="15" y1="3" x2="21" y2="3" stroke="hsl(221, 100%, 43%)" strokeWidth="2.5"/>
+    <line x1="21" y1="3" x2="21" y2="9" stroke="hsl(221, 100%, 43%)" strokeWidth="2.5"/>
   </svg>
 );
 
