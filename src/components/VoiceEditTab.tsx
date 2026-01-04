@@ -36,7 +36,7 @@ const presetScenarios = [
   { id: "service", icon: "service" as const, title: "Customer Service", subtitle: "AI Assistant", color: "text-green-500", text: "Hello, welcome to our Customer Service Center. I am your intelligent customer service assistant. How may I help you today?" },
   { id: "ad", icon: "mic" as const, title: "Ad Voiceover", subtitle: "Brand Promo", color: "text-violet-500", text: "Explore infinite possibilities, create a brilliant future. We use technology to change lives and innovation to define tomorrow." },
   { id: "education", icon: "education" as const, title: "Education", subtitle: "Poetry Reading", color: "text-sky-500", text: "Before my bed, the moonlight gleams, like frost upon the ground it seems. I raise my head to watch the moon, then lower it, thinking of home." },
-  { id: "radio", icon: "sparkles" as const, title: "Emotional Radio", subtitle: "Late Night Healing", color: "text-amber-500", text: "On this quiet night, let us slow down together and listen to the voice within. May you have sweet dreams tonight and still be filled with hope tomorrow." },
+  { id: "radio", icon: "sparkles" as const, title: "Emotional Radio", subtitle: "Late Night Healing", color: "text-cyan-500", text: "On this quiet night, let us slow down together and listen to the voice within. May you have sweet dreams tonight and still be filled with hope tomorrow." },
 ];
 
 // Sample texts for recording (~50 characters each, 10-30s reading time)
@@ -582,6 +582,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                   "text-violet-500": "bg-violet-100 hover:bg-violet-200",
                   "text-sky-500": "bg-sky-100 hover:bg-sky-200",
                   "text-amber-500": "bg-amber-100 hover:bg-amber-200",
+                  "text-cyan-500": "bg-cyan-100 hover:bg-cyan-200",
                 };
                 const bgColor = bgColorMap[scenario.color] || "bg-primary/10 hover:bg-primary/20";
                 return (
