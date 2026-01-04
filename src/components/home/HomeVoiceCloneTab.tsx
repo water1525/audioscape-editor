@@ -16,6 +16,7 @@ interface VoiceSample {
   genderIcon: string;
   originalFile: string;
   clonedFile: string;
+  borderColor: string;
 }
 
 const voiceSamples: VoiceSample[] = [
@@ -26,6 +27,7 @@ const voiceSamples: VoiceSample[] = [
     genderIcon: iconFemale,
     originalFile: "voice-clone/cila-original.mp3",
     clonedFile: "voice-clone/cila-cloned.mp3",
+    borderColor: "border-[#AD0606]",
   },
   {
     id: "john",
@@ -34,6 +36,7 @@ const voiceSamples: VoiceSample[] = [
     genderIcon: iconMale,
     originalFile: "voice-clone/john-original.mp3",
     clonedFile: "voice-clone/john-cloned.mp3",
+    borderColor: "border-[hsl(221,100%,43%)]",
   },
 ];
 
@@ -93,7 +96,7 @@ const HomeVoiceCloneTab = () => {
           {voiceSamples.map((sample) => (
             <div
               key={sample.id}
-              className="flex flex-col items-center gap-3 bg-muted/50 rounded-[3px] px-8 py-6"
+              className={`flex flex-col items-center gap-3 bg-muted/50 rounded-[3px] px-8 py-6 border ${sample.borderColor}`}
             >
               {/* Avatar */}
               <div className="w-16 h-16 rounded-full overflow-hidden bg-background">
