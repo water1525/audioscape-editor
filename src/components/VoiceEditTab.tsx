@@ -751,20 +751,11 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
       {showModal && createPortal(
         <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm flex items-center justify-center z-[9999] animate-fade-in">
           <div className="bg-card border border-border rounded-[3px] p-6 w-full max-w-lg shadow-elevated animate-scale-in mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-semibold text-foreground">Parameter Settings</h3>
-                <p className="text-sm text-muted-foreground">
-                  {isBatchEdit ? `Edit all ${sentences.length} sentences` : `Edit sentence ${editingSentenceId !== null ? editingSentenceId + 1 : ''}`}
-                </p>
-              </div>
-              <Button
-                variant="ghost"
-                size="iconSm"
-                onClick={() => { setShowModal(false); setSelectedTags([]); setEditingSentenceId(null); setIsBatchEdit(false); }}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-foreground">Parameter Settings</h3>
+              <p className="text-sm text-muted-foreground">
+                {isBatchEdit ? `Edit all ${sentences.length} sentences` : `Edit sentence ${editingSentenceId !== null ? editingSentenceId + 1 : ''}`}
+              </p>
             </div>
 
             {/* Show sentence text being edited */}
