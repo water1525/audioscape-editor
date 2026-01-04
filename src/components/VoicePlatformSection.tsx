@@ -69,7 +69,7 @@ const VoicePlatformSection = () => {
                       }
                     `}>
                       <IconComponent className="w-4 h-4 transition-all duration-300" />
-                      <span className="text-sm tracking-wide transition-all duration-300" style={{ fontFamily: 'HFTerse, sans-serif' }}>
+                      <span className="text-sm tracking-wide transition-all duration-300">
                         {tab.label}
                       </span>
                     </div>
