@@ -1,17 +1,19 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause } from "lucide-react";
+import { Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useGlobalAudio } from "@/hooks/useGlobalAudio";
 import WaveformAnimation from "@/components/ui/WaveformAnimation";
 import avatarFemale from "@/assets/avatar-female.png";
 import avatarMale from "@/assets/avatar-male.png";
+import iconFemale from "@/assets/icon-female.svg";
+import iconMale from "@/assets/icon-male.svg";
 
 interface VoiceSample {
   id: string;
   name: string;
   avatar: string;
-  gender: string;
+  genderIcon: string;
   originalFile: string;
   clonedFile: string;
 }
@@ -21,7 +23,7 @@ const voiceSamples: VoiceSample[] = [
     id: "cila",
     name: "Cila",
     avatar: avatarFemale,
-    gender: "♀",
+    genderIcon: iconFemale,
     originalFile: "voice-clone/cila-original.mp3",
     clonedFile: "voice-clone/cila-cloned.mp3",
   },
@@ -29,7 +31,7 @@ const voiceSamples: VoiceSample[] = [
     id: "john",
     name: "John",
     avatar: avatarMale,
-    gender: "♂",
+    genderIcon: iconMale,
     originalFile: "voice-clone/john-original.mp3",
     clonedFile: "voice-clone/john-cloned.mp3",
   },
@@ -103,9 +105,9 @@ const HomeVoiceCloneTab = () => {
               </div>
               
               {/* Name and Gender */}
-              <div className="text-center">
+              <div className="flex flex-col items-center gap-1">
                 <span className="text-base font-medium text-foreground">{sample.name}</span>
-                <div className="text-lg font-bold text-foreground">{sample.gender}</div>
+                <img src={sample.genderIcon} alt="gender" className="w-5 h-5" />
               </div>
 
               {/* Play Buttons */}
