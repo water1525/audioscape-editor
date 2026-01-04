@@ -43,7 +43,7 @@ const voiceSamples: VoiceSample[] = [
     gender: "female",
     originalFile: "voice-clone/cila-original.mp3",
     clonedFile: "voice-clone/cila-cloned.mp3",
-    bgColor: "bg-[#F5F5F5] border border-[#AD0606]",
+    bgColor: "bg-[#F5F8FB]",
     roundedClass: "rounded-[3px]",
   },
   {
@@ -53,7 +53,7 @@ const voiceSamples: VoiceSample[] = [
     gender: "male",
     originalFile: "voice-clone/john-original.mp3",
     clonedFile: "voice-clone/john-cloned.mp3",
-    bgColor: "bg-[#F5F5F5] border border-[hsl(221,100%,43%)]",
+    bgColor: "bg-[#F5F8FB]",
     roundedClass: "rounded-[3px]",
   },
 ];
