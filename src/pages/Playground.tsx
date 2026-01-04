@@ -414,8 +414,8 @@ const Playground = () => {
                   onClick={() => handleTabChange(tab.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[3px] text-sm transition-all duration-200 ${
                     isActive
-                      ? "bg-primary/10 text-primary font-semibold"
-                      : "text-foreground font-semibold hover:bg-accent"
+                      ? "text-[hsl(221,100%,43%)] font-semibold"
+                      : "text-foreground hover:text-[hsl(221,100%,43%)]"
                   }`}
                 >
                   <IconComponent className="w-4 h-4" />
