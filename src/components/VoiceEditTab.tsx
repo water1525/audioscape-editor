@@ -672,7 +672,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
               <span className="text-sm text-muted-foreground ml-2">🎙️</span>
             </div>
             
-            <div className="text-4xl font-bold text-primary">{countdown}S</div>
+            <div className="text-4xl font-bold text-[hsl(221,100%,43%)]">{countdown}S</div>
             <Button
               onClick={stopRecording}
               disabled={countdown > 20}
