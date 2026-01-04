@@ -98,10 +98,10 @@ const SentenceItem = ({
           </div>
         </div>
       ) : (
-        <div className="absolute bottom-1.5 right-1.5 z-10 flex items-center gap-1">
+        <div className="absolute bottom-2 right-2 z-10 flex items-center gap-2">
           {/* Non-clickable "Edited" text label for edited sentences */}
           {sentence.isEdited && (
-            <span className="text-[10px] text-[hsl(221,100%,43%)] font-medium">
+            <span className="text-sm text-[hsl(221,100%,43%)] font-medium">
               Edited
             </span>
           )}
@@ -114,9 +114,9 @@ const SentenceItem = ({
                 e.stopPropagation();
                 onEdit(sentence.id);
               }}
-              className="h-5 w-5 bg-white hover:bg-[#CCCCCC] border-border"
+              className="h-7 w-7 bg-white hover:bg-[#CCCCCC] border-border"
             >
-              <PencilEditIcon className="h-3 w-3" />
+              <PencilEditIcon className="h-4 w-4" />
             </Button>
           )}
         </div>
