@@ -540,7 +540,7 @@ const Playground = () => {
                           <button
                             key={sample.id}
                             onClick={() => handleCaseClick(sample)}
-                            className={`group flex items-center gap-2 px-4 py-2.5 rounded-[3px] ${bgColor} transition-all duration-200`}
+                            className={`group flex items-center gap-2 px-4 py-2.5 rounded-[3px] ${bgColor} transition-all duration-200 font-hfterse`}
                           >
                             {sample.icon === "news" && <NewsIcon className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
                             {sample.icon === "book" && <BookIcon className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}

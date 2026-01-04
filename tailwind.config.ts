@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         'hero-title': ['"Barlow Condensed"', 'sans-serif'],
         'hero-subtitle': ['"Oswald"', 'sans-serif'],
+        'hfterse': ['"HFTerse"', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
