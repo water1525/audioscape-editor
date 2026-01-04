@@ -270,8 +270,10 @@ const TextToSpeechTab = () => {
   };
 
   const handlePlayPause = async () => {
-    if (audioRef.current && isPlaying) {
+    if (isPlaying && audioRef.current) {
+      stopGlobalAudio();
       audioRef.current.pause();
+      audioRef.current = null;
       setIsPlaying(false);
       return;
     }
@@ -349,7 +351,7 @@ const TextToSpeechTab = () => {
           {isGenerating ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : isPlaying ? (
-            <WaveformAnimation isPlaying={true} variant="small" barCount={3} className="text-primary-foreground [&>div]:bg-primary-foreground" />
+            <WaveformAnimation isPlaying={true} variant="small" barCount={3} className="[&>div]:bg-white" />
           ) : (
             <Play className="h-4 w-4" />
           )}
