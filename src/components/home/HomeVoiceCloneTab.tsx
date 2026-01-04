@@ -87,70 +87,65 @@ const HomeVoiceCloneTab = () => {
       {/* Combined Card with Voice Samples and Description */}
       <div className="rounded-[3px] bg-white px-8 py-6">
         {/* Voice Sample Cards */}
-        <div className="flex items-center justify-center gap-12">
-          {voiceSamples.map((sample, index) => (
-            <>
-              <div
-                key={sample.id}
-                className="flex flex-col items-center gap-3"
-              >
-                {/* Avatar */}
-                <div className="w-16 h-16 rounded-full overflow-hidden bg-background">
-                  <img
-                    src={sample.avatar}
-                    alt={sample.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                
-                {/* Name and Gender */}
-                <div className="text-center">
-                  <span className="text-base font-medium text-foreground">{sample.name}</span>
-                  <div className="text-lg font-bold text-foreground">{sample.gender}</div>
-                </div>
-
-                {/* Play Buttons */}
-                <div className="flex flex-col w-full overflow-hidden rounded-[3px]">
-                  <Button
-                    variant="default"
-                    className="w-full gap-2 h-12 rounded-none bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white"
-                    onClick={() => handlePlay(sample.id, "original")}
-                  >
-                    {playingId === `${sample.id}-original` ? (
-                      <>
-                        <WaveformAnimation isPlaying={true} variant="small" barCount={4} className="[&>div]:bg-white" />
-                        <span className="ml-1">{sample.name} Original</span>
-                      </>
-                    ) : (
-                      <>
-                        <Play className="h-4 w-4" />
-                        {sample.name} Original
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    variant="default"
-                    className="w-full gap-2 h-12 rounded-none bg-[#AD0606] hover:bg-[#8a0505] text-white"
-                    onClick={() => handlePlay(sample.id, "cloned")}
-                  >
-                    {playingId === `${sample.id}-cloned` ? (
-                      <>
-                        <WaveformAnimation isPlaying={true} variant="small" barCount={4} className="[&>div]:bg-white" />
-                        <span className="ml-1">{sample.name} Cloned</span>
-                      </>
-                    ) : (
-                      <>
-                        <Play className="h-4 w-4" />
-                        {sample.name} Cloned
-                      </>
-                    )}
-                  </Button>
-                </div>
+        <div className="flex items-center justify-center gap-8">
+          {voiceSamples.map((sample) => (
+            <div
+              key={sample.id}
+              className="flex flex-col items-center gap-3 bg-muted/50 rounded-[3px] px-8 py-6"
+            >
+              {/* Avatar */}
+              <div className="w-16 h-16 rounded-full overflow-hidden bg-background">
+                <img
+                  src={sample.avatar}
+                  alt={sample.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
-              {index < voiceSamples.length - 1 && (
-                <div className="h-48 w-px bg-border/50 self-center" />
-              )}
-            </>
+              
+              {/* Name and Gender */}
+              <div className="text-center">
+                <span className="text-base font-medium text-foreground">{sample.name}</span>
+                <div className="text-lg font-bold text-foreground">{sample.gender}</div>
+              </div>
+
+              {/* Play Buttons */}
+              <div className="flex flex-col w-full overflow-hidden rounded-[3px]">
+                <Button
+                  variant="default"
+                  className="w-full gap-2 h-12 rounded-none bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white"
+                  onClick={() => handlePlay(sample.id, "original")}
+                >
+                  {playingId === `${sample.id}-original` ? (
+                    <>
+                      <WaveformAnimation isPlaying={true} variant="small" barCount={4} className="[&>div]:bg-white" />
+                      <span className="ml-1">{sample.name} Original</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4" />
+                      {sample.name} Original
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="default"
+                  className="w-full gap-2 h-12 rounded-none bg-[#AD0606] hover:bg-[#8a0505] text-white"
+                  onClick={() => handlePlay(sample.id, "cloned")}
+                >
+                  {playingId === `${sample.id}-cloned` ? (
+                    <>
+                      <WaveformAnimation isPlaying={true} variant="small" barCount={4} className="[&>div]:bg-white" />
+                      <span className="ml-1">{sample.name} Cloned</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4" />
+                      {sample.name} Cloned
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
           ))}
         </div>
 
