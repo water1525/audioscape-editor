@@ -213,61 +213,52 @@ const handleConfirm = async () => {
       </div>
 
       {/* Original audio card */}
-      <div className="bg-white/90 border border-border/30 rounded-[3px] overflow-hidden">
-        <div className="flex items-stretch">
-          <div className="flex-1 flex items-center gap-3 p-4">
-            <button
-              type="button"
-              onClick={handlePlayPause}
-              className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center transition-colors hover:bg-primary/20"
-              aria-label={isPlaying ? "Pause" : "Play"}
-            >
-              {isPlaying ? (
-                <Pause className="h-5 w-5 text-primary" />
-              ) : (
-                <Play className="h-5 w-5 text-primary ml-0.5" />
-              )}
-            </button>
-
-            {/* Audio waveform */}
-            <WaveformAnimation 
-              isPlaying={isPlaying} 
-              variant="default" 
-              barCount={8} 
-              className="mx-2"
-            />
-
-            <div className="ml-2">
-              <p className="text-sm font-medium text-foreground">Star Adventure.wav</p>
-              <p className="text-xs text-muted-foreground">Duration 00:10</p>
-            </div>
-          </div>
-
-          <button 
-            className="w-32 flex items-center justify-center gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold transition-colors disabled:opacity-50"
-            onClick={() => setShowModal(true)}
-            disabled={isGenerating}
+      <div className="bg-white border border-border/30 rounded-[3px] flex items-stretch overflow-hidden">
+        <div className="flex-1 flex items-center gap-3 p-4">
+          <button
+            type="button"
+            onClick={handlePlayPause}
+            className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center transition-colors hover:bg-primary/20"
+            aria-label={isPlaying ? "Pause" : "Play"}
           >
-            {isGenerating ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm">Generating</span>
-              </>
+            {isPlaying ? (
+              <Pause className="h-5 w-5 text-primary" />
             ) : (
-              <>
-                <ArrowRight className="h-4 w-4" />
-                <span className="text-sm">Edit</span>
-              </>
+              <Play className="h-5 w-5 text-primary ml-0.5" />
             )}
           </button>
+
+          {/* Audio waveform */}
+          <WaveformAnimation 
+            isPlaying={isPlaying} 
+            variant="default" 
+            barCount={8} 
+            className="mx-2"
+          />
+
+          <div className="ml-2">
+            <p className="text-sm font-medium text-foreground">Star Adventure.wav</p>
+            <p className="text-xs text-muted-foreground">Duration 00:10</p>
+          </div>
         </div>
 
-        {/* Description inside card with opaque white background */}
-        <div className="bg-white px-4 py-3 border-t border-border/20">
-          <p className="text-sm text-muted-foreground">
-            <span className="text-foreground font-medium">@Step-Audio-EditX</span> Edit emotion, style, and speed of original audio
-          </p>
-        </div>
+        <button 
+          className="w-32 flex items-center justify-center gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold transition-colors disabled:opacity-50"
+          onClick={() => setShowModal(true)}
+          disabled={isGenerating}
+        >
+          {isGenerating ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm">Generating</span>
+            </>
+          ) : (
+            <>
+              <ArrowRight className="h-4 w-4" />
+              <span className="text-sm">Edit</span>
+            </>
+          )}
+        </button>
       </div>
 
       {/* Edited audio - only show when available */}
@@ -332,6 +323,9 @@ const handleConfirm = async () => {
         </>
       )}
 
+      <p className="text-sm text-muted-foreground">
+        <span className="text-foreground font-medium">@Step-Audio-EditX</span> Edit emotion, style, and speed of original audio
+      </p>
 
       {/* Parameter settings modal */}
       {showModal && createPortal(
