@@ -647,7 +647,6 @@ const Playground = () => {
                   </SelectTrigger>
                   <SelectContent className="bg-popover">
                     <SelectGroup>
-                      <SelectLabel className="text-xs text-muted-foreground">System Voices</SelectLabel>
                       {voiceOptions.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
                           {option.label}
