@@ -9,7 +9,7 @@ const PlaygroundCTASection = () => {
           Visit the Playground for full capabilities
         </h2>
         <Link to="/playground">
-          <Button className="px-12 py-3 h-auto text-base font-semibold bg-[#AD0606] hover:bg-[#8a0505] text-white rounded-[3px] shadow-lg transition-all duration-300">
+          <Button className="px-12 py-3 h-auto text-base font-semibold bg-[#AD0606] hover:bg-[#8a0505] text-white rounded-[3px] transition-all duration-300">
             Try now
           </Button>
         </Link>

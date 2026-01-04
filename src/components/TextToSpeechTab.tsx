@@ -344,7 +344,7 @@ const TextToSpeechTab = () => {
       {/* Play Button */}
       <div className="flex items-center justify-end">
         <Button 
-          className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white shadow-lg shadow-[hsl(221,100%,43%)]/25 hover:shadow-xl hover:shadow-[hsl(221,100%,43%)]/30 transition-all duration-300"
+          className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white transition-all duration-300"
           onClick={handlePlayPause}
           disabled={isGenerating}
         >

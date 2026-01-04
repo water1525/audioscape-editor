@@ -125,7 +125,7 @@ const AudioPlayerBar = ({
   if (!isVisible || (!audioUrl && !isGenerating)) return null;
 
   return (
-    <div className="fixed bottom-0 left-56 right-0 z-50 bg-card border-t border-l border-border shadow-lg rounded-tl-[3px]">
+    <div className="fixed bottom-0 left-56 right-0 z-50 bg-card border-t border-l border-border rounded-tl-[3px]">
       <audio
         ref={audioRef}
         src={audioUrl}
