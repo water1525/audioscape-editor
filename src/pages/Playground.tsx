@@ -557,7 +557,7 @@ const Playground = () => {
                             {sample.icon === "education" && <GraduationCap className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
                             {sample.icon === "sparkles" && <Sparkles className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
                             <span className={`font-medium text-sm ${sample.iconColor}`}>{sample.title}</span>
-                            <span className="text-muted-foreground/50">|</span>
+                            <span className={`${sample.iconColor}/50`}>|</span>
                             <span className={`text-sm ${sample.iconColor}`}>{sample.description}</span>
                           </button>
                         );
