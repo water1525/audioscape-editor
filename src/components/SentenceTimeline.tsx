@@ -121,12 +121,6 @@ const SentenceItem = ({
         </div>
       )}
 
-      {/* Generating indicator */}
-      {isGenerating && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/60">
-          <Loader2 className="w-4 h-4 animate-spin text-primary" />
-        </div>
-      )}
 
       {/* Playing indicator - bottom left */}
       {isPlaying && !isGenerating && !isHovered && (
