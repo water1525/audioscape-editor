@@ -314,7 +314,7 @@ const handleConfirm = async () => {
                 setEditedAudioUrl(null);
                 toast.success("Edited audio deleted");
               }}
-              className="w-16 flex items-center justify-center text-muted-foreground hover:bg-red-400 hover:text-white transition-colors group"
+              className="w-16 flex items-center justify-center text-muted-foreground hover:bg-[#AD0606] hover:text-white transition-colors"
               aria-label="Delete"
             >
               <Trash2 className="h-5 w-5" />
