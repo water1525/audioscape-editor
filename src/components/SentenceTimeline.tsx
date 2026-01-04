@@ -550,7 +550,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
           {/* Delete button */}
           {onDelete && (
             <Button
-              variant="ghost"
+              variant="outline"
               size="icon"
               onClick={onDelete}
               disabled={isBatchGenerating}
