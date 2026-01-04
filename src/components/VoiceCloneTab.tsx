@@ -314,7 +314,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
         <h3 className="text-sm font-medium text-foreground">Step 1: Record Audio</h3>
         
         {!recordedAudioUrl ? (
-          <div className="bg-primary/5 border border-primary/20 rounded-[3px] p-6">
+          <div className="bg-secondary/50 border border-border rounded-[3px] p-6">
             <p className="text-sm text-muted-foreground text-center mb-4">
               Please read the following text in a quiet environment, recording 5-10 seconds
             </p>
