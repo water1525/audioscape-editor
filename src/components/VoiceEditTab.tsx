@@ -687,7 +687,29 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
         </div>
       )}
 
-      {/* Action buttons are now in SentenceTimeline */}
+      {/* Large centered waveform when sentences exist (preset/record mode) */}
+      {sentences.length > 0 && audioSource === "record" && !isRecording && (
+        <div className="flex items-center justify-center min-h-[300px]">
+          <div className="flex items-end justify-center gap-1 h-40 w-[600px] max-w-full">
+            {Array.from({ length: 60 }, (_, i) => {
+              const centerDistance = Math.abs(i - 30) / 30;
+              const baseHeight = 30 + Math.sin(i * 0.3) * 25 + Math.cos(i * 0.5) * 15;
+              const height = baseHeight * (1 - centerDistance * 0.3);
+              return (
+                <div
+                  key={i}
+                  className="w-2 bg-primary/30 rounded-sm animate-pulse"
+                  style={{
+                    height: `${height}%`,
+                    animationDelay: `${i * 0.03}s`,
+                    animationDuration: '1.5s',
+                  }}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Upload mode - show simple player */}
       {originalAudioUrl && audioSource === "upload" && (
