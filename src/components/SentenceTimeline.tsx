@@ -503,7 +503,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
               size="sm"
               onClick={onEditAll}
               disabled={isBatchGenerating}
-              className="h-8 gap-1.5 shrink-0 text-muted-foreground"
+              className="h-8 gap-1.5 shrink-0 text-foreground"
             >
               {isBatchGenerating ? (
                 <>
@@ -526,7 +526,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
               size="icon"
               onClick={onDelete}
               disabled={isBatchGenerating}
-              className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+              className="h-8 w-8 text-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
             >
               <DeleteIcon className="h-4 w-4" />
             </Button>
