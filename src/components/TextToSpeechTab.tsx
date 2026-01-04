@@ -322,7 +322,7 @@ const TextToSpeechTab = () => {
             <button
               key={caseItem.id}
               onClick={() => handleCaseChange(caseItem.id)}
-              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-[3px] transition-all duration-200 ${bgColor} ${
+              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-[3px] transition-all duration-200 font-hfterse ${bgColor} ${
                 activeCase === caseItem.id ? 'ring-1 ring-white ring-offset-1' : ''
               }`}
             >
@@ -330,7 +330,7 @@ const TextToSpeechTab = () => {
               {caseItem.icon === "book" && <BookIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
               {caseItem.icon === "service" && <CustomerServiceIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
               <span className={`text-sm font-medium ${caseItem.iconColor}`}>{caseItem.label}</span>
-              <span className="text-muted-foreground/50">|</span>
+              <span className={`${caseItem.iconColor}/50`}>|</span>
               <span className={`text-sm ${caseItem.iconColor}`}>{caseItem.description}</span>
             </button>
           );
