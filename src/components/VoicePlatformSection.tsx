@@ -30,7 +30,7 @@ const VoicePlatformSection = () => {
   };
 
   return (
-    <section className="relative min-h-screen px-4 pt-20 pb-20 overflow-hidden flex flex-col" style={{ backgroundImage: `url(${voicePlatformBg})`, backgroundSize: 'cover', backgroundPosition: 'left bottom' }}>
+    <section className="relative px-4 pt-20 pb-16 overflow-hidden" style={{ backgroundImage: `url(${voicePlatformBg})`, backgroundSize: 'cover', backgroundPosition: 'left bottom' }}>
       {/* Header */}
       <div className="text-center mb-12">
         <h2 className="text-3xl md:text-4xl font-medium text-white mb-3 tracking-tight" style={{ fontFamily: 'HFTerse, sans-serif' }}>
@@ -42,8 +42,8 @@ const VoicePlatformSection = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto flex flex-col flex-1">
-        <div className="bg-white/90 rounded-[3px] flex-1 flex flex-col">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white/90 rounded-[3px]">
           {/* Top Tabs */}
           <div className="bg-white rounded-t-[3px]">
             <div className="flex items-center">
@@ -82,16 +82,16 @@ const VoicePlatformSection = () => {
           </div>
 
           {/* Content Area */}
-          <div className="p-6 md:p-8 flex-1">{renderTabContent()}</div>
+          <div className="p-6 md:p-8">{renderTabContent()}</div>
         </div>
 
-        {/* CTA Section - integrated from PlaygroundCTASection */}
-        <div className="mt-8 flex flex-col items-center justify-center gap-6">
-          <h3 className="text-2xl md:text-3xl font-medium text-white text-center tracking-tight" style={{ fontFamily: 'HFTerse, sans-serif' }}>
+        {/* CTA Section - integrated at bottom */}
+        <div className="mt-10 flex flex-col items-center justify-center gap-5 pb-4">
+          <h3 className="text-xl md:text-2xl font-medium text-white text-center tracking-tight" style={{ fontFamily: 'HFTerse, sans-serif' }}>
             Visit the Playground for full capabilities
           </h3>
           <Link to="/playground">
-            <Button className="px-12 py-3 h-auto text-base font-semibold bg-[#AD0606] hover:bg-[#8a0505] text-white rounded-[3px] transition-all duration-300">
+            <Button className="px-10 py-2.5 h-auto text-base font-semibold bg-[#AD0606] hover:bg-[#8a0505] text-white rounded-[3px] transition-all duration-300">
               Try now
             </Button>
           </Link>
