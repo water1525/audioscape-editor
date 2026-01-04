@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Upload, Mic, RefreshCw, X, Loader2, ChevronLeft, ChevronRight, Pencil, Sparkles } from "lucide-react";
+import { Play, Pause, Upload, Mic, RefreshCw, X, Loader2, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import DeleteIcon from "@/components/ui/DeleteIcon";
 import { toast } from "sonner";
 

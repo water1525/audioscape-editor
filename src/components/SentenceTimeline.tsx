@@ -6,7 +6,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { ChevronLeft, ChevronRight, Loader2, PenLine, Pencil } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { PencilEditIcon } from "@/components/ui/TabIcons";
 import DeleteIcon from "@/components/ui/DeleteIcon";
 import { Button } from "@/components/ui/button";
 import { SentenceSegment } from "@/components/VoiceEditTab";
@@ -115,7 +116,7 @@ const SentenceItem = ({
               }}
               className="h-5 w-5 bg-white hover:bg-[#CCCCCC] border-border"
             >
-              <PenLine className="h-3 w-3" />
+              <PencilEditIcon className="h-3 w-3" />
             </Button>
           )}
         </div>
@@ -539,7 +540,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
                 </>
               ) : (
                 <>
-                  <Pencil className="h-3.5 w-3.5" />
+                  <PencilEditIcon className="h-3.5 w-3.5" />
                   Edit All
                 </>
               )}
