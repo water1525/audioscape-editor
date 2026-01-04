@@ -67,10 +67,10 @@ const SentenceItem = ({
         relative flex-shrink-0 w-[220px] h-20 rounded-[3px] cursor-pointer
         transition-all duration-200 overflow-hidden group
         ${isSelected || isPlaying
-          ? "bg-primary/10"
+          ? "bg-[#F5F8FB]"
           : sentence.isEdited
-            ? "bg-primary/5 hover:bg-primary/10"
-            : "bg-secondary/50 hover:bg-secondary/70"
+            ? "bg-[#F5F8FB] hover:bg-[#EBF0F5]"
+            : "bg-[#F5F8FB] hover:bg-[#EBF0F5]"
         }
       `}
     >
