@@ -244,7 +244,7 @@ const handleConfirm = async () => {
         </div>
 
         <button 
-          className="w-32 flex items-center justify-center gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold transition-colors disabled:opacity-50"
+          className="group w-32 flex items-center justify-center gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold transition-colors disabled:opacity-50"
           onClick={() => setShowModal(true)}
           disabled={isGenerating}
         >
@@ -255,7 +255,7 @@ const handleConfirm = async () => {
             </>
           ) : (
             <>
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity -mr-2 group-hover:mr-0" />
               <span className="text-sm">Edit</span>
             </>
           )}
