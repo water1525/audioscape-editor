@@ -559,13 +559,12 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
           {onDelete && (
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={onDelete}
               disabled={isBatchGenerating}
-              className="h-8 text-destructive/60 hover:text-destructive hover:bg-destructive/10 gap-1.5 shrink-0"
+              className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
             >
               <Trash2 className="h-4 w-4" />
-              Delete
             </Button>
           )}
         </div>
