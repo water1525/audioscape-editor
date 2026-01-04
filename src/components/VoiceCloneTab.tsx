@@ -406,7 +406,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
           <div className="absolute bottom-3 right-3 flex items-center gap-2">
             <button
               onClick={generateAITargetText}
-              className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
+              className="flex items-center gap-1 text-[hsl(221,100%,43%)] hover:text-[hsl(221,100%,30%)] transition-colors"
             >
               <Sparkles className="h-3.5 w-3.5" />
               <span className="text-xs font-medium">AI</span>
