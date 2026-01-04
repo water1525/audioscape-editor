@@ -297,7 +297,7 @@ const handleConfirm = async () => {
                 <p className="text-sm font-medium text-foreground">Star Adventure_edited.wav</p>
                 <div className="flex items-center gap-2">
                   <p className="text-xs text-muted-foreground">Duration 00:10</p>
-                  <span className="text-xs text-primary font-medium">Edited</span>
+                  <span className="text-xs text-[hsl(221,100%,43%)] font-medium">Edited</span>
                 </div>
               </div>
             </div>
