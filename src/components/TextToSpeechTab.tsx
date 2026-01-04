@@ -321,7 +321,7 @@ const TextToSpeechTab = () => {
               key={caseItem.id}
               onClick={() => handleCaseChange(caseItem.id)}
               className={`flex items-center gap-2.5 px-4 py-2.5 rounded-[3px] transition-all duration-200 ${bgColor} ${
-                activeCase === caseItem.id ? 'ring-1 ring-white ring-offset-1' : ''
+                activeCase === caseItem.id ? 'ring-2 ring-white ring-offset-2' : ''
               }`}
             >
               {caseItem.icon === "news" && <NewsIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
