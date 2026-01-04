@@ -361,7 +361,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-10 w-10 rounded-[3px] bg-primary/10 text-[hsl(221,100%,43%)]"
+                  className="h-10 w-10 rounded-[3px] bg-[hsl(187,70%,90%)] text-[hsl(187,70%,55%)]"
                 onClick={togglePlayRecorded}
               >
                 {isPlayingRecorded ? (
