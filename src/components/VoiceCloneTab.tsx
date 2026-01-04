@@ -423,15 +423,13 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
 
       {/* Clone Button */}
       {recordedAudioUrl && targetText.trim() && (
-        <div className="flex justify-center">
-          <Button
-            onClick={cloneVoice}
-            disabled={isCloning}
-            className="min-w-[120px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
-          >
-            {isCloning ? "Cloning..." : "Clone Voice"}
-          </Button>
-        </div>
+        <Button
+          onClick={cloneVoice}
+          disabled={isCloning}
+          className="w-full bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
+        >
+          {isCloning ? "Cloning..." : "Clone Voice"}
+        </Button>
       )}
 
 
