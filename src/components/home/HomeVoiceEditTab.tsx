@@ -244,7 +244,7 @@ const handleConfirm = async () => {
         </div>
 
         <button 
-          className="w-32 flex items-center justify-center gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold transition-colors disabled:opacity-50"
+          className="group w-32 flex items-center justify-center gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold transition-all disabled:opacity-50"
           onClick={() => setShowModal(true)}
           disabled={isGenerating}
         >
@@ -255,8 +255,8 @@ const handleConfirm = async () => {
             </>
           ) : (
             <>
-              <ArrowRight className="h-4 w-4" />
-              <span className="text-sm">Edit</span>
+              <ArrowRight className="h-4 w-4 hidden group-hover:block" />
+              <span className="text-base">Edit</span>
             </>
           )}
         </button>
@@ -324,11 +324,9 @@ const handleConfirm = async () => {
         </>
       )}
 
-      <div className="bg-white rounded-[3px] px-4 py-3">
-        <p className="text-sm text-muted-foreground">
-          <span className="text-foreground font-medium">@Step-Audio-EditX</span> Edit emotion, style, and speed of original audio
-        </p>
-      </div>
+      <p className="text-sm text-muted-foreground">
+        <span className="text-foreground font-medium">@Step-Audio-EditX</span> Edit emotion, style, and speed of original audio
+      </p>
 
       {/* Parameter settings modal */}
       {showModal && createPortal(
