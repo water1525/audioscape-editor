@@ -358,18 +358,17 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
         ) : (
           <div className="bg-card border border-border rounded-[3px] p-4">
             <div className="flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 rounded-full bg-primary/10 text-primary"
-                onClick={togglePlayRecorded}
-              >
-                {isPlayingRecorded ? (
-                  <Pause className="h-4 w-4" />
-                ) : (
-                  <Play className="h-4 w-4" />
-                )}
-              </Button>
+                <button
+                  type="button"
+                  onClick={togglePlayRecorded}
+                  className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center transition-colors hover:bg-primary/20 text-primary"
+                >
+                  {isPlayingRecorded ? (
+                    <Pause className="h-4 w-4" />
+                  ) : (
+                    <Play className="h-4 w-4" />
+                  )}
+                </button>
               {isPlayingRecorded && (
                 <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
               )}
