@@ -577,7 +577,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                 </Button>
                 <Button
                   onClick={startRecording}
-                  className="gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
+                  className="gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
                 >
                   <Mic className="h-4 w-4" />
                   Start Recording
@@ -676,7 +676,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
             <Button
               onClick={stopRecording}
               disabled={countdown > 20}
-              className="min-w-[120px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
+              className="min-w-[120px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
             >
               Stop Recording
             </Button>

@@ -505,7 +505,7 @@ const Playground = () => {
                   <div className="mb-6 flex justify-center">
                     <Button
                       onClick={handleGenerateClick}
-                      className="gap-2 h-11 px-12 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
+                      className="gap-2 h-11 px-12 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
                     >
                       Generate Audio
                     </Button>
@@ -517,7 +517,7 @@ const Playground = () => {
                   <div className="mb-6 flex justify-center">
                     <Button
                       disabled
-                      className="gap-2 h-11 px-12 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
+                      className="gap-2 h-11 px-12 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
                     >
                       <RefreshCw className="w-4 h-4 animate-spin" />
                       Generating...
@@ -531,7 +531,7 @@ const Playground = () => {
                     <Button
                       onClick={handleGenerateClick}
                       disabled={isGenerating || !text.trim()}
-                      className="gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
+                      className="gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
                     >
                       <RefreshCw className="w-4 h-4" />
                       Regenerate
