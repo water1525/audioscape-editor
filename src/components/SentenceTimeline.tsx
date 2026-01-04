@@ -66,15 +66,20 @@ const SentenceItem = ({
         relative flex-shrink-0 w-[220px] h-20 rounded-[3px] cursor-pointer
         transition-all duration-200 overflow-hidden group
         ${isSelected || isPlaying
-          ? "bg-primary/20 ring-2 ring-primary"
+          ? "bg-primary/10"
           : sentence.isEdited
-            ? "bg-primary/10 hover:bg-primary/15"
-            : "bg-secondary/80 hover:bg-secondary"
+            ? "bg-primary/5 hover:bg-primary/10"
+            : "bg-secondary/50 hover:bg-secondary/70"
         }
       `}
     >
-      {/* Text at top */}
-      <div className="absolute top-2 left-2 right-2 z-10">
+      {/* Waveform at top center - larger and more prominent */}
+      <div className="absolute top-2 left-0 right-0 flex items-end justify-center gap-0.5 px-4 h-8">
+        {generateWaveformBars(25, isSelected || isPlaying)}
+      </div>
+
+      {/* Text at bottom */}
+      <div className="absolute bottom-2 left-2 right-10 z-10">
         <p
           className={`text-xs line-clamp-2 leading-tight ${
             isSelected || isPlaying
@@ -84,11 +89,6 @@ const SentenceItem = ({
         >
           {sentence.text}
         </p>
-      </div>
-
-      {/* Waveform in middle area */}
-      <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-0.5 px-2 h-6">
-        {generateWaveformBars(20, isSelected || isPlaying)}
       </div>
 
       {/* Edit button / loading / edited state - positioned at bottom right */}
@@ -104,20 +104,20 @@ const SentenceItem = ({
         <div className="absolute bottom-1.5 right-1.5 z-10 flex items-center gap-1">
           {/* Non-clickable "Edited" badge for edited sentences */}
           {sentence.isEdited && (
-            <span className="h-5 px-1.5 text-[10px] bg-primary text-primary-foreground rounded-[3px] flex items-center">
+            <span className="h-5 px-1.5 text-[10px] bg-[hsl(221,100%,43%)] text-white rounded-[3px] flex items-center">
               Edited
             </span>
           )}
           {/* Pencil edit button - show on hover or selected */}
           {(isHovered || isSelected) && !isGenerating && (
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit(sentence.id);
               }}
-              className="h-5 w-5 bg-background/90 hover:bg-background"
+              className="h-5 w-5 bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground"
             >
               <PenLine className="h-3 w-3" />
             </Button>
