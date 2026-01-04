@@ -6,14 +6,29 @@ import { useGlobalAudio } from "@/hooks/useGlobalAudio";
 import WaveformAnimation from "@/components/ui/WaveformAnimation";
 import avatarFemale from "@/assets/avatar-female.png";
 import avatarMale from "@/assets/avatar-male.png";
-import iconFemale from "@/assets/icon-female.svg";
-import iconMale from "@/assets/icon-male.svg";
+
+const FemaleIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="8" r="5" stroke="#AD0606" strokeWidth="2"/>
+    <line x1="12" y1="13" x2="12" y2="21" stroke="#AD0606" strokeWidth="2"/>
+    <line x1="8" y1="17" x2="16" y2="17" stroke="#AD0606" strokeWidth="2"/>
+  </svg>
+);
+
+const MaleIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10" cy="14" r="5" stroke="hsl(221, 100%, 43%)" strokeWidth="2"/>
+    <line x1="14" y1="10" x2="20" y2="4" stroke="hsl(221, 100%, 43%)" strokeWidth="2"/>
+    <line x1="15" y1="4" x2="20" y2="4" stroke="hsl(221, 100%, 43%)" strokeWidth="2"/>
+    <line x1="20" y1="4" x2="20" y2="9" stroke="hsl(221, 100%, 43%)" strokeWidth="2"/>
+  </svg>
+);
 
 interface VoiceSample {
   id: string;
   name: string;
   avatar: string;
-  genderIcon: string;
+  gender: "female" | "male";
   originalFile: string;
   clonedFile: string;
   bgColor: string;
@@ -25,7 +40,7 @@ const voiceSamples: VoiceSample[] = [
     id: "cila",
     name: "Cila",
     avatar: avatarFemale,
-    genderIcon: iconFemale,
+    gender: "female",
     originalFile: "voice-clone/cila-original.mp3",
     clonedFile: "voice-clone/cila-cloned.mp3",
     bgColor: "bg-[#F5F5F5] border border-[#AD0606]",
@@ -35,7 +50,7 @@ const voiceSamples: VoiceSample[] = [
     id: "john",
     name: "John",
     avatar: avatarMale,
-    genderIcon: iconMale,
+    gender: "male",
     originalFile: "voice-clone/john-original.mp3",
     clonedFile: "voice-clone/john-cloned.mp3",
     bgColor: "bg-[#F5F5F5] border border-[hsl(221,100%,43%)]",
@@ -113,7 +128,7 @@ const HomeVoiceCloneTab = () => {
               {/* Name and Gender */}
               <div className="flex flex-col items-center gap-1">
                 <span className="text-base font-medium text-foreground">{sample.name}</span>
-                <img src={sample.genderIcon} alt="gender" className="w-5 h-5" />
+                {sample.gender === "female" ? <FemaleIcon /> : <MaleIcon />}
               </div>
 
               {/* Play Buttons */}
