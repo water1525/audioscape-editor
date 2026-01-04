@@ -86,10 +86,6 @@ const SentenceItem = ({
         </p>
       </div>
 
-      {/* Waveform in middle area */}
-      <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-0.5 px-2 h-6">
-        {generateWaveformBars(20, isSelected || isPlaying)}
-      </div>
 
       {/* Edit button / loading / edited state - positioned at bottom right */}
       {isEditGenerating ? (
