@@ -87,7 +87,7 @@ const HomeVoiceCloneTab = () => {
       {/* Combined Card with Voice Samples and Description */}
       <div className="rounded-[3px] bg-white px-8 py-6">
         {/* Voice Sample Cards */}
-        <div className="flex items-start justify-center gap-12">
+        <div className="flex items-start justify-center gap-12 divide-x divide-border/50 [&>*]:px-12 [&>*:first-child]:pl-0 [&>*:last-child]:pr-0">
           {voiceSamples.map((sample) => (
             <div
               key={sample.id}
