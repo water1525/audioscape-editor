@@ -29,7 +29,7 @@ const WaveformAnimation = ({
         {[...Array(barCount)].map((_, i) => (
           <div
             key={i}
-            className={cn(`${barWidth} rounded-full ${colorClass} opacity-40`)}
+            className={cn(`${barWidth} ${colorClass} opacity-40`)}
             style={{ height: `${30 + (i % 3) * 20}%` }}
           />
         ))}
@@ -43,7 +43,7 @@ const WaveformAnimation = ({
         <div
           key={i}
           className={cn(
-            `${barWidth} rounded-full ${colorClass} animate-waveform`,
+            `${barWidth} ${colorClass} animate-waveform`,
             "origin-center"
           )}
           style={{ 

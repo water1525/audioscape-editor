@@ -130,7 +130,7 @@ const SentenceItem = ({
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="w-0.5 bg-primary rounded-full animate-pulse"
+                className="w-0.5 bg-primary animate-pulse"
                 style={{
                   height: `${6 + i * 2}px`,
                   animationDelay: `${i * 0.1}s`,
@@ -392,7 +392,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
         return (
           <div
             key={i}
-            className={`w-0.5 rounded-full transition-colors ${
+            className={`w-0.5 transition-colors ${
               isActive ? "bg-primary/60" : "bg-muted-foreground/30"
             }`}
             style={{ height: `${height}%` }}

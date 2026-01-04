@@ -661,7 +661,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                 {[...Array(20)].map((_, i) => (
                   <div
                     key={i}
-                    className="w-1 bg-primary rounded-full animate-pulse"
+                    className="w-1 bg-primary animate-pulse"
                     style={{
                       height: `${Math.random() * 20 + 10}px`,
                       animationDelay: `${i * 0.05}s`,
@@ -722,7 +722,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                   {Array.from({ length: 15 }, (_, i) => (
                     <div
                       key={i}
-                      className="w-0.5 bg-current opacity-40 rounded-full"
+                      className="w-0.5 bg-current opacity-40"
                       style={{ height: `${20 + Math.random() * 30}%` }}
                     />
                   ))}
