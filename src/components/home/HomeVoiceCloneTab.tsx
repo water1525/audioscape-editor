@@ -84,12 +84,12 @@ const HomeVoiceCloneTab = () => {
 
   return (
     <div className="animate-fade-in space-y-6">
-      {/* Voice Sample Cards - unified layout */}
-      <div className="flex items-start justify-center gap-12 py-6">
+      {/* Voice Sample Cards */}
+      <div className="flex items-start justify-center gap-6">
         {voiceSamples.map((sample) => (
           <div
             key={sample.id}
-            className="flex flex-col items-center gap-3"
+            className="flex flex-col items-center gap-3 rounded-[3px] border border-border/50 bg-white px-8 py-6"
           >
             {/* Avatar */}
             <div className="w-16 h-16 rounded-full overflow-hidden bg-background">
@@ -147,7 +147,7 @@ const HomeVoiceCloneTab = () => {
         ))}
       </div>
 
-      {/* Description - 80% opacity white background */}
+      {/* Description */}
       <p className="text-left text-sm text-muted-foreground">
         <span className="text-foreground font-medium">@Step-tts-2</span> Generate voice clones that sound identical to the original
       </p>

@@ -645,9 +645,9 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
               {sampleText}
             </p>
             <Button
-              variant="outline"
+              variant="ghost"
               size="icon"
-              className="h-8 w-8 shrink-0 bg-white hover:bg-[#CCCCCC] border-border"
+              className="h-8 w-8 shrink-0"
               onClick={generateRandomText}
               disabled={isRecording}
             >
