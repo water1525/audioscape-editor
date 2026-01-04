@@ -669,7 +669,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                   />
                 ))}
               </div>
-              <span className="text-sm text-muted-foreground ml-2">🎙️</span>
+              <MicrophoneIcon className="h-5 w-5 text-primary ml-2" />
             </div>
             
             <div className="text-4xl font-bold text-[hsl(221,100%,43%)]">{countdown}S</div>
