@@ -248,10 +248,10 @@ const handleConfirm = async () => {
           disabled={isGenerating}
         >
           {isGenerating ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="text-sm">Generating</span>
-            </>
+            <div className="flex flex-col items-center justify-center gap-1">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span className="text-xs">Generating</span>
+            </div>
           ) : (
             <>
               <ArrowRight className="h-4 w-4" />
