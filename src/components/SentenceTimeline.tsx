@@ -101,7 +101,7 @@ const SentenceItem = ({
         <div className="absolute bottom-2 right-2 z-10 flex items-center gap-2">
           {/* Non-clickable "Edited" text label for edited sentences */}
           {sentence.isEdited && (
-            <span className="text-sm text-[hsl(221,100%,43%)] font-medium">
+            <span className="text-sm text-[hsl(221,100%,43%)] font-semibold">
               Edited
             </span>
           )}
@@ -141,34 +141,6 @@ const SentenceItem = ({
         </div>
       )}
 
-      {/* Version navigation for edited sentences */}
-      {sentence.isEdited && sentence.versions.length > 1 && isSelected && !isHovered && (
-        <div className="absolute bottom-0.5 right-0.5 flex items-center gap-0.5">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onNavigateVersion(sentence.id, "prev");
-            }}
-            disabled={sentence.currentVersionIndex <= 0}
-            className="h-4 w-4 flex items-center justify-center rounded-[3px] bg-background/80 text-muted-foreground hover:text-foreground disabled:opacity-30"
-          >
-            <ChevronLeft className="h-2.5 w-2.5" />
-          </button>
-          <span className="text-[8px] text-muted-foreground">
-            {sentence.currentVersionIndex + 1}/{sentence.versions.length}
-          </span>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onNavigateVersion(sentence.id, "next");
-            }}
-            disabled={sentence.currentVersionIndex >= sentence.versions.length - 1}
-            className="h-4 w-4 flex items-center justify-center rounded-[3px] bg-background/80 text-muted-foreground hover:text-foreground disabled:opacity-30"
-          >
-            <ChevronRight className="h-2.5 w-2.5" />
-          </button>
-        </div>
-      )}
     </div>
   );
 };
@@ -531,7 +503,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
               size="sm"
               onClick={onEditAll}
               disabled={isBatchGenerating}
-              className="h-8 gap-1.5 shrink-0"
+              className="h-8 gap-1.5 shrink-0 font-semibold"
             >
               {isBatchGenerating ? (
                 <>
