@@ -520,7 +520,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
       {audioSource === "none" && !isRecording && (
         <div className="space-y-6">
           {/* Upload/Record Section */}
-          <div className="bg-primary/5 border border-primary/20 rounded-[3px] p-8">
+          <div className="bg-[#F5F8FB] border border-border rounded-[3px] p-8">
             <div className="flex flex-col items-center gap-4">
               <div className="relative">
                 <svg 
@@ -635,7 +635,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
 
       {/* Recording State */}
       {isRecording && (
-        <div className="bg-primary/5 border border-primary/20 rounded-[3px] p-6">
+        <div className="bg-[#F5F8FB] border border-border rounded-[3px] p-6">
           <p className="text-sm text-muted-foreground text-center mb-4">
             Please read the following text in a quiet environment, record 10-30 seconds
           </p>
