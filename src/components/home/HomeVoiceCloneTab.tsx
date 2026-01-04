@@ -28,8 +28,8 @@ const voiceSamples: VoiceSample[] = [
     genderIcon: iconFemale,
     originalFile: "voice-clone/cila-original.mp3",
     clonedFile: "voice-clone/cila-cloned.mp3",
-    bgColor: "bg-[#FFECEC]",
-    roundedClass: "rounded-l-[3px] rounded-r-none",
+    bgColor: "bg-[#F5F5F5] border border-[#AD0606]",
+    roundedClass: "rounded-[3px]",
   },
   {
     id: "john",
@@ -38,8 +38,8 @@ const voiceSamples: VoiceSample[] = [
     genderIcon: iconMale,
     originalFile: "voice-clone/john-original.mp3",
     clonedFile: "voice-clone/john-cloned.mp3",
-    bgColor: "bg-[#ECF0FF]",
-    roundedClass: "rounded-r-[3px] rounded-l-none",
+    bgColor: "bg-[#F5F5F5] border border-[hsl(221,100%,43%)]",
+    roundedClass: "rounded-[3px]",
   },
 ];
 
@@ -95,7 +95,7 @@ const HomeVoiceCloneTab = () => {
       {/* Combined Card with Voice Samples and Description */}
       <div className="rounded-[3px] bg-white px-8 py-6">
         {/* Voice Sample Cards */}
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center gap-4">
           {voiceSamples.map((sample) => (
             <div
               key={sample.id}
