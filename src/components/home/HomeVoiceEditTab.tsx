@@ -266,17 +266,16 @@ const handleConfirm = async () => {
         <>
           {/* Edited audio label */}
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-primary" />
-            <p className="text-sm text-muted-foreground">Edited Audio</p>
+            <p className="text-sm text-foreground font-semibold">Edited Audio</p>
           </div>
 
           {/* Edited audio card */}
-          <div className="bg-primary/5 border border-primary/20 rounded-[3px] p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          <div className="bg-white border border-border/30 rounded-[3px] flex items-stretch overflow-hidden">
+            <div className="flex-1 flex items-center gap-3 p-4">
               <button
                 type="button"
                 onClick={handlePlayEditedPause}
-                className="w-12 h-12 rounded-full flex items-center justify-center transition-colors bg-primary/20 hover:bg-primary/30"
+                className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center transition-colors hover:bg-primary/20"
                 aria-label={isPlayingEdited ? "Pause" : "Play"}
               >
                 {isPlayingEdited ? (
@@ -286,13 +285,13 @@ const handleConfirm = async () => {
                 )}
               </button>
 
-            {/* Audio waveform */}
-            <WaveformAnimation 
-              isPlaying={isPlayingEdited} 
-              variant="primary" 
-              barCount={8} 
-              className="mx-2"
-            />
+              {/* Audio waveform */}
+              <WaveformAnimation 
+                isPlaying={isPlayingEdited} 
+                variant="default" 
+                barCount={8} 
+                className="mx-2"
+              />
 
               <div className="ml-2">
                 <p className="text-sm font-medium text-foreground">Star Adventure_edited.wav</p>
@@ -315,7 +314,7 @@ const handleConfirm = async () => {
                 setEditedAudioUrl(null);
                 toast.success("Edited audio deleted");
               }}
-              className="p-2 rounded-[3px] text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+              className="w-32 flex items-center justify-center gap-2 bg-muted hover:bg-muted/80 text-muted-foreground transition-colors"
               aria-label="Delete"
             >
               <Trash2 className="h-4 w-4" />
