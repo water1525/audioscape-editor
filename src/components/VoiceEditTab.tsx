@@ -698,7 +698,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
               return (
                 <div
                   key={i}
-                  className="flex-1 bg-primary/30 rounded-sm animate-pulse"
+                  className="flex-1 bg-[hsl(221,100%,43%)]/30 animate-pulse"
                   style={{
                     height: `${height}%`,
                     animationDelay: `${i * 0.03}s`,
