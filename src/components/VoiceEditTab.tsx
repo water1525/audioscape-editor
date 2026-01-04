@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Upload, Mic, RefreshCw, Trash2, X, Loader2, ChevronLeft, ChevronRight, Pencil, GraduationCap, Sparkles } from "lucide-react";
+import { Play, Pause, Upload, Mic, RefreshCw, X, Loader2, ChevronLeft, ChevronRight, Pencil, GraduationCap, Sparkles } from "lucide-react";
+import DeleteIcon from "@/components/ui/DeleteIcon";
 import { toast } from "sonner";
 
 // Custom News Icon component (matching homepage/playground)
@@ -702,7 +703,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                 className="h-8 w-8 text-destructive/60 hover:text-destructive hover:bg-destructive/10"
                 onClick={deleteAudio}
               >
-                <Trash2 className="h-4 w-4" />
+                <DeleteIcon className="h-4 w-4" />
               </Button>
             </div>
           </div>

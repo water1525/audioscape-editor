@@ -2,7 +2,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Play, Pause, RefreshCw, Trash2, Sparkles, Save } from "lucide-react";
+import { Play, Pause, RefreshCw, Sparkles, Save } from "lucide-react";
+import DeleteIcon from "@/components/ui/DeleteIcon";
 import { toast } from "sonner";
 import WaveformAnimation from "@/components/ui/WaveformAnimation";
 import {
@@ -384,7 +385,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
                 className="h-8 w-8 text-muted-foreground hover:text-destructive"
                 onClick={deleteRecordedAudio}
               >
-                <Trash2 className="h-4 w-4" />
+                <DeleteIcon className="h-4 w-4" />
               </Button>
             </div>
           </div>
