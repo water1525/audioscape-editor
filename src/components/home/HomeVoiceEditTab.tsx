@@ -361,7 +361,7 @@ const handleConfirm = async () => {
             </div>
 
 
-            <div className="flex gap-3 mt-4">
+            <div className="flex mt-4">
               <Button
                 variant="outline"
                 className="flex-1 font-semibold"
