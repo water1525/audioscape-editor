@@ -324,9 +324,11 @@ const handleConfirm = async () => {
         </>
       )}
 
-      <p className="text-sm text-muted-foreground">
-        <span className="text-foreground font-medium">@Step-Audio-EditX</span> Edit emotion, style, and speed of original audio
-      </p>
+      <div className="bg-white rounded-[3px] px-4 py-3">
+        <p className="text-sm text-muted-foreground">
+          <span className="text-foreground font-medium">@Step-Audio-EditX</span> Edit emotion, style, and speed of original audio
+        </p>
+      </div>
 
       {/* Parameter settings modal */}
       {showModal && createPortal(
