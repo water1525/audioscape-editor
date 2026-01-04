@@ -765,7 +765,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                       onClick={() => toggleTag(tag)}
                       className={`px-3 py-1 text-xs rounded-[3px] cursor-pointer transition-colors ${
                         selectedTags.includes(tag)
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-[hsl(221,100%,43%)] text-white"
                           : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
                       }`}
                     >
@@ -784,7 +784,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                       onClick={() => toggleTag(tag)}
                       className={`px-3 py-1 text-xs rounded-[3px] cursor-pointer transition-colors ${
                         selectedTags.includes(tag)
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-[hsl(221,100%,43%)] text-white"
                           : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
                       }`}
                     >
@@ -803,7 +803,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                       onClick={() => toggleTag(tag)}
                       className={`px-3 py-1 text-xs rounded-[3px] cursor-pointer transition-colors ${
                         selectedTags.includes(tag)
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-[hsl(221,100%,43%)] text-white"
                           : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
                       }`}
                     >
@@ -815,11 +815,11 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-3">
-              <Button variant="outline" onClick={() => { setShowModal(false); setSelectedTags([]); setEditingSentenceId(null); setIsBatchEdit(false); }} className="font-semibold">
+            <div className="flex">
+              <Button variant="outline" onClick={() => { setShowModal(false); setSelectedTags([]); setEditingSentenceId(null); setIsBatchEdit(false); }} className="flex-1 font-semibold rounded-r-none">
                 Cancel
               </Button>
-              <Button onClick={handleConfirm} disabled={isGenerating} className="bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold">
+              <Button onClick={handleConfirm} disabled={isGenerating} className="flex-1 bg-[#C23A2B] hover:bg-[#A83225] text-white font-semibold rounded-l-none">
                 {isGenerating ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
