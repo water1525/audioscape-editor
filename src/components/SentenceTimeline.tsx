@@ -88,16 +88,16 @@ const SentenceItem = ({
       </div>
 
 
-      {/* Edit button / loading / edited state - positioned at bottom right */}
-      {isEditGenerating ? (
-        // Show loading state during generation
-        <div className="absolute bottom-1.5 right-1.5 z-10">
-          <div className="h-5 px-1.5 text-[10px] bg-[hsl(221,100%,43%)] text-white rounded-[3px] flex items-center gap-1">
-            <Loader2 className="h-3 w-3 animate-spin" />
-            <span>Generating</span>
-          </div>
+      {/* Full-width generating bar at bottom */}
+      {isEditGenerating && (
+        <div className="absolute bottom-0 left-0 right-0 h-8 bg-[hsl(221,100%,43%)] flex items-center justify-center gap-2 z-20">
+          <Loader2 className="h-4 w-4 text-white animate-spin" />
+          <span className="text-sm text-white font-medium">Generating</span>
         </div>
-      ) : (
+      )}
+
+      {/* Edit button / edited state - positioned at bottom right */}
+      {!isEditGenerating && (
         <div className="absolute bottom-2 right-2 z-10 flex items-center gap-2">
           {/* Non-clickable "Edited" text label for edited sentences */}
           {sentence.isEdited && (
