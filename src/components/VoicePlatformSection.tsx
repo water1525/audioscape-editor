@@ -41,7 +41,7 @@ const VoicePlatformSection = () => {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto flex flex-col" style={{ minHeight: 'calc(100vh - 200px)' }}>
-        <div className="bg-white/90 rounded-t-[3px] shadow-xl flex-1 flex flex-col">
+        <div className="bg-white/90 rounded-t-[3px] flex-1 flex flex-col">
           {/* Top Tabs */}
           <div className="bg-white rounded-t-[3px]">
             <div className="flex items-center">

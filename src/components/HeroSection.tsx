@@ -25,8 +25,7 @@ const HeroWaveform = () => {
       const baseHeight = Math.max(12, 80 - distanceFromCenter * 3);
       return <div key={i} className="w-[3px] rounded-full bg-[hsl(var(--hero-accent))] waveform-bar" style={{
         height: `${baseHeight}px`,
-        animationDelay: `${i * 0.04}s`,
-        boxShadow: '0 0 8px hsl(195 100% 50% / 0.7), 0 0 16px hsl(195 100% 50% / 0.4)'
+        animationDelay: `${i * 0.04}s`
       }} />;
     })}
     </div>;
@@ -47,8 +46,7 @@ const HeroParticles = () => {
         left: `calc(50% + ${Math.cos(angle) * radius}px)`,
         top: `calc(50% + ${Math.sin(angle) * radius}px)`,
         animation: `particle-float 2s ease-in-out infinite`,
-        animationDelay: `${delay}s`,
-        boxShadow: '0 0 10px hsl(195 100% 50% / 0.8), 0 0 20px hsl(195 100% 50% / 0.4)'
+        animationDelay: `${delay}s`
       }} />;
     })}
       {/* Center glow */}
