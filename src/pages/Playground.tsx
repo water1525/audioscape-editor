@@ -378,7 +378,7 @@ const Playground = () => {
               <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Documentation
               </a>
-              <Link to="/playground" className="flex items-center gap-1 text-sm text-primary font-medium">
+              <Link to="/playground" className="flex items-center gap-1 text-sm text-[hsl(221,100%,43%)] font-medium">
                 Playground
                 <ChevronDown size={14} />
               </Link>
