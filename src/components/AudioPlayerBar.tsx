@@ -186,7 +186,7 @@ const AudioPlayerBar = ({
                 onClick={() => skipTime(10)}
                 className="p-2 text-[hsl(221,100%,43%)] hover:text-[hsl(221,100%,38%)] transition-colors"
               >
-                <SkipForward10Icon className="w-12 h-12" />
+                <SkipForward10Icon className="w-7 h-7" />
               </button>
             )}
           </div>
