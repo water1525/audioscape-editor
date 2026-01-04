@@ -51,6 +51,14 @@ const CustomerServiceIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// Custom Microphone Icon component for Ad Voiceover
+const MicrophoneIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 1024 1024" className={className} fill="currentColor">
+    <path d="M469.632 808.064A341.376 341.376 0 0 1 170.666667 469.333333h85.333333a256 256 0 0 0 256 256h1.749333A256 256 0 0 0 768 469.333333h85.333333a341.376 341.376 0 0 1-298.368 338.645334l0.426667 130.56-85.333333 0.256-0.426667-130.730667zM512 128a85.333333 85.333333 0 0 0-85.333333 85.333333v256a85.333333 85.333333 0 1 0 170.666666 0V213.333333a85.333333 85.333333 0 0 0-85.333333-85.333333z m0-85.333333a170.666667 170.666667 0 0 1 170.666667 170.666666v256a170.666667 170.666667 0 1 1-341.333334 0V213.333333a170.666667 170.666667 0 0 1 170.666667-170.666666z" />
+    <path d="M341.333333 981.333333v-85.333333h341.333334v85.333333z" />
+  </svg>
+);
+
 const sidebarTabs = [
   { id: "tts", label: "Text to Speech", icon: MessageSquareText },
   { id: "clone", label: "Voice Clone", icon: Copy },
@@ -545,7 +553,7 @@ const Playground = () => {
                             {sample.icon === "news" && <NewsIcon className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
                             {sample.icon === "book" && <BookIcon className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
                             {sample.icon === "service" && <CustomerServiceIcon className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
-                            {sample.icon === "mic" && <Mic className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
+                            {sample.icon === "mic" && <MicrophoneIcon className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
                             {sample.icon === "education" && <GraduationCap className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
                             {sample.icon === "sparkles" && <Sparkles className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
                             <span className={`font-medium text-sm ${sample.iconColor}`}>{sample.title}</span>
