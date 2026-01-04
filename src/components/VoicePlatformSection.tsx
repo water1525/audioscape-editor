@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { MessageSquareText, Mic2, Wand2 } from "lucide-react";
 import TextToSpeechTab from "@/components/TextToSpeechTab";
 import HomeVoiceCloneTab from "@/components/home/HomeVoiceCloneTab";
 import HomeVoiceEditTab from "@/components/home/HomeVoiceEditTab";
 import voicePlatformBg from "@/assets/voice-platform-bg.png";
+import { TTSIcon, CloneIcon, EditIcon } from "@/components/ui/TabIcons";
 
 const tabs = [
-  { id: "tts", label: "Text to Speech", icon: MessageSquareText },
-  { id: "clone", label: "Voice Clone", icon: Mic2 },
-  { id: "edit", label: "Voice Edit", icon: Wand2 },
+  { id: "tts", label: "Text to Speech", icon: TTSIcon },
+  { id: "clone", label: "Voice Clone", icon: CloneIcon },
+  { id: "edit", label: "Voice Edit", icon: EditIcon },
 ];
 
 const VoicePlatformSection = () => {
