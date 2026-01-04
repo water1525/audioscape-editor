@@ -574,7 +574,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
           {/* Preset Scenarios */}
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">Select a scenario to experience voice editing</p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-wrap gap-3">
               {presetScenarios.map((scenario) => {
                 const bgColorMap: Record<string, string> = {
                   "text-blue-500": "bg-blue-100 hover:bg-blue-200",
@@ -591,7 +591,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                     key={scenario.id}
                     onClick={() => handlePresetClick(scenario)}
                     disabled={isGeneratingPreset !== null}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-[3px] ${bgColor} transition-all text-left ${
+                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-[3px] ${bgColor} transition-all ${
                       isGeneratingPreset === scenario.id ? "opacity-70" : ""
                     }`}
                   >
@@ -609,7 +609,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                     )}
                     <span className={`font-medium text-sm ${scenario.color}`}>{scenario.title}</span>
                     <span className="text-muted-foreground/50">|</span>
-                    <span className={`text-sm truncate ${scenario.color}`}>{scenario.subtitle}</span>
+                    <span className={`text-sm ${scenario.color}`}>{scenario.subtitle}</span>
                   </button>
                 );
               })}
