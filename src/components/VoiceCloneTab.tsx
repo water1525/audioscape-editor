@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Play, Pause, RefreshCw, Sparkles, Save } from "lucide-react";
+import { MicrophoneIcon } from "@/components/ui/TabIcons";
 import DeleteIcon from "@/components/ui/DeleteIcon";
 import { toast } from "sonner";
 import WaveformAnimation from "@/components/ui/WaveformAnimation";
@@ -349,7 +350,8 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
               </div>
             ) : (
               <div className="flex justify-center">
-                <Button onClick={startRecording} className="min-w-[120px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold">
+                <Button onClick={startRecording} className="min-w-[180px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold">
+                  <MicrophoneIcon className="h-4 w-4 mr-2" />
                   Start Recording
                 </Button>
               </div>
