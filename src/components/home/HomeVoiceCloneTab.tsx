@@ -16,7 +16,8 @@ interface VoiceSample {
   genderIcon: string;
   originalFile: string;
   clonedFile: string;
-  borderColor: string;
+  bgColor: string;
+  roundedClass: string;
 }
 
 const voiceSamples: VoiceSample[] = [
@@ -27,7 +28,8 @@ const voiceSamples: VoiceSample[] = [
     genderIcon: iconFemale,
     originalFile: "voice-clone/cila-original.mp3",
     clonedFile: "voice-clone/cila-cloned.mp3",
-    borderColor: "border-[#AD0606]",
+    bgColor: "bg-[#FFECEC]",
+    roundedClass: "rounded-l-[3px] rounded-r-none",
   },
   {
     id: "john",
@@ -36,7 +38,8 @@ const voiceSamples: VoiceSample[] = [
     genderIcon: iconMale,
     originalFile: "voice-clone/john-original.mp3",
     clonedFile: "voice-clone/john-cloned.mp3",
-    borderColor: "border-[hsl(221,100%,43%)]",
+    bgColor: "bg-[#ECF0FF]",
+    roundedClass: "rounded-r-[3px] rounded-l-none",
   },
 ];
 
@@ -92,11 +95,11 @@ const HomeVoiceCloneTab = () => {
       {/* Combined Card with Voice Samples and Description */}
       <div className="rounded-[3px] bg-white px-8 py-6">
         {/* Voice Sample Cards */}
-        <div className="flex items-center justify-center gap-8">
+        <div className="flex items-center justify-center">
           {voiceSamples.map((sample) => (
             <div
               key={sample.id}
-              className={`flex flex-col items-center gap-3 bg-muted/50 rounded-[3px] px-8 py-6 border ${sample.borderColor}`}
+              className={`flex flex-col items-center gap-3 ${sample.bgColor} ${sample.roundedClass} px-8 py-6`}
             >
               {/* Avatar */}
               <div className="w-16 h-16 rounded-full overflow-hidden bg-background">
