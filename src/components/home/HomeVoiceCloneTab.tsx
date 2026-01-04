@@ -115,7 +115,7 @@ const HomeVoiceCloneTab = () => {
               >
                 {playingId === `${sample.id}-original` ? (
                   <>
-                    <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
+                    <WaveformAnimation isPlaying={true} variant="small" barCount={4} className="[&>div]:bg-white" />
                     <span className="ml-1">{sample.name} Original</span>
                   </>
                 ) : (
@@ -132,7 +132,7 @@ const HomeVoiceCloneTab = () => {
               >
                 {playingId === `${sample.id}-cloned` ? (
                   <>
-                    <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
+                    <WaveformAnimation isPlaying={true} variant="small" barCount={4} className="[&>div]:bg-white" />
                     <span className="ml-1">{sample.name} Cloned</span>
                   </>
                 ) : (
