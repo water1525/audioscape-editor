@@ -1,7 +1,8 @@
 import { useRef, useEffect, useState } from "react";
-import { Play, Pause, Download, RotateCcw, ChevronDown, Save, Loader2 } from "lucide-react";
+import { Play, Pause, Download, ChevronDown, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { SkipForward10Icon, SkipBack10Icon } from "@/components/ui/TabIcons";
 
 interface AudioPlayerBarProps {
   audioUrl: string | null;
@@ -150,15 +151,14 @@ const AudioPlayerBar = ({
           </div>
 
           {/* Center: Playback Controls */}
-          <div className="flex-1 flex items-center justify-center gap-2">
+          <div className="flex-1 flex items-center justify-center gap-6">
             {/* Skip Back */}
             {!hideSkipControls && (
               <button
                 onClick={() => skipTime(-10)}
-                className="p-2 text-muted-foreground hover:text-foreground transition-colors relative"
+                className="p-2 text-[hsl(221,100%,43%)] hover:text-[hsl(221,100%,38%)] transition-colors"
               >
-                <RotateCcw className="w-5 h-5" />
-                <span className="absolute -top-0.5 -right-0.5 text-[10px] font-medium">10</span>
+                <SkipBack10Icon className="w-6 h-6" />
               </button>
             )}
 
@@ -184,10 +184,9 @@ const AudioPlayerBar = ({
             {!hideSkipControls && (
               <button
                 onClick={() => skipTime(10)}
-                className="p-2 text-muted-foreground hover:text-foreground transition-colors relative"
+                className="p-2 text-[hsl(221,100%,43%)] hover:text-[hsl(221,100%,38%)] transition-colors"
               >
-                <RotateCcw className="w-5 h-5 scale-x-[-1]" />
-                <span className="absolute -top-0.5 -left-0.5 text-[10px] font-medium">10</span>
+                <SkipForward10Icon className="w-6 h-6" />
               </button>
             )}
           </div>
