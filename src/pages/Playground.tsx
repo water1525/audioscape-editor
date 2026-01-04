@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, MessageSquareText, Copy, Wand2, RefreshCw, X, Mic, GraduationCap, Sparkles, HeadphonesIcon, Mail } from "lucide-react";
+import { ChevronDown, RefreshCw, X, Mic, GraduationCap, Sparkles, HeadphonesIcon, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { useCustomVoices } from "@/hooks/useCustomVoices";
+import { TTSIcon, CloneIcon, EditIcon } from "@/components/ui/TabIcons";
 
 // Custom News Icon component (matching homepage)
 const NewsIcon = ({ className }: { className?: string }) => (
@@ -67,9 +68,9 @@ const EducationIcon = ({ className }: { className?: string }) => (
 );
 
 const sidebarTabs = [
-  { id: "tts", label: "Text to Speech", icon: MessageSquareText },
-  { id: "clone", label: "Voice Clone", icon: Copy },
-  { id: "edit", label: "Voice Edit", icon: Wand2 },
+  { id: "tts", label: "Text to Speech", icon: TTSIcon },
+  { id: "clone", label: "Voice Clone", icon: CloneIcon },
+  { id: "edit", label: "Voice Edit", icon: EditIcon },
 ];
 
 const voiceOptions = [
