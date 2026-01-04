@@ -423,13 +423,18 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
 
       {/* Clone Button */}
       {recordedAudioUrl && targetText.trim() && (
-        <Button
-          onClick={cloneVoice}
-          disabled={isCloning}
-          className="w-full bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
-        >
-          {isCloning ? "Cloning..." : "Clone Voice"}
-        </Button>
+        isCloning ? (
+          <div className="w-full h-10 bg-[hsl(221,100%,43%)] rounded-[3px] overflow-hidden">
+            <div className="h-full bg-[hsl(221,100%,30%)] animate-pulse" style={{ width: '100%' }} />
+          </div>
+        ) : (
+          <Button
+            onClick={cloneVoice}
+            className="w-full bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
+          >
+            Clone Voice
+          </Button>
+        )
       )}
 
 
