@@ -528,7 +528,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                   height="60" 
                   viewBox="0 0 80 60" 
                   fill="none"
-                  className="text-primary"
+                  className="text-[hsl(221,100%,43%)]"
                 >
                   <path 
                     d="M5 30 L10 30 L15 20 L20 40 L25 15 L30 45 L35 10 L40 50 L45 5 L50 55 L55 20 L60 35 L65 25 L70 30 L75 30" 
@@ -545,7 +545,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                     height="24" 
                     viewBox="0 0 24 24" 
                     fill="none"
-                    className="text-primary"
+                    className="text-[hsl(221,100%,43%)]"
                   >
                     <path 
                       d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" 
@@ -553,7 +553,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                       strokeWidth="2" 
                       strokeLinecap="round" 
                       strokeLinejoin="round"
-                      fill="hsl(var(--primary) / 0.1)"
+                      fill="hsl(221 100% 43% / 0.1)"
                     />
                   </svg>
                 </div>
