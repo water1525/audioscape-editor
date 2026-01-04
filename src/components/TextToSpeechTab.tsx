@@ -330,9 +330,9 @@ const TextToSpeechTab = () => {
                 activeCase === caseItem.id ? 'ring-1 ring-white ring-offset-1' : ''
               }`}
             >
-              {caseItem.icon === "news" && <NewsIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
-              {caseItem.icon === "book" && <BookIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
-              {caseItem.icon === "service" && <CustomerServiceIcon className={`w-6 h-6 ${caseItem.iconColor}`} />}
+              {caseItem.icon === "news" && <NewsIcon className={`w-5 h-5 ${caseItem.iconColor} shrink-0`} />}
+              {caseItem.icon === "book" && <BookIcon className={`w-5 h-5 ${caseItem.iconColor} shrink-0`} />}
+              {caseItem.icon === "service" && <CustomerServiceIcon className={`w-5 h-5 ${caseItem.iconColor} shrink-0`} />}
               <span className={`text-sm font-medium ${caseItem.iconColor}`}>{caseItem.label}</span>
               <span className={`${caseItem.iconColor}/50`}>|</span>
               <span className={`text-sm ${caseItem.iconColor}`}>{caseItem.description}</span>
