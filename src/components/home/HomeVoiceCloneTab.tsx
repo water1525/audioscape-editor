@@ -83,74 +83,77 @@ const HomeVoiceCloneTab = () => {
   };
 
   return (
-    <div className="animate-fade-in space-y-6">
-      {/* Voice Sample Cards */}
-      <div className="flex items-start justify-center gap-6">
-        {voiceSamples.map((sample) => (
-          <div
-            key={sample.id}
-            className="flex flex-col items-center gap-3 rounded-[3px] border border-border/50 bg-white px-8 py-6"
-          >
-            {/* Avatar */}
-            <div className="w-16 h-16 rounded-full overflow-hidden bg-background">
-              <img
-                src={sample.avatar}
-                alt={sample.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            
-            {/* Name and Gender */}
-            <div className="text-center">
-              <span className="text-base font-medium text-foreground">{sample.name}</span>
-              <div className="text-lg font-bold text-foreground">{sample.gender}</div>
-            </div>
+    <div className="animate-fade-in">
+      {/* Combined Card with Voice Samples and Description */}
+      <div className="rounded-[3px] bg-white px-8 py-6">
+        {/* Voice Sample Cards */}
+        <div className="flex items-start justify-center gap-12">
+          {voiceSamples.map((sample) => (
+            <div
+              key={sample.id}
+              className="flex flex-col items-center gap-3"
+            >
+              {/* Avatar */}
+              <div className="w-16 h-16 rounded-full overflow-hidden bg-background">
+                <img
+                  src={sample.avatar}
+                  alt={sample.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              {/* Name and Gender */}
+              <div className="text-center">
+                <span className="text-base font-medium text-foreground">{sample.name}</span>
+                <div className="text-lg font-bold text-foreground">{sample.gender}</div>
+              </div>
 
-            {/* Play Buttons */}
-            <div className="flex flex-col w-full overflow-hidden rounded-[3px]">
-              <Button
-                variant="default"
-                className="w-full gap-2 h-12 rounded-none bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white"
-                onClick={() => handlePlay(sample.id, "original")}
-              >
-                {playingId === `${sample.id}-original` ? (
-                  <>
-                    <WaveformAnimation isPlaying={true} variant="small" barCount={4} className="[&>div]:bg-white" />
-                    <span className="ml-1">{sample.name} Original</span>
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4" />
-                    {sample.name} Original
-                  </>
-                )}
-              </Button>
-              <Button
-                variant="default"
-                className="w-full gap-2 h-12 rounded-none bg-[#AD0606] hover:bg-[#8a0505] text-white"
-                onClick={() => handlePlay(sample.id, "cloned")}
-              >
-                {playingId === `${sample.id}-cloned` ? (
-                  <>
-                    <WaveformAnimation isPlaying={true} variant="small" barCount={4} className="[&>div]:bg-white" />
-                    <span className="ml-1">{sample.name} Cloned</span>
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4" />
-                    {sample.name} Cloned
-                  </>
-                )}
-              </Button>
+              {/* Play Buttons */}
+              <div className="flex flex-col w-full overflow-hidden rounded-[3px]">
+                <Button
+                  variant="default"
+                  className="w-full gap-2 h-12 rounded-none bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white"
+                  onClick={() => handlePlay(sample.id, "original")}
+                >
+                  {playingId === `${sample.id}-original` ? (
+                    <>
+                      <WaveformAnimation isPlaying={true} variant="small" barCount={4} className="[&>div]:bg-white" />
+                      <span className="ml-1">{sample.name} Original</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4" />
+                      {sample.name} Original
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="default"
+                  className="w-full gap-2 h-12 rounded-none bg-[#AD0606] hover:bg-[#8a0505] text-white"
+                  onClick={() => handlePlay(sample.id, "cloned")}
+                >
+                  {playingId === `${sample.id}-cloned` ? (
+                    <>
+                      <WaveformAnimation isPlaying={true} variant="small" barCount={4} className="[&>div]:bg-white" />
+                      <span className="ml-1">{sample.name} Cloned</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4" />
+                      {sample.name} Cloned
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+
+        {/* Description */}
+        <p className="text-left text-sm text-muted-foreground mt-6">
+          <span className="text-foreground font-medium">@Step-tts-2</span> Generate voice clones that sound identical to the original
+        </p>
       </div>
-
-      {/* Description */}
-      <p className="text-left text-sm text-muted-foreground">
-        <span className="text-foreground font-medium">@Step-tts-2</span> Generate voice clones that sound identical to the original
-      </p>
     </div>
   );
 };
