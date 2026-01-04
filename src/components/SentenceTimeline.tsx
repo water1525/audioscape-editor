@@ -91,7 +91,7 @@ const SentenceItem = ({
       {isEditGenerating ? (
         // Show loading state during generation
         <div className="absolute bottom-1.5 right-1.5 z-10">
-          <div className="h-5 px-1.5 text-[10px] bg-primary text-white rounded-[3px] flex items-center gap-1">
+          <div className="h-5 px-1.5 text-[10px] bg-[hsl(221,100%,43%)] text-white rounded-[3px] flex items-center gap-1">
             <Loader2 className="h-3 w-3 animate-spin" />
             <span>Generating</span>
           </div>
@@ -100,7 +100,7 @@ const SentenceItem = ({
         <div className="absolute bottom-1.5 right-1.5 z-10 flex items-center gap-1">
           {/* Non-clickable "Edited" badge for edited sentences */}
           {sentence.isEdited && (
-            <span className="h-5 px-1.5 text-[10px] bg-primary text-white rounded-[3px] flex items-center">
+            <span className="h-5 px-1.5 text-[10px] bg-[hsl(221,100%,43%)] text-white rounded-[3px] flex items-center">
               Edited
             </span>
           )}
