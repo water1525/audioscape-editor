@@ -66,10 +66,10 @@ const SentenceItem = ({
         relative flex-shrink-0 w-[220px] h-20 rounded-[3px] cursor-pointer
         transition-all duration-200 overflow-hidden group
         ${isSelected || isPlaying
-          ? "bg-primary/20 ring-2 ring-primary"
+          ? "bg-primary/10"
           : sentence.isEdited
-            ? "bg-primary/10 hover:bg-primary/15"
-            : "bg-secondary/80 hover:bg-secondary"
+            ? "bg-primary/5 hover:bg-primary/10"
+            : "bg-secondary/50 hover:bg-secondary/70"
         }
       `}
     >
