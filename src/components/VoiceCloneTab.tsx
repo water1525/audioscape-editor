@@ -404,6 +404,9 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
             className="min-h-[120px] resize-none pr-16"
           />
           <div className="absolute bottom-3 right-3 flex items-center gap-3">
+            <span className="text-xs text-muted-foreground">
+              {targetText.length}/1000 chars
+            </span>
             <button
               onClick={generateAITargetText}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white text-xs font-semibold rounded-[3px] transition-colors"
@@ -414,9 +417,6 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
                 <RefreshCw className="h-3 w-3" />
               )}
             </button>
-            <span className="text-xs text-muted-foreground">
-              {targetText.length}/1000 chars
-            </span>
           </div>
         </div>
       </div>
