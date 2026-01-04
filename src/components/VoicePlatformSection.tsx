@@ -41,42 +41,40 @@ const VoicePlatformSection = () => {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto flex flex-col" style={{ minHeight: 'calc(100vh - 200px)' }}>
-        <div className="bg-white/90 rounded-t-[3px] shadow-xl flex-1 flex flex-col">
+        <div className="bg-white rounded-t-[3px] shadow-xl flex-1 flex flex-col">
           {/* Top Tabs */}
-          <div className="bg-white rounded-t-[3px]">
-            <div className="flex items-center">
-              {tabs.map((tab) => {
-                const IconComponent = tab.icon;
-                const isActive = activeTab === tab.id;
-                return (
-                  <div
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`
-                      relative flex-1 cursor-pointer transition-all duration-300
-                      ${isActive 
-                        ? 'bg-[#AD0606]' 
-                        : 'bg-white hover:bg-gray-50'
-                      }
-                    `}
-                  >
-                    <div className={`
-                      flex items-center justify-center gap-2.5 py-4 px-4
-                      transition-all duration-300
-                      ${isActive 
-                        ? 'text-white font-semibold' 
-                        : 'text-foreground'
-                      }
-                    `}>
-                      <IconComponent className="w-4 h-4 transition-all duration-300" />
-                      <span className="text-sm tracking-wide transition-all duration-300">
-                        {tab.label}
-                      </span>
-                    </div>
+          <div className="flex items-center border-b border-border/30">
+            {tabs.map((tab) => {
+              const IconComponent = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <div
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`
+                    relative flex-1 cursor-pointer transition-all duration-300
+                    ${isActive 
+                      ? 'bg-[#AD0606]' 
+                      : 'bg-white hover:bg-gray-50'
+                    }
+                  `}
+                >
+                  <div className={`
+                    flex items-center justify-center gap-2.5 py-4 px-4
+                    transition-all duration-300
+                    ${isActive 
+                      ? 'text-white font-semibold' 
+                      : 'text-foreground'
+                    }
+                  `}>
+                    <IconComponent className="w-4 h-4 transition-all duration-300" />
+                    <span className="text-sm tracking-wide transition-all duration-300">
+                      {tab.label}
+                    </span>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Content Area */}
