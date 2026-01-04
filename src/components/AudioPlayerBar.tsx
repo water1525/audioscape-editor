@@ -158,7 +158,7 @@ const AudioPlayerBar = ({
                 onClick={() => skipTime(-10)}
                 className="p-2 text-[hsl(221,100%,43%)] hover:text-[hsl(221,100%,38%)] transition-colors"
               >
-                <SkipBack10Icon className="w-6 h-6" />
+                <SkipBack10Icon className="w-8 h-8" />
               </button>
             )}
 
@@ -186,7 +186,7 @@ const AudioPlayerBar = ({
                 onClick={() => skipTime(10)}
                 className="p-2 text-[hsl(221,100%,43%)] hover:text-[hsl(221,100%,38%)] transition-colors"
               >
-                <SkipForward10Icon className="w-6 h-6" />
+                <SkipForward10Icon className="w-8 h-8" />
               </button>
             )}
           </div>
