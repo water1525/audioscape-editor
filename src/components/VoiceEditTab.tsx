@@ -689,16 +689,16 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
 
       {/* Large centered waveform when sentences exist (preset/record mode) */}
       {sentences.length > 0 && audioSource === "record" && !isRecording && (
-        <div className="flex items-center justify-center min-h-[300px]">
-          <div className="flex items-end justify-center gap-1 h-40 w-[600px] max-w-full">
-            {Array.from({ length: 60 }, (_, i) => {
-              const centerDistance = Math.abs(i - 30) / 30;
+        <div className="flex items-center justify-center min-h-[300px] w-full">
+          <div className="flex items-center justify-between gap-0.5 h-40 w-full">
+            {Array.from({ length: 100 }, (_, i) => {
+              const centerDistance = Math.abs(i - 50) / 50;
               const baseHeight = 30 + Math.sin(i * 0.3) * 25 + Math.cos(i * 0.5) * 15;
               const height = baseHeight * (1 - centerDistance * 0.3);
               return (
                 <div
                   key={i}
-                  className="w-2 bg-primary/30 rounded-sm animate-pulse"
+                  className="flex-1 bg-primary/30 rounded-sm animate-pulse"
                   style={{
                     height: `${height}%`,
                     animationDelay: `${i * 0.03}s`,
