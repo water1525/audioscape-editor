@@ -323,9 +323,9 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
                 {sampleText}
               </p>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
-                className="h-8 w-8 shrink-0"
+                className="h-8 w-8 shrink-0 bg-white hover:bg-[#CCCCCC] border-border"
                 onClick={generateRandomText}
                 disabled={isRecording}
               >
