@@ -132,7 +132,7 @@ const caseSamples = [
     description: "Late Night Healing",
     audioTitle: "Night Healing",
     icon: "sparkles" as const,
-    iconColor: "text-amber-500",
+    iconColor: "text-cyan-500",
     text: "Dear listeners, welcome to Starlight Night Talk. On this quiet night, let me accompany you through this gentle time. Life may not always be smooth sailing, but please believe that every dawn brings new hope. No matter what you experienced today, remember to be gentle with yourself. Close your eyes, take a deep breath, and let my voice accompany you to sleep. Sweet dreams.",
   },
 ];
@@ -533,6 +533,7 @@ const Playground = () => {
                           "text-violet-500": "bg-violet-100 hover:bg-violet-200",
                           "text-sky-500": "bg-sky-100 hover:bg-sky-200",
                           "text-amber-500": "bg-amber-100 hover:bg-amber-200",
+                          "text-cyan-500": "bg-cyan-100 hover:bg-cyan-200",
                         };
                         const bgColor = bgColorMap[sample.iconColor] || "bg-primary/10 hover:bg-primary/20";
                         return (
