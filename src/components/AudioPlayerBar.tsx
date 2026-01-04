@@ -170,7 +170,7 @@ const AudioPlayerBar = ({
             ) : (
               <button
                 onClick={togglePlayPause}
-                className="w-12 h-12 rounded-[3px] bg-[hsl(221,100%,43%)] text-white flex items-center justify-center hover:bg-[hsl(221,100%,38%)] transition-colors"
+                className="w-12 h-12 rounded-[3px] bg-[hsl(221,100%,43%)] text-white flex items-center justify-center hover:bg-[hsl(221,100%,30%)] transition-colors"
               >
                 {(typeof isPlayingOverride === "boolean" ? isPlayingOverride : isPlaying) ? (
                   <Pause className="w-5 h-5" />

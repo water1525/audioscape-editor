@@ -135,7 +135,7 @@ const HomeVoiceCloneTab = () => {
               <div className="flex flex-col w-full overflow-hidden rounded-[3px]">
                 <Button
                   variant="default"
-                  className="w-full gap-2 h-12 rounded-none bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white"
+                  className="w-full gap-2 h-12 rounded-none bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white"
                   onClick={() => handlePlay(sample.id, "original")}
                 >
                   {playingId === `${sample.id}-original` ? (

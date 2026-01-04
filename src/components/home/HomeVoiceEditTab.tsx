@@ -244,7 +244,7 @@ const handleConfirm = async () => {
         </div>
 
         <button 
-          className="group w-32 flex items-center justify-center gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold transition-all disabled:opacity-50"
+          className="group w-32 flex items-center justify-center gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold transition-all disabled:opacity-50"
           onClick={() => setShowModal(true)}
           disabled={isGenerating}
         >

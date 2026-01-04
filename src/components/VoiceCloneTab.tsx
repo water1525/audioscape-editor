@@ -340,7 +340,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
                 <Button
                   onClick={stopRecording}
                   disabled={countdown > 5}
-                  className="min-w-[120px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
+                  className="min-w-[120px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
                 >
                   Stop Recording
                 </Button>
@@ -350,7 +350,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
               </div>
             ) : (
               <div className="flex justify-center">
-                <Button onClick={startRecording} className="min-w-[180px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold">
+                <Button onClick={startRecording} className="min-w-[180px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold">
                   <MicrophoneIcon className="h-4 w-4 mr-2" />
                   Start Recording
                 </Button>
@@ -427,7 +427,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
           <Button
             onClick={cloneVoice}
             disabled={isCloning}
-            className="min-w-[120px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold"
+            className="min-w-[120px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
           >
             {isCloning ? "Cloning..." : "Clone Voice"}
           </Button>
@@ -467,7 +467,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
             <Button variant="outline" onClick={() => setIsSaveDialogOpen(false)} className="font-semibold">
               Cancel
             </Button>
-            <Button onClick={handleSaveVoice} className="bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white font-semibold">
+            <Button onClick={handleSaveVoice} className="bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold">
               Save
             </Button>
           </DialogFooter>
