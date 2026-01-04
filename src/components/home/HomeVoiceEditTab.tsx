@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Pause, Play, X, Loader2, Trash2 } from "lucide-react";
+import { ArrowRight, Pause, Play, X, Loader2 } from "lucide-react";
+import DeleteIcon from "@/components/ui/DeleteIcon";
 import { useGlobalAudio } from "@/hooks/useGlobalAudio";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -317,7 +318,7 @@ const handleConfirm = async () => {
               className="w-16 flex items-center justify-center text-muted-foreground hover:bg-[#AD0606] hover:text-white transition-colors"
               aria-label="Delete"
             >
-              <Trash2 className="h-5 w-5" />
+              <DeleteIcon className="h-5 w-5" />
             </button>
           </div>
         </>

@@ -6,7 +6,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { ChevronLeft, ChevronRight, Loader2, PenLine, Pencil, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, PenLine, Pencil } from "lucide-react";
+import DeleteIcon from "@/components/ui/DeleteIcon";
 import { Button } from "@/components/ui/button";
 import { SentenceSegment } from "@/components/VoiceEditTab";
 import { toast } from "sonner";
@@ -564,7 +565,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
               disabled={isBatchGenerating}
               className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
             >
-              <Trash2 className="h-4 w-4" />
+              <DeleteIcon className="h-4 w-4" />
             </Button>
           )}
         </div>
