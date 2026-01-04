@@ -335,7 +335,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
 
             {isRecording ? (
               <div className="flex flex-col items-center gap-4">
-                <div className="text-4xl font-bold text-primary">{countdown}S</div>
+                <div className="text-4xl font-bold text-[hsl(221,100%,43%)]">{countdown}S</div>
                 <Button
                   onClick={stopRecording}
                   disabled={countdown > 5}
