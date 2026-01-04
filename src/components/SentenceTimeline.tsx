@@ -130,7 +130,7 @@ const SentenceItem = ({
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="w-0.5 bg-primary animate-pulse"
+                className="w-0.5 bg-[hsl(221,100%,43%)] animate-pulse"
                 style={{
                   height: `${6 + i * 2}px`,
                   animationDelay: `${i * 0.1}s`,
