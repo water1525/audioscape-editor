@@ -101,7 +101,7 @@ const SentenceItem = ({
         <div className="absolute bottom-2 right-2 z-10 flex items-center gap-2">
           {/* Non-clickable "Edited" text label for edited sentences */}
           {sentence.isEdited && (
-            <span className="text-sm text-[hsl(221,100%,43%)] font-semibold">
+            <span className="text-sm text-[hsl(221,100%,43%)] font-normal">
               Edited
             </span>
           )}
@@ -503,7 +503,7 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
               size="sm"
               onClick={onEditAll}
               disabled={isBatchGenerating}
-              className="h-8 gap-1.5 shrink-0 font-semibold"
+              className="h-8 gap-1.5 shrink-0 text-muted-foreground"
             >
               {isBatchGenerating ? (
                 <>
