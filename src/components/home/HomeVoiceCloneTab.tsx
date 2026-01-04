@@ -93,7 +93,7 @@ const HomeVoiceCloneTab = () => {
   return (
     <div className="animate-fade-in">
       {/* Combined Card with Voice Samples and Description */}
-      <div className="px-8 py-6">
+      <div className="rounded-[3px] bg-white px-8 py-6">
         {/* Voice Sample Cards */}
         <div className="flex items-center justify-center">
           {voiceSamples.map((sample) => (
