@@ -41,56 +41,46 @@ const VoicePlatformSection = () => {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto flex flex-col" style={{ minHeight: 'calc(100vh - 200px)' }}>
-        {/* Top Tabs - Pure White */}
-        <div className="bg-white shadow-xl">
-          <div className="flex items-center">
-            {tabs.map((tab) => {
-              const IconComponent = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <div
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`
-                    relative flex-1 cursor-pointer transition-all duration-300
-                    ${isActive 
-                      ? 'bg-[#AD0606]' 
-                      : 'bg-white hover:bg-gray-50'
-                    }
-                  `}
-                >
-                  <div className={`
-                    flex items-center justify-center gap-2.5 py-4 px-4
-                    transition-all duration-300
-                    ${isActive 
-                      ? 'text-white font-semibold' 
-                      : 'text-foreground'
-                    }
-                  `}>
-                    <IconComponent className="w-4 h-4 transition-all duration-300" />
-                    <span className="text-sm tracking-wide transition-all duration-300">
-                      {tab.label}
-                    </span>
+        <div className="bg-white/90 rounded-t-[3px] shadow-xl flex-1 flex flex-col">
+          {/* Top Tabs */}
+          <div className="bg-white rounded-t-[3px]">
+            <div className="flex items-center">
+              {tabs.map((tab) => {
+                const IconComponent = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <div
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`
+                      relative flex-1 cursor-pointer transition-all duration-300
+                      ${isActive 
+                        ? 'bg-[#AD0606]' 
+                        : 'bg-white hover:bg-gray-50'
+                      }
+                    `}
+                  >
+                    <div className={`
+                      flex items-center justify-center gap-2.5 py-4 px-4
+                      transition-all duration-300
+                      ${isActive 
+                        ? 'text-white font-semibold' 
+                        : 'text-foreground'
+                      }
+                    `}>
+                      <IconComponent className="w-4 h-4 transition-all duration-300" />
+                      <span className="text-sm tracking-wide transition-all duration-300">
+                        {tab.label}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
 
-        {/* Content Area - Light gradient background */}
-        <div className="bg-gradient-to-b from-slate-100 to-slate-200/80 flex-1 flex flex-col">
+          {/* Content Area */}
           <div className="p-6 md:p-8 flex-1">{renderTabContent()}</div>
-          
-          {/* Description footer */}
-          <div className="bg-slate-100/90 border-t border-slate-200 px-6 py-4">
-            <p className="text-sm text-muted-foreground">
-              <span className="text-foreground font-medium">@Step-tts-2</span>{" "}
-              {activeTab === "tts" && "Generate hyper-realistic speech with rich emotions and styles"}
-              {activeTab === "clone" && "Generate voice clones that sound identical to the original"}
-              {activeTab === "edit" && "Edit emotion, style, and speed of original audio"}
-            </p>
-          </div>
         </div>
       </div>
     </section>
