@@ -364,14 +364,14 @@ const handleConfirm = async () => {
             <div className="flex mt-4">
               <Button
                 variant="outline"
-                className="flex-1 font-semibold"
+                className="flex-1 font-semibold rounded-r-none"
                 onClick={() => setShowModal(false)}
                 disabled={isGenerating}
               >
                 Cancel
               </Button>
               <Button
-                className="flex-1 bg-[#C23A2B] hover:bg-[#A83225] text-white font-semibold"
+                className="flex-1 bg-[#C23A2B] hover:bg-[#A83225] text-white font-semibold rounded-l-none"
                 onClick={handleConfirm}
                 disabled={isGenerating}
               >
