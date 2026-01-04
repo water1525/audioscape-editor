@@ -400,7 +400,7 @@ const Playground = () => {
 
       <div className="flex">
         {/* Left Sidebar */}
-        <aside className="w-56 h-[calc(100vh-56px)] sticky top-14 border-r border-border bg-card/50 p-4 flex flex-col">
+        <aside className="w-56 h-[calc(100vh-56px)] fixed top-14 left-0 border-r border-border bg-card/50 p-4 flex flex-col z-30">
           <h2 className="text-lg font-semibold text-foreground mb-6">Playground</h2>
           
           <nav className="space-y-1 flex-1">
@@ -468,6 +468,9 @@ const Playground = () => {
             </HoverCardContent>
           </HoverCard>
         </aside>
+
+        {/* Spacer for fixed sidebar */}
+        <div className="w-56 flex-shrink-0" />
 
         {/* Main Content */}
         <main className="flex-1 p-6">
