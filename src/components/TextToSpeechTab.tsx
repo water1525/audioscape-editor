@@ -303,9 +303,13 @@ const TextToSpeechTab = () => {
   return (
     <div className="animate-fade-in">
       {/* Text Display Area */}
-      <div className="bg-card border border-border rounded-[3px] p-6 mb-4 min-h-[160px] shadow-soft">
-        <p className="text-foreground text-sm whitespace-pre-wrap leading-relaxed">
+      <div className="bg-card border border-border rounded-[3px] p-6 mb-4 min-h-[160px] shadow-soft flex flex-col">
+        <p className="text-foreground text-sm whitespace-pre-wrap leading-relaxed flex-1">
           {currentCase.text}
+        </p>
+        <p className="text-sm text-muted-foreground mt-4 pt-4 border-t border-border/50">
+          <span className="text-foreground font-medium">@Step-tts-2</span>{" "}
+          Generate hyper-realistic speech with rich emotions and styles
         </p>
       </div>
 
@@ -337,12 +341,8 @@ const TextToSpeechTab = () => {
         })}
       </div>
 
-      {/* Description and Play */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          <span className="text-foreground font-medium">@Step-tts-2</span>{" "}
-          Generate hyper-realistic speech with rich emotions and styles
-        </p>
+      {/* Play Button */}
+      <div className="flex items-center justify-end">
         <Button 
           className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,38%)] text-white shadow-lg shadow-[hsl(221,100%,43%)]/25 hover:shadow-xl hover:shadow-[hsl(221,100%,43%)]/30 transition-all duration-300"
           onClick={handlePlayPause}
