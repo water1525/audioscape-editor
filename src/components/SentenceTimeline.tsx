@@ -59,84 +59,85 @@ const SentenceItem = ({
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div
-      onClick={() => onClick(sentence)}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className={`
-        relative flex-shrink-0 w-[220px] h-20 rounded-[3px] cursor-pointer
-        transition-all duration-200 overflow-hidden group
-        ${isSelected || isPlaying
-          ? "bg-[#F5F8FB]"
-          : sentence.isEdited
-            ? "bg-[#F5F8FB] hover:bg-[#EBF0F5]"
-            : "bg-[#F5F8FB] hover:bg-[#EBF0F5]"
-        }
-      `}
-    >
-      {/* Text at top */}
-      <div className="absolute top-2 left-2 right-2 z-10">
-        <p
-          className={`text-xs line-clamp-2 leading-tight ${
-            isSelected || isPlaying
-              ? "text-foreground font-medium"
-              : "text-muted-foreground"
-          }`}
-        >
-          {sentence.text}
-        </p>
-      </div>
-
-      {/* Full-width generating bar at bottom */}
-      {isEditGenerating && (
-        <div className="absolute bottom-0 left-0 right-0 h-8 bg-[hsl(221,100%,43%)] flex items-center justify-center gap-2 z-20">
-          <Loader2 className="h-4 w-4 text-white animate-spin" />
-          <span className="text-sm text-white font-medium">Generating</span>
+    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+      {/* Card */}
+      <div
+        onClick={() => onClick(sentence)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className={`
+          relative w-[220px] h-20 rounded-[3px] cursor-pointer
+          transition-all duration-200 overflow-hidden group
+          ${isSelected || isPlaying
+            ? "bg-[#F5F8FB]"
+            : sentence.isEdited
+              ? "bg-[#F5F8FB] hover:bg-[#EBF0F5]"
+              : "bg-[#F5F8FB] hover:bg-[#EBF0F5]"
+          }
+        `}
+      >
+        {/* Text at top */}
+        <div className="absolute top-2 left-2 right-2 z-10">
+          <p
+            className={`text-xs line-clamp-2 leading-tight ${
+              isSelected || isPlaying
+                ? "text-foreground font-medium"
+                : "text-muted-foreground"
+            }`}
+          >
+            {sentence.text}
+          </p>
         </div>
-      )}
 
-      {/* Edit button / edited state - positioned at bottom right */}
-      {!isEditGenerating && (
-        <div className="absolute bottom-2 right-2 z-10 flex items-center gap-2">
-          {/* Non-clickable "Edited" text label for edited sentences */}
-          {sentence.isEdited && (
+        {/* Full-width generating bar at bottom */}
+        {isEditGenerating && (
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-[hsl(221,100%,43%)] flex items-center justify-center gap-2 z-20">
+            <Loader2 className="h-4 w-4 text-white animate-spin" />
+            <span className="text-sm text-white font-medium">Generating</span>
+          </div>
+        )}
+
+        {/* Edited label - positioned at bottom right */}
+        {!isEditGenerating && sentence.isEdited && (
+          <div className="absolute bottom-2 right-2 z-10">
             <span className="text-sm text-[hsl(221,100%,43%)] font-normal">
               Edited
             </span>
-          )}
-          {/* Pencil edit button - always visible */}
-          {!isGenerating && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(sentence.id);
-              }}
-              className="h-7 w-7 bg-white hover:bg-[#CCCCCC] border-border"
-            >
-              <PencilEditIcon className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      )}
-
-      {/* Playing indicator - bottom left */}
-      {isPlaying && !isGenerating && !isHovered && (
-        <div className="absolute bottom-1.5 left-1.5">
-          <div className="flex items-center gap-0.5">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="w-0.5 bg-[hsl(221,100%,43%)] animate-pulse"
-                style={{
-                  height: `${6 + i * 2}px`,
-                  animationDelay: `${i * 0.1}s`,
-                }}
-              />
-            ))}
           </div>
-        </div>
+        )}
+
+        {/* Playing indicator - bottom left */}
+        {isPlaying && !isGenerating && !isHovered && (
+          <div className="absolute bottom-1.5 left-1.5">
+            <div className="flex items-center gap-0.5">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="w-0.5 bg-[hsl(221,100%,43%)] animate-pulse"
+                  style={{
+                    height: `${6 + i * 2}px`,
+                    animationDelay: `${i * 0.1}s`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Edit button - below the card */}
+      {!isEditGenerating && !isGenerating && (
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(sentence.id);
+          }}
+          className="h-7 w-7 bg-white hover:bg-[#CCCCCC] border-border"
+        >
+          <PencilEditIcon className="h-4 w-4" />
+        </Button>
       )}
     </div>
   );
