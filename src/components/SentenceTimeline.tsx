@@ -448,22 +448,8 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
 
     return (
       <div className="fixed bottom-[68px] left-56 right-0 z-40 bg-card border-t border-l border-border rounded-tl-[3px]">
-        {/* Single combined text card with controls */}
-        <div className="px-6 py-3 flex items-center gap-4">
-          {/* Combined text card */}
-          <div 
-            className="flex-1 bg-[#F5F8FB] rounded-[3px] p-3 cursor-pointer hover:bg-[#EBF0F5] transition-colors"
-            onClick={() => {
-              if (sentences.length > 0) {
-                handleClick(sentences[0]);
-              }
-            }}
-          >
-            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-              {sentences.map(s => s.text).join('')}
-            </p>
-          </div>
-
+        {/* Controls only */}
+        <div className="px-6 py-3 flex items-center justify-end gap-4">
           {/* Edit All button */}
           {onEditAll && (
             <Button
