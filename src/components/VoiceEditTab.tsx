@@ -265,13 +265,13 @@ const WaveformCardsWithScroll = ({
       <div className="h-[40vh] min-h-[280px] flex flex-col">
         {/* Waveform row with side arrow blocks */}
         <div className="flex-1 flex items-stretch">
-        {/* Left arrow block - no rounded corners */}
+        {/* Left arrow block - aligned with delete button width */}
         <div 
-          className={`w-12 shrink-0 bg-[hsl(210,70%,55%)] flex items-center justify-center cursor-pointer hover:bg-[hsl(210,75%,50%)] transition-colors ${!canScrollLeft ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`w-10 shrink-0 bg-[hsl(210,70%,55%)] flex items-center justify-center cursor-pointer hover:bg-[hsl(210,75%,50%)] transition-colors ${!canScrollLeft ? 'opacity-50 cursor-not-allowed' : ''}`}
           onMouseEnter={() => handleMouseEnter('left')}
           onMouseLeave={handleMouseLeave}
         >
-          <ChevronLeft className="h-6 w-6 text-white" />
+          <ChevronLeft className="h-5 w-5 text-white" />
         </div>
 
         {/* Scrollable waveform container */}
@@ -321,19 +321,19 @@ const WaveformCardsWithScroll = ({
           </div>
         </div>
 
-        {/* Right arrow block - no rounded corners */}
+        {/* Right arrow block - aligned with delete button width */}
         <div 
-          className={`w-12 shrink-0 bg-[hsl(210,70%,55%)] flex items-center justify-center cursor-pointer hover:bg-[hsl(210,75%,50%)] transition-colors ${!canScrollRight ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`w-10 shrink-0 bg-[hsl(210,70%,55%)] flex items-center justify-center cursor-pointer hover:bg-[hsl(210,75%,50%)] transition-colors ${!canScrollRight ? 'opacity-50 cursor-not-allowed' : ''}`}
           onMouseEnter={() => handleMouseEnter('right')}
           onMouseLeave={handleMouseLeave}
         >
-          <ChevronRight className="h-6 w-6 text-white" />
+          <ChevronRight className="h-5 w-5 text-white" />
         </div>
         </div>
       </div>
       {/* Text area row with white background - bottom rounded corners only */}
       <div className="h-[80px] bg-white rounded-b-[10px] flex overflow-x-auto scrollbar-none shadow-sm">
-        <div className="w-12 shrink-0" /> {/* Spacer for left arrow */}
+        <div className="w-10 shrink-0" /> {/* Spacer for left arrow */}
         <div className="flex-1 flex min-w-max">
           {sentences.map((sentence) => {
             const isHovered = hoveredSentenceId === sentence.id;
@@ -369,7 +369,7 @@ const WaveformCardsWithScroll = ({
             );
           })}
         </div>
-        <div className="w-12 shrink-0" /> {/* Spacer for right arrow */}
+        <div className="w-10 shrink-0" /> {/* Spacer for right arrow */}
       </div>
     </div>
   );
