@@ -25,23 +25,23 @@ interface VoiceCloneTabProps {
 
 // Sample texts for recording (20-30 characters each)
 const sampleTexts = [
-  "Sunlight streams through the curtains, casting golden patterns on the floor.",
-  "Technology advances rapidly, transforming our daily lives in countless ways.",
-  "Music is a universal language that touches hearts across all cultures.",
-  "Nature paints magnificent scenes with the changing of each season.",
-  "The morning breeze gently brushes your cheek, carrying the fragrance of flowers.",
+  "阳光透过窗帘洒落，在地板上投下金色的光斑。",
+  "科技日新月异，改变着我们生活的方方面面。",
+  "音乐是一种跨越国界的语言，能够触动每个人的心灵。",
+  "大自然用四季的变换描绘出最美的画卷。",
+  "清晨的微风轻抚脸颊，带来阵阵花香。",
 ];
 
 // AI generated target texts (20-30 characters each)
 const aiTargetTexts = [
-  "The morning dew glistens on petals, welcoming a brand new day.",
-  "City lights twinkle in the night sky like countless distant stars.",
-  "The aroma of coffee fills the air, awakening the sleeping soul.",
-  "The sound of turning pages is the most beautiful melody of knowledge.",
-  "Raindrops tap against the window, composing nature's own symphony.",
-  "Children's laughter echoes through the park, pure and joyful.",
-  "The sunset paints the sky in shades of orange, breathtakingly beautiful.",
-  "Spring cherry blossoms fall like pink snow upon the winding path.",
+  "晨露在花瓣上闪烁，迎接崭新的一天。",
+  "城市的灯火在夜空中闪烁，如繁星点点。",
+  "咖啡的香气弥漫在空气中，唤醒沉睡的灵魂。",
+  "翻书的声音是知识最美的旋律。",
+  "雨滴敲打着窗户，奏响大自然的交响乐。",
+  "孩子们的笑声在公园里回荡，纯真而快乐。",
+  "夕阳将天空染成橙红色，美得令人窒息。",
+  "春日的樱花如粉色的雪，飘落在蜿蜒的小路上。",
 ];
 
 const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: VoiceCloneTabProps) => {
