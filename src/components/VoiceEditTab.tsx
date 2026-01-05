@@ -198,11 +198,6 @@ const WaveformCardsWithScroll = ({
   
   const timeMarkers = generateTimeMarkers();
 
-  // Get hovered sentence index for position calculation
-  const hoveredSentenceIndex = hoveredSentenceId 
-    ? sentences.findIndex(s => s.id === hoveredSentenceId) 
-    : -1;
-
   return (
     <div className="w-full flex flex-col">
       {/* Toolbar row: Timeline ruler with scale + Edit All + Delete */}
@@ -220,11 +215,12 @@ const WaveformCardsWithScroll = ({
               const isHovered = hoveredSentenceId === sentence.id;
               const startTime = idx * 3;
               const endTime = startTime + 3;
-              
+              const isLast = idx === sentences.length - 1;
+
               return (
                 <div
                   key={`ruler-${sentence.id}`}
-                  className={`flex-shrink-0 min-w-[180px] max-w-[260px] h-full relative flex items-end justify-center transition-colors ${isHovered ? 'bg-[hsl(210,70%,55%)]/20' : ''}`}
+                  className={`flex-shrink-0 min-w-[180px] max-w-[260px] h-full relative flex items-end justify-center px-2 transition-colors ${isHovered ? 'bg-[hsl(210,70%,55%)]/20' : ''}`}
                   onMouseEnter={() => setHoveredSentenceId(sentence.id)}
                   onMouseLeave={() => setHoveredSentenceId(null)}
                 >
@@ -243,13 +239,19 @@ const WaveformCardsWithScroll = ({
                       </div>
                     </>
                   )}
-                  {/* Tick marks at segment boundaries */}
+
+                  {/* Ticks (match waveform segment boundaries visually) */}
                   <div className="absolute left-0 bottom-0 w-px h-3 bg-muted-foreground/40" />
-                  {idx === sentences.length - 1 && (
+                  {!isLast && (
+                    <div className="absolute right-0 top-0 bottom-0 w-px bg-muted-foreground/10" />
+                  )}
+                  {isLast && (
                     <div className="absolute right-0 bottom-0 w-px h-3 bg-muted-foreground/40" />
                   )}
-                  {/* Center tick */}
                   <div className="absolute left-1/2 bottom-0 w-px h-2 bg-muted-foreground/20 -translate-x-1/2" />
+
+                  {/* Reserve the same separator space as waveform (ml-1) */}
+                  {!isLast && <div className="h-2/3 w-px ml-1 opacity-0" />}
                 </div>
               );
             })}
