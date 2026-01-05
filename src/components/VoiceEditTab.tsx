@@ -166,27 +166,78 @@ const WaveformCardsWithScroll = ({
     }
   };
 
+  // Calculate total duration based on sentences (estimate ~3s per sentence)
+  const totalDuration = sentences.length * 3;
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+  
+  // Generate time markers for the ruler
+  const generateTimeMarkers = () => {
+    const markers = [];
+    const step = totalDuration <= 10 ? 1 : totalDuration <= 30 ? 5 : 10;
+    for (let i = 0; i <= totalDuration; i += step) {
+      markers.push(i);
+    }
+    return markers;
+  };
+  
+  const timeMarkers = generateTimeMarkers();
+
   return (
     <div className="w-full flex flex-col">
-      {/* Toolbar row: Timeline ruler - Edit All - Delete */}
-      <div className="flex items-center justify-between py-3">
-        {/* Left side: Time ruler */}
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
-          </svg>
-          <span className="text-sm font-medium">0:00 / 0:00</span>
+      {/* Toolbar row: Timeline ruler with scale + Edit All + Delete */}
+      <div className="flex items-stretch h-10">
+        {/* Left side: Time ruler with scale and background */}
+        <div className="flex-1 bg-[#E8ECF0] flex items-center overflow-hidden">
+          {/* Ruler scale */}
+          <div className="flex items-end h-full w-full relative">
+            {/* Time scale ticks */}
+            <div className="flex items-end h-full w-full px-4">
+              {timeMarkers.map((time, idx) => (
+                <div 
+                  key={time} 
+                  className="flex flex-col items-center"
+                  style={{ 
+                    position: 'absolute', 
+                    left: `${(time / totalDuration) * 100}%`,
+                    transform: 'translateX(-50%)'
+                  }}
+                >
+                  {/* Tick mark */}
+                  <div className={`w-px ${idx === 0 || idx === timeMarkers.length - 1 ? 'h-4' : 'h-3'} bg-muted-foreground/50`} />
+                  {/* Time label */}
+                  <span className="text-[10px] text-muted-foreground mt-0.5">{formatTime(time)}</span>
+                </div>
+              ))}
+              {/* Minor ticks between major markers */}
+              {Array.from({ length: Math.min(totalDuration, 20) }, (_, i) => i).map((tick) => {
+                if (timeMarkers.includes(tick)) return null;
+                return (
+                  <div 
+                    key={`minor-${tick}`}
+                    className="absolute w-px h-2 bg-muted-foreground/30"
+                    style={{ 
+                      left: `${(tick / totalDuration) * 100}%`,
+                      bottom: '16px'
+                    }}
+                  />
+                );
+              })}
+            </div>
+          </div>
         </div>
         
-        {/* Right side: Edit All + Delete - no gap, no border */}
-        <div className="flex items-stretch">
+        {/* Right side: Edit All + Delete - no gap */}
+        <div className="flex items-stretch shrink-0">
           {/* Edit All button - blue background, no border */}
           {onEditAll && (
             <button
               onClick={onEditAll}
               disabled={isBatchGenerating}
-              className="h-10 px-5 flex items-center gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,35%)] text-white font-medium disabled:opacity-50 transition-colors"
+              className="h-full px-5 flex items-center gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,35%)] text-white font-medium disabled:opacity-50 transition-colors"
             >
               {isBatchGenerating ? (
                 <>
@@ -202,11 +253,11 @@ const WaveformCardsWithScroll = ({
             </button>
           )}
           
-          {/* Delete button - no border, matches height */}
+          {/* Delete button - matches height */}
           {onDeleteAll && (
             <button
               onClick={onDeleteAll}
-              className="h-10 w-10 flex items-center justify-center bg-card hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors border-l border-border"
+              className="h-full w-10 flex items-center justify-center bg-[#E8ECF0] hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors"
             >
               <DeleteIcon className="h-4 w-4" />
             </button>
