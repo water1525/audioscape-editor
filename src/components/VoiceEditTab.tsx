@@ -132,87 +132,115 @@ const WaveformCardsWithScroll = ({
     }
   };
 
-  return (
-    <div className="w-full flex items-center">
-      {/* Left arrow */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className={`h-10 w-10 shrink-0 ${!canScrollLeft ? 'opacity-30 cursor-not-allowed' : ''}`}
-        onClick={scrollLeft}
-        disabled={!canScrollLeft}
-      >
-        <ChevronLeft className="h-5 w-5" />
-      </Button>
-      {/* Left arrow - already added above */}
+  // Auto-scroll on hover
+  const handleMouseEnter = (direction: 'left' | 'right') => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    
+    const scroll = () => {
+      if (direction === 'left' && canScrollLeft) {
+        container.scrollBy({ left: -8, behavior: 'auto' });
+      } else if (direction === 'right' && canScrollRight) {
+        container.scrollBy({ left: 8, behavior: 'auto' });
+      }
+    };
+    
+    const interval = setInterval(scroll, 16);
+    container.dataset.scrollInterval = String(interval);
+  };
+  
+  const handleMouseLeave = () => {
+    const container = scrollContainerRef.current;
+    if (container?.dataset.scrollInterval) {
+      clearInterval(Number(container.dataset.scrollInterval));
+      delete container.dataset.scrollInterval;
+    }
+  };
 
-      {/* Scrollable cards container */}
-      <div 
-        ref={scrollContainerRef}
-        className="flex-1 overflow-x-auto scrollbar-none"
-      >
-        <div className="flex">
-          {sentences.map((sentence, idx) => {
-            // Generate unique waveform pattern for each sentence
-            const waveformBars = Array.from({ length: 35 }, (_, i) => {
-              const seed = idx * 100 + i;
-              const baseHeight = 25;
-              const variation = Math.sin(seed * 0.4) * 30 + Math.cos(seed * 0.6) * 20;
-              const randomness = Math.sin(seed * 1.7) * 15;
-              return Math.max(8, Math.min(95, baseHeight + variation + randomness));
-            });
-            
-            const isFirst = idx === 0;
-            const isLast = idx === sentences.length - 1;
-            
-            return (
-              <div
-                key={sentence.id}
-                className={`flex-shrink-0 flex-1 min-w-[200px] max-w-[280px] bg-[#F5F8FB] overflow-hidden cursor-pointer group hover:bg-[#EDF2F7] transition-colors ${isFirst ? 'rounded-l-[3px]' : ''} ${isLast ? 'rounded-r-[3px]' : ''} ${!isLast ? 'border-r border-border/40' : ''}`}
-                onClick={() => onEditSentence(sentence.id)}
-              >
-                {/* Waveform area - clickable */}
-                <div className="h-[100px] flex items-center justify-center px-2 py-2">
-                  <div className="w-full h-full flex items-center justify-center gap-[1px]">
-                    {waveformBars.map((height, i) => (
-                      <div
-                        key={i}
-                        className="w-[3px] bg-[hsl(221,80%,75%)] group-hover:bg-[hsl(221,80%,65%)] transition-colors"
-                        style={{ height: `${height}%` }}
-                      />
-                    ))}
+  return (
+    <div className="w-full h-[45vh] min-h-[320px] flex flex-col">
+      {/* Main waveform area with unified background */}
+      <div className="flex-1 flex items-stretch relative bg-gradient-to-b from-[#E8F4FD] to-[#F0F7FC] rounded-lg overflow-hidden">
+        {/* Left hover zone for scrolling */}
+        <div 
+          className={`absolute left-0 top-0 bottom-0 w-16 z-10 flex items-center justify-start pl-2 bg-gradient-to-r from-[#E8F4FD]/90 to-transparent ${canScrollLeft ? 'cursor-pointer' : 'opacity-50'}`}
+          onMouseEnter={() => handleMouseEnter('left')}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div className="h-10 w-10 rounded-full bg-white/80 shadow-sm flex items-center justify-center">
+            <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+          </div>
+        </div>
+
+        {/* Scrollable waveform container */}
+        <div 
+          ref={scrollContainerRef}
+          className="flex-1 overflow-x-auto scrollbar-none px-16"
+        >
+          <div className="flex h-full min-w-max">
+            {sentences.map((sentence, idx) => {
+              // Generate unique waveform pattern for each sentence - more bars for bigger area
+              const waveformBars = Array.from({ length: 50 }, (_, i) => {
+                const seed = idx * 100 + i;
+                const baseHeight = 30;
+                const variation = Math.sin(seed * 0.4) * 25 + Math.cos(seed * 0.6) * 20;
+                const randomness = Math.sin(seed * 1.7) * 15;
+                return Math.max(10, Math.min(90, baseHeight + variation + randomness));
+              });
+              
+              const isFirst = idx === 0;
+              const isLast = idx === sentences.length - 1;
+              
+              return (
+                <div
+                  key={sentence.id}
+                  className="flex-shrink-0 min-w-[180px] max-w-[260px] flex flex-col cursor-pointer group"
+                  onClick={() => onEditSentence(sentence.id)}
+                >
+                  {/* Waveform area - takes most of the height */}
+                  <div className="flex-1 flex items-center justify-center px-1 py-4">
+                    <div className="w-full h-full flex items-center justify-center gap-[2px]">
+                      {waveformBars.map((height, i) => (
+                        <div
+                          key={i}
+                          className="w-[3px] rounded-full bg-[hsl(210,70%,70%)] group-hover:bg-[hsl(210,80%,55%)] transition-colors"
+                          style={{ height: `${height}%` }}
+                        />
+                      ))}
+                    </div>
+                    {/* Subtle separator between segments */}
+                    {!isLast && (
+                      <div className="h-2/3 w-px bg-[hsl(210,40%,80%)] ml-1" />
+                    )}
+                  </div>
+                  
+                  {/* Text area below waveform */}
+                  <div className="h-[80px] px-3 py-2 bg-white/60 group-hover:bg-white/90 transition-colors relative border-t border-[hsl(210,30%,90%)]">
+                    <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
+                      {sentence.text}
+                    </p>
+                    {/* Edit icon indicator */}
+                    <div className="absolute bottom-2 right-2 h-5 w-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <PencilEditIcon className="h-3.5 w-3.5 text-primary" />
+                    </div>
                   </div>
                 </div>
-                
-                {/* Divider */}
-                <div className="h-px bg-border/30" />
-                
-                {/* Text area - clickable */}
-                <div className="p-2 min-h-[60px] relative bg-white group-hover:bg-[#F8FAFC] transition-colors">
-                  <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                    {sentence.text}
-                  </p>
-                  {/* Edit icon indicator */}
-                  <div className="absolute bottom-1 right-1 h-5 w-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <PencilEditIcon className="h-3 w-3 text-muted-foreground" />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Right hover zone for scrolling */}
+        <div 
+          className={`absolute right-0 top-0 bottom-0 w-16 z-10 flex items-center justify-end pr-2 bg-gradient-to-l from-[#E8F4FD]/90 to-transparent ${canScrollRight ? 'cursor-pointer' : 'opacity-50'}`}
+          onMouseEnter={() => handleMouseEnter('right')}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div className="h-10 w-10 rounded-full bg-white/80 shadow-sm flex items-center justify-center">
+            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+          </div>
         </div>
       </div>
-
-      {/* Right arrow */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className={`h-10 w-10 shrink-0 ${!canScrollRight ? 'opacity-30 cursor-not-allowed' : ''}`}
-        onClick={scrollRight}
-        disabled={!canScrollRight}
-      >
-        <ChevronRight className="h-5 w-5" />
-      </Button>
     </div>
   );
 };
