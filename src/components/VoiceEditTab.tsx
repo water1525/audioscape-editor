@@ -687,24 +687,65 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
         </div>
       )}
 
-      {/* Large centered waveform when sentences exist (preset/record mode) */}
+      {/* Segmented waveform cards when sentences exist (preset/record mode) */}
       {sentences.length > 0 && audioSource === "record" && !isRecording && (
-        <div className="flex items-center justify-center min-h-[300px] w-full">
-          <div className="flex items-center justify-between gap-0.5 h-40 w-full">
-            {Array.from({ length: 100 }, (_, i) => {
-              const centerDistance = Math.abs(i - 50) / 50;
-              const baseHeight = 30 + Math.sin(i * 0.3) * 25 + Math.cos(i * 0.5) * 15;
-              const height = baseHeight * (1 - centerDistance * 0.3);
+        <div className="w-full">
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-none">
+            {sentences.map((sentence, idx) => {
+              // Generate unique waveform pattern for each sentence
+              const waveformBars = Array.from({ length: 35 }, (_, i) => {
+                const seed = idx * 100 + i;
+                const baseHeight = 25;
+                const variation = Math.sin(seed * 0.4) * 30 + Math.cos(seed * 0.6) * 20;
+                const randomness = Math.sin(seed * 1.7) * 15;
+                return Math.max(8, Math.min(95, baseHeight + variation + randomness));
+              });
+              
               return (
                 <div
-                  key={i}
-                  className="flex-1 bg-[hsl(221,100%,43%)]/30 animate-pulse"
-                  style={{
-                    height: `${height}%`,
-                    animationDelay: `${i * 0.03}s`,
-                    animationDuration: '1.5s',
-                  }}
-                />
+                  key={sentence.id}
+                  className="flex-shrink-0 w-[240px] bg-white border border-border/30 rounded-[3px] overflow-hidden"
+                >
+                  {/* Waveform area */}
+                  <div className="h-[120px] flex items-center justify-center px-3 py-2">
+                    <div className="w-full h-full flex items-center justify-center gap-[2px]">
+                      {waveformBars.map((height, i) => (
+                        <div
+                          key={i}
+                          className="w-[4px] bg-[hsl(221,100%,43%)]/30"
+                          style={{ height: `${height}%` }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Divider */}
+                  <div className="h-px bg-border/50" />
+                  
+                  {/* Text area with edit icon */}
+                  <div className="p-3 min-h-[70px] relative">
+                    <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed pr-8">
+                      {sentence.text}
+                    </p>
+                    {/* Edit icon at bottom right */}
+                    <button
+                      onClick={() => openEditModal(sentence.id)}
+                      className="absolute bottom-2 right-2 p-1 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <svg 
+                        viewBox="0 0 24 24" 
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
               );
             })}
           </div>
