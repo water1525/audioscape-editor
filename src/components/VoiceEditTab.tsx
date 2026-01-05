@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Upload, Mic, RefreshCw, X, Loader2, ChevronLeft, ChevronRight, Sparkles, ZoomIn, ZoomOut } from "lucide-react";
+import { Play, Pause, Upload, Mic, RefreshCw, X, Loader2, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import DeleteIcon from "@/components/ui/DeleteIcon";
 import { PencilEditIcon } from "@/components/ui/TabIcons";
 import { toast } from "sonner";
@@ -109,15 +109,29 @@ const WaveformCardsWithScroll = ({
   const [zoomLevel, setZoomLevel] = useState(1);
   const minZoom = 0.5;
   const maxZoom = 3;
-  const zoomStep = 0.25;
   
-  const handleZoomIn = () => {
-    setZoomLevel(prev => Math.min(maxZoom, prev + zoomStep));
-  };
+  // Wheel zoom handler (Ctrl + wheel or trackpad pinch)
+  const handleWheel = useCallback((e: WheelEvent) => {
+    // ctrlKey is true for pinch gestures on trackpad and Ctrl+wheel on mouse
+    if (e.ctrlKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      setZoomLevel(prev => Math.min(maxZoom, Math.max(minZoom, prev + delta)));
+    }
+  }, []);
   
-  const handleZoomOut = () => {
-    setZoomLevel(prev => Math.max(minZoom, prev - zoomStep));
-  };
+  // Attach wheel event listener to the container
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+      return () => {
+        container.removeEventListener('wheel', handleWheel);
+      };
+    }
+  }, [handleWheel]);
   
   // Calculate card width based on zoom level
   const baseMinWidth = 180;
@@ -222,7 +236,7 @@ const WaveformCardsWithScroll = ({
   const timeMarkers = generateTimeMarkers();
 
   return (
-    <div className="w-full flex flex-col">
+    <div ref={containerRef} className="w-full flex flex-col">
       {/* Toolbar row: Timeline ruler with scale + Edit All + Delete */}
       <div className="flex items-stretch h-10 rounded-t-[10px] overflow-hidden">
         {/* Left spacer - matches left arrow width */}
@@ -322,7 +336,7 @@ const WaveformCardsWithScroll = ({
             </button>
           )}
           
-          {/* Delete button - white background */}
+        {/* Delete button - white background */}
           {onDeleteAll && (
             <button
               onClick={onDeleteAll}
@@ -333,27 +347,9 @@ const WaveformCardsWithScroll = ({
           )}
         </div>
         
-        {/* Zoom controls */}
-        <div className="flex items-stretch shrink-0 gap-0.5 ml-1">
-          <button
-            onClick={handleZoomOut}
-            disabled={zoomLevel <= minZoom}
-            className="h-full w-8 flex items-center justify-center bg-white hover:bg-muted text-muted-foreground transition-colors border-b border-border/30 disabled:opacity-40"
-            title="Zoom Out"
-          >
-            <ZoomOut className="h-4 w-4" />
-          </button>
-          <div className="h-full px-2 flex items-center justify-center bg-white text-xs text-muted-foreground border-b border-border/30 min-w-[48px]">
-            {Math.round(zoomLevel * 100)}%
-          </div>
-          <button
-            onClick={handleZoomIn}
-            disabled={zoomLevel >= maxZoom}
-            className="h-full w-8 flex items-center justify-center bg-white hover:bg-muted text-muted-foreground transition-colors border-b border-border/30 disabled:opacity-40"
-            title="Zoom In"
-          >
-            <ZoomIn className="h-4 w-4" />
-          </button>
+        {/* Zoom level indicator */}
+        <div className="flex items-center px-2 bg-white border-b border-border/30 text-xs text-muted-foreground">
+          {Math.round(zoomLevel * 100)}%
         </div>
       </div>
       
