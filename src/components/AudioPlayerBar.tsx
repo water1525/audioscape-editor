@@ -140,8 +140,30 @@ const AudioPlayerBar = ({
 
       <div className="px-6 py-3">
         <div className="flex items-center gap-4">
-          {/* Left: Title and Voice Info */}
-          <div className="w-64 min-w-0 shrink-0">
+          {/* Left: Play/Pause Button */}
+          {isGenerating ? (
+            <div className="w-12 h-12 rounded-[3px] bg-muted text-muted-foreground flex items-center justify-center shrink-0">
+              <Loader2 className="w-5 h-5 animate-spin" />
+            </div>
+          ) : (
+            <button
+              onClick={togglePlayPause}
+              className={`w-12 h-12 rounded-[3px] flex items-center justify-center transition-colors shrink-0 ${
+                (typeof isPlayingOverride === "boolean" ? isPlayingOverride : isPlaying)
+                  ? "bg-[#AD0606] hover:bg-[#8a0505] text-white"
+                  : "bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white"
+              }`}
+            >
+              {(typeof isPlayingOverride === "boolean" ? isPlayingOverride : isPlaying) ? (
+                <Pause className="w-5 h-5" />
+              ) : (
+                <Play className="w-5 h-5 ml-0.5" />
+              )}
+            </button>
+          )}
+
+          {/* Title and Voice Info */}
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-foreground">
               {title || "Untitled Audio"}
             </p>
@@ -150,49 +172,8 @@ const AudioPlayerBar = ({
             </p>
           </div>
 
-          {/* Center: Playback Controls */}
-          <div className="flex-1 flex items-center justify-center gap-6">
-            {/* Skip Back */}
-            {!hideSkipControls && (
-              <button
-                onClick={() => skipTime(-10)}
-                className="p-2 text-[hsl(221,100%,43%)] hover:text-[hsl(221,100%,38%)] transition-colors"
-              >
-                <SkipBack10Icon className="w-7 h-7" />
-              </button>
-            )}
-
-            {/* Play/Pause or Generating */}
-            {isGenerating ? (
-              <div className="w-12 h-12 rounded-[3px] bg-muted text-muted-foreground flex items-center justify-center">
-                <Loader2 className="w-5 h-5 animate-spin" />
-              </div>
-            ) : (
-              <button
-                onClick={togglePlayPause}
-                className="w-12 h-12 rounded-[3px] bg-[hsl(221,100%,43%)] text-white flex items-center justify-center hover:bg-[hsl(221,100%,30%)] transition-colors"
-              >
-                {(typeof isPlayingOverride === "boolean" ? isPlayingOverride : isPlaying) ? (
-                  <Pause className="w-5 h-5" />
-                ) : (
-                  <Play className="w-5 h-5 ml-0.5" />
-                )}
-              </button>
-            )}
-
-            {/* Skip Forward */}
-            {!hideSkipControls && (
-              <button
-                onClick={() => skipTime(10)}
-                className="p-2 text-[hsl(221,100%,43%)] hover:text-[hsl(221,100%,38%)] transition-colors"
-              >
-                <SkipForward10Icon className="w-7 h-7" />
-              </button>
-            )}
-          </div>
-
           {/* Right section */}
-          <div className="w-48 shrink-0 flex items-center justify-end gap-3">
+          <div className="shrink-0 flex items-center gap-3">
             {/* Duration display */}
             {(typeof durationOverride === "number" || duration > 0) && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
