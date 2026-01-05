@@ -187,29 +187,28 @@ const AudioPlayerBar = ({
             </p>
           </div>
 
+          {/* Skip controls - small, light gray, positioned left */}
+          {!hideSkipControls && (
+            <div className="flex items-center gap-4 mr-4">
+              <button
+                onClick={() => skipTime(-10)}
+                className="w-5 h-5 opacity-50 hover:opacity-80 transition-opacity"
+                title="Back 10s"
+              >
+                <img src={SkipBack10Icon} alt="Back 10s" className="w-full h-full" />
+              </button>
+              <button
+                onClick={() => skipTime(10)}
+                className="w-5 h-5 opacity-50 hover:opacity-80 transition-opacity"
+                title="Forward 10s"
+              >
+                <img src={SkipForward10Icon} alt="Forward 10s" className="w-full h-full" />
+              </button>
+            </div>
+          )}
+
           {/* Right section */}
           <div className="shrink-0 flex items-center gap-3">
-            {/* Skip controls - small, light gray */}
-            {!hideSkipControls && (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => skipTime(-10)}
-                  className="w-5 h-5 opacity-50 hover:opacity-80 transition-opacity"
-                  title="Back 10s"
-                >
-                  <img src={SkipBack10Icon} alt="Back 10s" className="w-full h-full" />
-                </button>
-                <button
-                  onClick={() => skipTime(10)}
-                  className="w-5 h-5 opacity-50 hover:opacity-80 transition-opacity"
-                  title="Forward 10s"
-                >
-                  <img src={SkipForward10Icon} alt="Forward 10s" className="w-full h-full" />
-                </button>
-              </div>
-            )}
-
-            {/* Duration display */}
             {(typeof durationOverride === "number" || duration > 0) && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <span>
