@@ -237,14 +237,31 @@ const WaveformCardsWithScroll = ({
             return (
               <div
                 key={`text-${sentence.id}`}
-                className={`flex-shrink-0 min-w-[180px] max-w-[260px] px-3 py-2 cursor-pointer transition-colors relative ${isHovered ? 'bg-muted/50' : ''}`}
+                className={`flex-shrink-0 min-w-[180px] max-w-[260px] px-3 py-2 cursor-pointer transition-colors relative ${isHovered ? "bg-muted/50" : ""}`}
                 onClick={() => onEditSentence(sentence.id)}
                 onMouseEnter={() => setHoveredSentenceId(sentence.id)}
                 onMouseLeave={() => setHoveredSentenceId(null)}
               >
-                <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
-                  {sentence.text}
-                </p>
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
+                    {sentence.text}
+                  </p>
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 shrink-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditSentence(sentence.id);
+                    }}
+                    aria-label="Edit segment"
+                    title="Edit"
+                  >
+                    <PencilEditIcon className="h-4 w-4 text-foreground/80" />
+                  </Button>
+                </div>
               </div>
             );
           })}
