@@ -704,7 +704,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
               return (
                 <div
                   key={sentence.id}
-                  className="flex-shrink-0 w-[240px] bg-white border border-border/30 rounded-[3px] overflow-hidden"
+                  className="flex-shrink-0 w-[240px] bg-[#F5F8FB] rounded-[3px] overflow-hidden"
                 >
                   {/* Waveform area */}
                   <div className="h-[120px] flex items-center justify-center px-3 py-2">
@@ -712,7 +712,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                       {waveformBars.map((height, i) => (
                         <div
                           key={i}
-                          className="w-[4px] bg-[hsl(221,100%,43%)]/30"
+                          className="w-[4px] bg-[hsl(221,80%,75%)]"
                           style={{ height: `${height}%` }}
                         />
                       ))}
@@ -720,21 +720,21 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                   </div>
                   
                   {/* Divider */}
-                  <div className="h-px bg-border/50" />
+                  <div className="h-px bg-border/30" />
                   
                   {/* Text area with edit icon */}
-                  <div className="p-3 min-h-[70px] relative">
+                  <div className="p-3 min-h-[80px] relative bg-white">
                     <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed pr-8">
                       {sentence.text}
                     </p>
-                    {/* Edit icon at bottom right */}
+                    {/* Edit icon at bottom right - matching bottom timeline style */}
                     <button
                       onClick={() => openEditModal(sentence.id)}
-                      className="absolute bottom-2 right-2 p-1 text-muted-foreground hover:text-foreground transition-colors"
+                      className="absolute bottom-2 right-2 h-7 w-7 flex items-center justify-center rounded-[3px] bg-[#F5F8FB] border border-border hover:bg-[#CCCCCC] transition-colors"
                     >
                       <svg 
                         viewBox="0 0 24 24" 
-                        className="h-4 w-4"
+                        className="h-4 w-4 text-foreground"
                         fill="none"
                         stroke="currentColor"
                         strokeWidth="2"
