@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { Download, ChevronDown, Save, Loader2 } from "lucide-react";
+import { Download, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import SkipBack10Icon from "@/assets/icon-skip-back-10.svg";
@@ -245,15 +245,6 @@ const AudioPlayerBar = ({
               <Download className="w-5 h-5" />
             </Button>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              disabled={isGenerating}
-              className="text-muted-foreground hover:text-foreground disabled:opacity-50"
-            >
-              <ChevronDown className="w-5 h-5" />
-            </Button>
           </div>
         </div>
       </div>
