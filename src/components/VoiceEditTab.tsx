@@ -202,10 +202,13 @@ const WaveformCardsWithScroll = ({
     <div className="w-full flex flex-col">
       {/* Toolbar row: Timeline ruler with scale + Edit All + Delete */}
       <div className="flex items-stretch h-10 rounded-t-[10px] overflow-hidden">
-        {/* Left side: Time ruler with scale - white background */}
+        {/* Left spacer - matches left arrow width */}
+        <div className="w-10 shrink-0 bg-white border-b border-border/30" />
+        
+        {/* Time ruler with scale - aligned with waveform area */}
         <div className="flex-1 bg-white flex items-end overflow-hidden border-b border-border/30">
           {/* Ruler scale */}
-          <div className="flex items-end h-full w-full relative px-14">
+          <div className="flex items-end h-full w-full relative">
             {/* Selection indicator on time ruler */}
             {hoveredTimeRange && (
               <div 
@@ -255,6 +258,9 @@ const WaveformCardsWithScroll = ({
             })}
           </div>
         </div>
+        
+        {/* Right spacer - matches right arrow width */}
+        <div className="w-10 shrink-0 bg-white border-b border-border/30" />
         
         {/* Right side: Edit All + Delete - no gap */}
         <div className="flex items-stretch shrink-0">
