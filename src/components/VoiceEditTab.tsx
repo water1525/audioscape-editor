@@ -240,15 +240,29 @@ const WaveformCardsWithScroll = ({
                     </>
                   )}
 
-                  {/* Ticks (match waveform segment boundaries visually) */}
+                  {/* Primary ticks at segment boundaries */}
                   <div className="absolute left-0 bottom-0 w-px h-3 bg-muted-foreground/40" />
-                  {!isLast && (
-                    <div className="absolute right-0 top-0 bottom-0 w-px bg-muted-foreground/10" />
-                  )}
                   {isLast && (
                     <div className="absolute right-0 bottom-0 w-px h-3 bg-muted-foreground/40" />
                   )}
-                  <div className="absolute left-1/2 bottom-0 w-px h-2 bg-muted-foreground/20 -translate-x-1/2" />
+                  
+                  {/* Secondary tick at center (1.5s mark) */}
+                  <div className="absolute left-1/2 bottom-0 w-px h-2.5 bg-muted-foreground/30 -translate-x-1/2" />
+                  
+                  {/* Tertiary ticks at quarter positions (0.75s, 2.25s marks) */}
+                  <div className="absolute left-1/4 bottom-0 w-px h-1.5 bg-muted-foreground/20 -translate-x-1/2" />
+                  <div className="absolute left-3/4 bottom-0 w-px h-1.5 bg-muted-foreground/20 -translate-x-1/2" />
+                  
+                  {/* Fine ticks at eighth positions */}
+                  <div className="absolute left-[12.5%] bottom-0 w-px h-1 bg-muted-foreground/10 -translate-x-1/2" />
+                  <div className="absolute left-[37.5%] bottom-0 w-px h-1 bg-muted-foreground/10 -translate-x-1/2" />
+                  <div className="absolute left-[62.5%] bottom-0 w-px h-1 bg-muted-foreground/10 -translate-x-1/2" />
+                  <div className="absolute left-[87.5%] bottom-0 w-px h-1 bg-muted-foreground/10 -translate-x-1/2" />
+                  
+                  {/* Segment separator line */}
+                  {!isLast && (
+                    <div className="absolute right-0 top-0 bottom-0 w-px bg-muted-foreground/10" />
+                  )}
 
                   {/* Reserve the same separator space as waveform (ml-1) */}
                   {!isLast && <div className="h-2/3 w-px ml-1 opacity-0" />}
