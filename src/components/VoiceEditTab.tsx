@@ -224,7 +224,7 @@ const WaveformCardsWithScroll = ({
       </div>
 
       {/* Text area row with white background */}
-      <div className="h-[80px] bg-background rounded-b-[10px] flex overflow-x-auto scrollbar-none">
+      <div className="h-[80px] bg-white rounded-b-[10px] flex overflow-x-auto scrollbar-none shadow-sm">
         <div className="w-12 shrink-0" /> {/* Spacer for left arrow */}
         <div className="flex-1 flex min-w-max">
           {sentences.map((sentence) => (
