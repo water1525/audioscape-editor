@@ -32,6 +32,20 @@ interface SentenceTimelineProps {
   batchProgress?: { current: number; total: number };
 }
 
+// Generate static waveform bars for display
+const generateStaticWaveformBars = (count: number): number[] => {
+  // Create a deterministic pattern that looks like audio waveform
+  const bars: number[] = [];
+  for (let i = 0; i < count; i++) {
+    // Create a wave-like pattern
+    const base = 0.3;
+    const wave = Math.sin(i * 0.3) * 0.3;
+    const variation = Math.sin(i * 0.7) * 0.2;
+    bars.push(base + wave + variation + 0.2);
+  }
+  return bars;
+};
+
 // Individual sentence item component with hover state
 interface SentenceItemProps {
   sentence: SentenceSegment;
@@ -57,6 +71,7 @@ const SentenceItem = ({
   generateWaveformBars,
 }: SentenceItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const waveformBars = generateStaticWaveformBars(40);
 
   return (
     <div
@@ -64,29 +79,68 @@ const SentenceItem = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`
-        relative flex-shrink-0 w-[220px] h-20 rounded-[3px] cursor-pointer
-        transition-all duration-200 overflow-hidden group
+        relative flex-shrink-0 w-[220px] rounded-lg cursor-pointer
+        transition-all duration-200 overflow-hidden group border
         ${isSelected || isPlaying
-          ? "bg-[#F5F8FB]"
-          : sentence.isEdited
-            ? "bg-[#F5F8FB] hover:bg-[#EBF0F5]"
-            : "bg-[#F5F8FB] hover:bg-[#EBF0F5]"
+          ? "border-[hsl(221,100%,43%)] bg-white"
+          : "border-border bg-white hover:border-[hsl(221,100%,43%)]/50"
         }
       `}
     >
-      {/* Text at top */}
-      <div className="absolute top-2 left-2 right-2 z-10">
-        <p
-          className={`text-xs line-clamp-2 leading-tight ${
-            isSelected || isPlaying
-              ? "text-foreground font-medium"
-              : "text-muted-foreground"
-          }`}
-        >
-          {sentence.text}
-        </p>
+      {/* Waveform visualization area */}
+      <div className="h-28 bg-white flex items-center justify-center px-4 py-3">
+        <div className="flex items-center justify-center gap-[2px] h-full w-full">
+          {waveformBars.map((height, i) => (
+            <div
+              key={i}
+              className={`w-[3px] transition-colors ${
+                isPlaying
+                  ? "bg-[hsl(221,100%,43%)]/70"
+                  : "bg-[hsl(221,100%,43%)]/30"
+              }`}
+              style={{ 
+                height: `${height * 100}%`,
+                minHeight: '8px',
+                maxHeight: '90%'
+              }}
+            />
+          ))}
+        </div>
       </div>
 
+      {/* Text and edit button area */}
+      <div className="px-3 py-2.5 border-t border-border bg-white min-h-[70px] flex flex-col justify-between">
+        <p className="text-sm text-foreground line-clamp-2 leading-snug">
+          {sentence.text}
+        </p>
+        
+        {/* Bottom row with edited status and edit button */}
+        <div className="flex items-center justify-between mt-2">
+          {/* Edited status */}
+          {sentence.isEdited ? (
+            <span className="text-xs text-[hsl(221,100%,43%)] font-normal">
+              Edited
+            </span>
+          ) : (
+            <span />
+          )}
+          
+          {/* Edit button */}
+          {!isEditGenerating && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(sentence.id);
+              }}
+              className="h-7 w-7 hover:bg-muted"
+            >
+              <PencilEditIcon className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          )}
+        </div>
+      </div>
 
       {/* Full-width generating bar at bottom */}
       {isEditGenerating && (
@@ -96,43 +150,16 @@ const SentenceItem = ({
         </div>
       )}
 
-      {/* Edit button / edited state - positioned at bottom right */}
-      {!isEditGenerating && (
-        <div className="absolute bottom-2 right-2 z-10 flex items-center gap-2">
-          {/* Non-clickable "Edited" text label for edited sentences */}
-          {sentence.isEdited && (
-            <span className="text-sm text-[hsl(221,100%,43%)] font-normal">
-              Edited
-            </span>
-          )}
-          {/* Pencil edit button - show on hover or selected */}
-          {(isHovered || isSelected) && !isGenerating && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(sentence.id);
-              }}
-              className="h-7 w-7 bg-white hover:bg-[#CCCCCC] border-border"
-            >
-              <PencilEditIcon className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      )}
-
-
-      {/* Playing indicator - bottom left */}
-      {isPlaying && !isGenerating && !isHovered && (
-        <div className="absolute bottom-1.5 left-1.5">
+      {/* Playing indicator - top right corner */}
+      {isPlaying && !isGenerating && (
+        <div className="absolute top-2 right-2">
           <div className="flex items-center gap-0.5">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
                 className="w-0.5 bg-[hsl(221,100%,43%)] animate-pulse"
                 style={{
-                  height: `${6 + i * 2}px`,
+                  height: `${8 + i * 3}px`,
                   animationDelay: `${i * 0.1}s`,
                 }}
               />
@@ -140,7 +167,6 @@ const SentenceItem = ({
           </div>
         </div>
       )}
-
     </div>
   );
 };
