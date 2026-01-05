@@ -201,6 +201,67 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
     }
   };
 
+  // Convert audio blob to WAV format for better API compatibility
+  const convertToWav = async (audioBlob: Blob): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const audioContext = new AudioContext();
+      const reader = new FileReader();
+      
+      reader.onload = async () => {
+        try {
+          const arrayBuffer = reader.result as ArrayBuffer;
+          const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+          
+          // Convert to WAV
+          const numChannels = audioBuffer.numberOfChannels;
+          const sampleRate = audioBuffer.sampleRate;
+          const length = audioBuffer.length * numChannels * 2;
+          const buffer = new ArrayBuffer(44 + length);
+          const view = new DataView(buffer);
+          
+          // WAV header
+          const writeString = (offset: number, str: string) => {
+            for (let i = 0; i < str.length; i++) {
+              view.setUint8(offset + i, str.charCodeAt(i));
+            }
+          };
+          
+          writeString(0, 'RIFF');
+          view.setUint32(4, 36 + length, true);
+          writeString(8, 'WAVE');
+          writeString(12, 'fmt ');
+          view.setUint32(16, 16, true);
+          view.setUint16(20, 1, true); // PCM
+          view.setUint16(22, numChannels, true);
+          view.setUint32(24, sampleRate, true);
+          view.setUint32(28, sampleRate * numChannels * 2, true);
+          view.setUint16(32, numChannels * 2, true);
+          view.setUint16(34, 16, true);
+          writeString(36, 'data');
+          view.setUint32(40, length, true);
+          
+          // Write audio data
+          let offset = 44;
+          for (let i = 0; i < audioBuffer.length; i++) {
+            for (let channel = 0; channel < numChannels; channel++) {
+              const sample = audioBuffer.getChannelData(channel)[i];
+              const intSample = Math.max(-1, Math.min(1, sample)) * 0x7FFF;
+              view.setInt16(offset, intSample, true);
+              offset += 2;
+            }
+          }
+          
+          resolve(new Blob([buffer], { type: 'audio/wav' }));
+        } catch (err) {
+          reject(err);
+        }
+      };
+      
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(audioBlob);
+    });
+  };
+
   // Clone voice using Step TTS Mini
   const cloneVoice = async () => {
     if (!recordedAudio || !targetText.trim()) {
@@ -210,8 +271,12 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
 
     setIsCloning(true);
     try {
-      // Convert recorded audio blob to base64
-      const arrayBuffer = await recordedAudio.arrayBuffer();
+      // Convert to WAV format for better API compatibility
+      toast.info("Converting audio format...");
+      const wavBlob = await convertToWav(recordedAudio);
+      
+      // Convert WAV blob to base64
+      const arrayBuffer = await wavBlob.arrayBuffer();
       const uint8Array = new Uint8Array(arrayBuffer);
       let binary = '';
       for (let i = 0; i < uint8Array.length; i++) {
@@ -224,7 +289,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
           audioBase64,
           sampleText, // The text that was spoken during recording
           targetText, // The text to generate with the cloned voice
-          mimeType: recordedAudio.type, // Pass the actual MIME type
+          mimeType: "audio/wav", // Now sending WAV format
         },
       });
 
