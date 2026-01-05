@@ -459,25 +459,9 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
               }
             }}
           >
-            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed pr-8">
+            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
               {sentences.map(s => s.text).join('')}
             </p>
-            {/* Edit icon at bottom right */}
-            <div className="flex justify-end mt-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (sentences.length > 0) {
-                    onEditSentence(sentences[0].id);
-                  }
-                }}
-                className="h-7 w-7 bg-white hover:bg-[#CCCCCC] border-border"
-              >
-                <PencilEditIcon className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
 
           {/* Edit All button */}
