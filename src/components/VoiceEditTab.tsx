@@ -265,9 +265,9 @@ const WaveformCardsWithScroll = ({
       <div className="h-[40vh] min-h-[280px] flex flex-col">
         {/* Waveform row with side arrow blocks */}
         <div className="flex-1 flex items-stretch">
-        {/* Left arrow block */}
+        {/* Left arrow block - no rounded corners */}
         <div 
-          className={`w-12 shrink-0 bg-[hsl(210,70%,55%)] rounded-l-[10px] flex items-center justify-center cursor-pointer hover:bg-[hsl(210,75%,50%)] transition-colors ${!canScrollLeft ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`w-12 shrink-0 bg-[hsl(210,70%,55%)] flex items-center justify-center cursor-pointer hover:bg-[hsl(210,75%,50%)] transition-colors ${!canScrollLeft ? 'opacity-50 cursor-not-allowed' : ''}`}
           onMouseEnter={() => handleMouseEnter('left')}
           onMouseLeave={handleMouseLeave}
         >
@@ -321,9 +321,9 @@ const WaveformCardsWithScroll = ({
           </div>
         </div>
 
-        {/* Right arrow block */}
+        {/* Right arrow block - no rounded corners */}
         <div 
-          className={`w-12 shrink-0 bg-[hsl(210,70%,55%)] rounded-r-[10px] flex items-center justify-center cursor-pointer hover:bg-[hsl(210,75%,50%)] transition-colors ${!canScrollRight ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`w-12 shrink-0 bg-[hsl(210,70%,55%)] flex items-center justify-center cursor-pointer hover:bg-[hsl(210,75%,50%)] transition-colors ${!canScrollRight ? 'opacity-50 cursor-not-allowed' : ''}`}
           onMouseEnter={() => handleMouseEnter('right')}
           onMouseLeave={handleMouseLeave}
         >
@@ -331,7 +331,7 @@ const WaveformCardsWithScroll = ({
         </div>
         </div>
       </div>
-      {/* Text area row with white background */}
+      {/* Text area row with white background - bottom rounded corners only */}
       <div className="h-[80px] bg-white rounded-b-[10px] flex overflow-x-auto scrollbar-none shadow-sm">
         <div className="w-12 shrink-0" /> {/* Spacer for left arrow */}
         <div className="flex-1 flex min-w-max">
