@@ -180,8 +180,8 @@ serve(async (req) => {
 
     console.log("Audio generated successfully with cloned voice");
 
-    // Stream MP3 back directly (avoids heavy base64 conversions)
-    const contentType = ttsResponse.headers.get("content-type") || "audio/mpeg";
+    // Stream MP3 back as octet-stream so supabase-js returns a Blob (not text)
+    const contentType = "application/octet-stream";
 
     if (ttsResponse.body) {
       return new Response(ttsResponse.body, {
