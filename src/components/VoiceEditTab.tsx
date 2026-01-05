@@ -189,50 +189,46 @@ const WaveformCardsWithScroll = ({
   return (
     <div className="w-full flex flex-col">
       {/* Toolbar row: Timeline ruler with scale + Edit All + Delete */}
-      <div className="flex items-stretch h-10">
-        {/* Left side: Time ruler with scale and background */}
-        <div className="flex-1 bg-[#E8ECF0] flex items-center overflow-hidden">
+      <div className="flex items-stretch h-10 rounded-t-[10px] overflow-hidden">
+        {/* Left side: Time ruler with scale - white background */}
+        <div className="flex-1 bg-white flex items-end overflow-hidden border-b border-border/30">
           {/* Ruler scale */}
-          <div className="flex items-end h-full w-full relative">
+          <div className="flex items-end h-full w-full relative px-14">
             {/* Time scale ticks */}
-            <div className="flex items-end h-full w-full px-4">
-              {timeMarkers.map((time, idx) => (
+            {timeMarkers.map((time, idx) => (
+              <div 
+                key={time} 
+                className="flex flex-col items-center absolute bottom-0"
+                style={{ 
+                  left: `${(time / totalDuration) * 100}%`,
+                  transform: 'translateX(-50%)'
+                }}
+              >
+                {/* Tick mark */}
+                <div className={`w-px ${idx === 0 || idx === timeMarkers.length - 1 ? 'h-3' : 'h-2'} bg-muted-foreground/40`} />
+                {/* Time label */}
+                <span className="text-[10px] text-muted-foreground/70 mb-1">{formatTime(time)}</span>
+              </div>
+            ))}
+            {/* Minor ticks between major markers */}
+            {Array.from({ length: Math.min(totalDuration, 20) }, (_, i) => i).map((tick) => {
+              if (timeMarkers.includes(tick)) return null;
+              return (
                 <div 
-                  key={time} 
-                  className="flex flex-col items-center"
+                  key={`minor-${tick}`}
+                  className="absolute w-px h-1.5 bg-muted-foreground/20 bottom-5"
                   style={{ 
-                    position: 'absolute', 
-                    left: `${(time / totalDuration) * 100}%`,
-                    transform: 'translateX(-50%)'
+                    left: `${(tick / totalDuration) * 100}%`
                   }}
-                >
-                  {/* Tick mark */}
-                  <div className={`w-px ${idx === 0 || idx === timeMarkers.length - 1 ? 'h-4' : 'h-3'} bg-muted-foreground/50`} />
-                  {/* Time label */}
-                  <span className="text-[10px] text-muted-foreground mt-0.5">{formatTime(time)}</span>
-                </div>
-              ))}
-              {/* Minor ticks between major markers */}
-              {Array.from({ length: Math.min(totalDuration, 20) }, (_, i) => i).map((tick) => {
-                if (timeMarkers.includes(tick)) return null;
-                return (
-                  <div 
-                    key={`minor-${tick}`}
-                    className="absolute w-px h-2 bg-muted-foreground/30"
-                    style={{ 
-                      left: `${(tick / totalDuration) * 100}%`,
-                      bottom: '16px'
-                    }}
-                  />
-                );
-              })}
-            </div>
+                />
+              );
+            })}
           </div>
         </div>
         
         {/* Right side: Edit All + Delete - no gap */}
         <div className="flex items-stretch shrink-0">
-          {/* Edit All button - blue background, no border */}
+          {/* Edit All button - blue background */}
           {onEditAll && (
             <button
               onClick={onEditAll}
@@ -253,11 +249,11 @@ const WaveformCardsWithScroll = ({
             </button>
           )}
           
-          {/* Delete button - matches height */}
+          {/* Delete button - white background */}
           {onDeleteAll && (
             <button
               onClick={onDeleteAll}
-              className="h-full w-10 flex items-center justify-center bg-[#E8ECF0] hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors"
+              className="h-full w-10 flex items-center justify-center bg-white hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors border-b border-border/30"
             >
               <DeleteIcon className="h-4 w-4" />
             </button>
