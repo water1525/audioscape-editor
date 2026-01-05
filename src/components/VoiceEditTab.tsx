@@ -127,10 +127,10 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
     onSentencesChange?.(sentences);
   }, [sentences, onSentencesChange]);
 
-  // Split text into sentences
+  // Split text into sentences by punctuation (Chinese and English)
   const splitIntoSentences = (text: string): string[] => {
     return text
-      .split(/[。！？，；]/)
+      .split(/[。！？，；,.!?]/)
       .filter(s => s.trim().length > 0)
       .map(s => s.trim());
   };
