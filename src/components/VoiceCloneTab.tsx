@@ -332,17 +332,50 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
         },
       });
 
-      // Transport-level errors
-      if (error) throw new Error((error as any)?.message || "Voice cloning failed");
+      if (error) {
+        const status = (error as any)?.context?.status ?? (error as any)?.status;
+        const msg = (error as any)?.message || "Voice cloning failed";
+        throw new Error(status ? `克隆请求失败（${status}）：${msg}` : `克隆请求失败：${msg}`);
+      }
 
       // Some backends return { error } with HTTP 200
       if (data && typeof data === "object" && "error" in (data as any)) {
         throw new Error(String((data as any).error || "Voice cloning failed"));
       }
 
-      // Expected response: { audioBase64, format }
+      // Legacy backend: { audioBase64, format }
       if (data && typeof data === "object" && "audioBase64" in (data as any)) {
         const audioBlob = base64ToBlob(String((data as any).audioBase64), "audio/mpeg");
+        const url = URL.createObjectURL(audioBlob);
+        setClonedAudioUrl(url);
+        toast.success("克隆成功，已生成试听音频");
+        onAudioGenerated?.(url, "Cloned Audio");
+        return;
+      }
+
+      // New backend: returns MP3 bytes
+      if (data instanceof Blob) {
+        if (data.size === 0) throw new Error("生成音频为空，请稍后重试");
+        const url = URL.createObjectURL(data);
+        setClonedAudioUrl(url);
+        toast.success("克隆成功，已生成试听音频");
+        onAudioGenerated?.(url, "Cloned Audio");
+        return;
+      }
+
+      if (data instanceof ArrayBuffer) {
+        const audioBlob = new Blob([data], { type: "audio/mpeg" });
+        if (audioBlob.size === 0) throw new Error("生成音频为空，请稍后重试");
+        const url = URL.createObjectURL(audioBlob);
+        setClonedAudioUrl(url);
+        toast.success("克隆成功，已生成试听音频");
+        onAudioGenerated?.(url, "Cloned Audio");
+        return;
+      }
+
+      if (data instanceof Uint8Array) {
+        const audioBlob = new Blob([data as unknown as BlobPart], { type: "audio/mpeg" });
+        if (audioBlob.size === 0) throw new Error("生成音频为空，请稍后重试");
         const url = URL.createObjectURL(audioBlob);
         setClonedAudioUrl(url);
         toast.success("克隆成功，已生成试听音频");
