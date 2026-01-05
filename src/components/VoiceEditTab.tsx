@@ -186,6 +186,18 @@ const WaveformCardsWithScroll = ({
   
   const timeMarkers = generateTimeMarkers();
 
+  // Calculate sentence positions for time ruler selection indicator
+  const sentenceDuration = 3; // Each sentence is ~3 seconds
+  const getSentenceTimeRange = (sentenceId: number) => {
+    const index = sentences.findIndex(s => s.id === sentenceId);
+    if (index === -1) return null;
+    const startTime = index * sentenceDuration;
+    const endTime = startTime + sentenceDuration;
+    return { startTime, endTime };
+  };
+
+  const hoveredTimeRange = hoveredSentenceId ? getSentenceTimeRange(hoveredSentenceId) : null;
+
   return (
     <div className="w-full flex flex-col">
       {/* Toolbar row: Timeline ruler with scale + Edit All + Delete */}
@@ -194,6 +206,24 @@ const WaveformCardsWithScroll = ({
         <div className="flex-1 bg-white flex items-end overflow-hidden border-b border-border/30">
           {/* Ruler scale */}
           <div className="flex items-end h-full w-full relative px-14">
+            {/* Selection indicator on time ruler */}
+            {hoveredTimeRange && (
+              <div 
+                className="absolute top-0 bottom-0 bg-[hsl(210,70%,55%)]/20 border-l-2 border-r-2 border-[hsl(210,70%,55%)] transition-all duration-150"
+                style={{ 
+                  left: `${(hoveredTimeRange.startTime / totalDuration) * 100}%`,
+                  width: `${((hoveredTimeRange.endTime - hoveredTimeRange.startTime) / totalDuration) * 100}%`
+                }}
+              >
+                {/* Start and end time labels */}
+                <div className="absolute -top-0.5 left-0 transform -translate-x-1/2">
+                  <span className="text-[9px] font-medium text-[hsl(210,70%,55%)] bg-white px-0.5 rounded">{formatTime(hoveredTimeRange.startTime)}</span>
+                </div>
+                <div className="absolute -top-0.5 right-0 transform translate-x-1/2">
+                  <span className="text-[9px] font-medium text-[hsl(210,70%,55%)] bg-white px-0.5 rounded">{formatTime(hoveredTimeRange.endTime)}</span>
+                </div>
+              </div>
+            )}
             {/* Time scale ticks */}
             {timeMarkers.map((time, idx) => (
               <div 
