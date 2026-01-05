@@ -723,32 +723,7 @@ const Playground = () => {
       {/* Bottom padding when player bar is visible */}
       {showPlayerBar && <div className={editSentences.length > 0 ? "h-36" : "h-20"} />}
 
-      {/* Sentence Timeline for Edit tab */}
-      {activeTab === "edit" && editSentences.length > 0 && (
-        <SentenceTimeline
-          ref={sentenceTimelineRef}
-          sentences={editSentences}
-          onEditSentence={(id) => {
-            (window as any).__voiceEditOpenModal?.(id);
-          }}
-          onEditAll={() => {
-            (window as any).__voiceEditOpenBatchModal?.();
-          }}
-          onDelete={() => {
-            (window as any).__voiceEditDeleteAudio?.();
-          }}
-          onSentencesUpdate={setEditSentences}
-          onSelectionChange={setEditSelectedSentenceId}
-          onPlayingChange={setEditPlayingSentenceId}
-          onTimeChange={(current, total) => {
-            setEditCurrentTime(current);
-            setEditDuration(total);
-          }}
-          editGeneratingId={editGeneratingSentenceId}
-          isBatchGenerating={isBatchGenerating}
-          batchProgress={batchProgress}
-        />
-      )}
+      {/* SentenceTimeline removed - functionality integrated into VoiceEditTab */}
 
       {/* Fixed Bottom Audio Player Bar */}
       <AudioPlayerBar
