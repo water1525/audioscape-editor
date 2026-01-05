@@ -448,47 +448,43 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
 
     return (
       <div className="fixed bottom-[68px] left-56 right-0 z-40 bg-card border-t border-l border-border rounded-tl-[3px]">
-        {/* Horizontal sentence segments with navigation */}
-        <div className="px-6 py-3 flex items-center gap-2">
+        {/* Continuous waveform display */}
+        <div className="px-6 py-3 flex items-center gap-4">
           {/* Left scroll button */}
           <Button
             variant="ghost"
             size="icon"
-            className={`h-8 w-8 shrink-0 ${!canScrollLeft ? 'opacity-30 cursor-not-allowed' : ''}`}
-            onClick={scrollLeft}
-            disabled={!canScrollLeft}
+            className="h-8 w-8 shrink-0 opacity-50"
+            disabled
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
 
-          {/* Scrollable container */}
-          <div 
-            ref={scrollContainerRef}
-            className="flex gap-2 overflow-x-auto pb-1 scrollbar-none flex-1"
-          >
-            {sentences.map((sentence) => (
-              <SentenceItem
-                key={sentence.id}
-                sentence={sentence}
-                isSelected={selectedId === sentence.id}
-                isPlaying={playingId === sentence.id}
-                isGenerating={generatingId === sentence.id}
-                isEditGenerating={editGeneratingId === sentence.id}
-                onEdit={onEditSentence}
-                onClick={handleClick}
-                onNavigateVersion={navigateVersion}
-                generateWaveformBars={generateWaveformBars}
-              />
-            ))}
+          {/* Full-width continuous waveform */}
+          <div className="flex-1 h-12 flex items-center justify-center">
+            <div className="w-full h-full flex items-center gap-[1px]">
+              {Array.from({ length: 150 }, (_, i) => {
+                const baseHeight = 20;
+                const variation = Math.sin(i * 0.2) * 25 + Math.cos(i * 0.4) * 15;
+                const randomness = Math.sin(i * 1.3) * 10;
+                const height = Math.max(10, Math.min(95, baseHeight + variation + randomness));
+                return (
+                  <div
+                    key={i}
+                    className="flex-1 bg-[hsl(221,80%,75%)]"
+                    style={{ height: `${height}%` }}
+                  />
+                );
+              })}
+            </div>
           </div>
 
           {/* Right scroll button */}
           <Button
             variant="ghost"
             size="icon"
-            className={`h-8 w-8 shrink-0 ${!canScrollRight ? 'opacity-30 cursor-not-allowed' : ''}`}
-            onClick={scrollRight}
-            disabled={!canScrollRight}
+            className="h-8 w-8 shrink-0 opacity-50"
+            disabled
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
