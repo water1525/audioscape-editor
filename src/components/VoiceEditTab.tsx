@@ -86,10 +86,18 @@ export interface SentenceSegment {
 // Waveform cards with left/right arrow navigation
 const WaveformCardsWithScroll = ({ 
   sentences, 
-  onEditSentence 
+  onEditSentence,
+  onEditAll,
+  onDeleteAll,
+  isBatchGenerating,
+  batchProgress,
 }: { 
   sentences: SentenceSegment[]; 
   onEditSentence: (id: number) => void;
+  onEditAll?: () => void;
+  onDeleteAll?: () => void;
+  isBatchGenerating?: boolean;
+  batchProgress?: { current: number; total: number };
 }) => {
   const [hoveredSentenceId, setHoveredSentenceId] = useState<number | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -159,9 +167,59 @@ const WaveformCardsWithScroll = ({
   };
 
   return (
-    <div className="w-full h-[45vh] min-h-[320px] flex flex-col">
-      {/* Waveform row with side arrow blocks */}
-      <div className="flex-1 flex items-stretch">
+    <div className="w-full flex flex-col">
+      {/* Toolbar row: Timeline ruler - Edit All - Delete */}
+      <div className="flex items-center justify-between px-4 py-2 bg-card border-b border-border">
+        {/* Left side: Time ruler */}
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span className="text-sm font-medium">0:00 / 0:00</span>
+        </div>
+        
+        {/* Right side: Edit All + Delete */}
+        <div className="flex items-center gap-2">
+          {/* Edit All button - blue background */}
+          {onEditAll && (
+            <Button
+              onClick={onEditAll}
+              disabled={isBatchGenerating}
+              className="h-8 gap-1.5 shrink-0 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,35%)] text-white font-medium"
+            >
+              {isBatchGenerating ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Generating ({batchProgress?.current || 0}/{batchProgress?.total || 0})
+                </>
+              ) : (
+                <>
+                  <PencilEditIcon className="h-3.5 w-3.5" />
+                  Edit All
+                </>
+              )}
+            </Button>
+          )}
+          
+          {/* Delete button */}
+          {onDeleteAll && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onDeleteAll}
+              className="h-8 w-8 shrink-0 border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50"
+            >
+              <DeleteIcon className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </div>
+      
+      {/* Waveform area */}
+      <div className="h-[40vh] min-h-[280px] flex flex-col">
+        {/* Waveform row with side arrow blocks */}
+        <div className="flex-1 flex items-stretch">
         {/* Left arrow block */}
         <div 
           className={`w-12 shrink-0 bg-[hsl(210,70%,55%)] rounded-l-[10px] flex items-center justify-center cursor-pointer hover:bg-[hsl(210,75%,50%)] transition-colors ${!canScrollLeft ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -226,8 +284,8 @@ const WaveformCardsWithScroll = ({
         >
           <ChevronRight className="h-6 w-6 text-white" />
         </div>
+        </div>
       </div>
-
       {/* Text area row with white background */}
       <div className="h-[80px] bg-white rounded-b-[10px] flex overflow-x-auto scrollbar-none shadow-sm">
         <div className="w-12 shrink-0" /> {/* Spacer for left arrow */}
@@ -882,7 +940,11 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
         <div className="-mx-6">
           <WaveformCardsWithScroll 
             sentences={sentences} 
-            onEditSentence={openEditModal} 
+            onEditSentence={openEditModal}
+            onEditAll={openBatchEditModal}
+            onDeleteAll={deleteAudio}
+            isBatchGenerating={isBatchGenerating}
+            batchProgress={batchProgress}
           />
         </div>
       )}
