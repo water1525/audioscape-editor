@@ -104,8 +104,8 @@ const SentenceItem = ({
               Edited
             </span>
           )}
-          {/* Pencil edit button - show on hover or selected */}
-          {(isHovered || isSelected) && !isGenerating && (
+          {/* Pencil edit button - always visible */}
+          {!isGenerating && (
             <Button
               variant="outline"
               size="icon"
