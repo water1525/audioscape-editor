@@ -8,10 +8,10 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-14">
           {/* Left: Logo */}
           <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-3">
-              <span className="text-lg font-bold text-[hsl(0,0%,100%)]">Step Star</span>
+            <Link to="/" className="flex items-center gap-2">
+              <span className="text-lg font-bold text-[hsl(0,0%,100%)]">StepFun</span>
               <span className="text-[hsl(220,10%,40%)]">|</span>
-              <span className="text-sm text-[hsl(220,10%,60%)]">Open Platform</span>
+              <span className="text-sm text-[hsl(195,100%,50%)]">Open Platform</span>
             </Link>
           </div>
 
