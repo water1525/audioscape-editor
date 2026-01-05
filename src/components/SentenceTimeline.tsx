@@ -448,50 +448,37 @@ const SentenceTimeline = forwardRef<SentenceTimelineHandle, SentenceTimelineProp
 
     return (
       <div className="fixed bottom-[68px] left-56 right-0 z-40 bg-card border-t border-l border-border rounded-tl-[3px]">
-        {/* Horizontal sentence segments with navigation */}
-        <div className="px-6 py-3 flex items-center gap-2">
-          {/* Left scroll button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className={`h-8 w-8 shrink-0 ${!canScrollLeft ? 'opacity-30 cursor-not-allowed' : ''}`}
-            onClick={scrollLeft}
-            disabled={!canScrollLeft}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-
-          {/* Scrollable container */}
+        {/* Single combined text card with controls */}
+        <div className="px-6 py-3 flex items-center gap-4">
+          {/* Combined text card */}
           <div 
-            ref={scrollContainerRef}
-            className="flex gap-2 overflow-x-auto pb-1 scrollbar-none flex-1"
+            className="flex-1 bg-[#F5F8FB] rounded-[3px] p-3 cursor-pointer hover:bg-[#EBF0F5] transition-colors"
+            onClick={() => {
+              if (sentences.length > 0) {
+                handleClick(sentences[0]);
+              }
+            }}
           >
-            {sentences.map((sentence) => (
-              <SentenceItem
-                key={sentence.id}
-                sentence={sentence}
-                isSelected={selectedId === sentence.id}
-                isPlaying={playingId === sentence.id}
-                isGenerating={generatingId === sentence.id}
-                isEditGenerating={editGeneratingId === sentence.id}
-                onEdit={onEditSentence}
-                onClick={handleClick}
-                onNavigateVersion={navigateVersion}
-                generateWaveformBars={generateWaveformBars}
-              />
-            ))}
+            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed pr-8">
+              {sentences.map(s => s.text).join('')}
+            </p>
+            {/* Edit icon at bottom right */}
+            <div className="flex justify-end mt-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (sentences.length > 0) {
+                    onEditSentence(sentences[0].id);
+                  }
+                }}
+                className="h-7 w-7 bg-white hover:bg-[#CCCCCC] border-border"
+              >
+                <PencilEditIcon className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-
-          {/* Right scroll button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className={`h-8 w-8 shrink-0 ${!canScrollRight ? 'opacity-30 cursor-not-allowed' : ''}`}
-            onClick={scrollRight}
-            disabled={!canScrollRight}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
 
           {/* Edit All button */}
           {onEditAll && (
