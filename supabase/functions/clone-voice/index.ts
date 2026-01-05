@@ -119,7 +119,7 @@ serve(async (req) => {
         body: JSON.stringify({
           file_id: fileId,
           model: "step-tts-mini",
-          // Omit 'text' to let API use ASR for better tolerance
+          ...(sampleText ? { text: sampleText } : {}),
         }),
       });
 

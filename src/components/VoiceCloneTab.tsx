@@ -201,122 +201,156 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
     }
   };
 
-  // Convert audio blob to WAV format for better API compatibility
-  const convertToWav = async (audioBlob: Blob): Promise<Blob> => {
-    return new Promise((resolve, reject) => {
-      const audioContext = new AudioContext();
-      const reader = new FileReader();
-      
-      reader.onload = async () => {
-        try {
-          const arrayBuffer = reader.result as ArrayBuffer;
-          const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-          
-          // Convert to WAV
-          const numChannels = audioBuffer.numberOfChannels;
-          const sampleRate = audioBuffer.sampleRate;
-          const length = audioBuffer.length * numChannels * 2;
-          const buffer = new ArrayBuffer(44 + length);
-          const view = new DataView(buffer);
-          
-          // WAV header
-          const writeString = (offset: number, str: string) => {
-            for (let i = 0; i < str.length; i++) {
-              view.setUint8(offset + i, str.charCodeAt(i));
-            }
-          };
-          
-          writeString(0, 'RIFF');
-          view.setUint32(4, 36 + length, true);
-          writeString(8, 'WAVE');
-          writeString(12, 'fmt ');
-          view.setUint32(16, 16, true);
-          view.setUint16(20, 1, true); // PCM
-          view.setUint16(22, numChannels, true);
-          view.setUint32(24, sampleRate, true);
-          view.setUint32(28, sampleRate * numChannels * 2, true);
-          view.setUint16(32, numChannels * 2, true);
-          view.setUint16(34, 16, true);
-          writeString(36, 'data');
-          view.setUint32(40, length, true);
-          
-          // Write audio data
-          let offset = 44;
-          for (let i = 0; i < audioBuffer.length; i++) {
-            for (let channel = 0; channel < numChannels; channel++) {
-              const sample = audioBuffer.getChannelData(channel)[i];
-              const intSample = Math.max(-1, Math.min(1, sample)) * 0x7FFF;
-              view.setInt16(offset, intSample, true);
-              offset += 2;
-            }
-          }
-          
-          resolve(new Blob([buffer], { type: 'audio/wav' }));
-        } catch (err) {
-          reject(err);
-        }
-      };
-      
-      reader.onerror = reject;
-      reader.readAsArrayBuffer(audioBlob);
-    });
+  // Convert recorded audio to WAV (mono, 16kHz) for Step API compatibility
+  const convertToWav = async (
+    audioBlob: Blob,
+  ): Promise<{ wav: Blob; durationSec: number; rms: number }> => {
+    const TARGET_SAMPLE_RATE = 16000;
+    const MIN_SEC = 5;
+    const MAX_SEC = 10;
+
+    const arrayBuffer = await audioBlob.arrayBuffer();
+
+    // Decode to PCM
+    const decodeCtx = new AudioContext();
+    let decoded: AudioBuffer;
+    try {
+      // Some browsers require a copy of the buffer
+      decoded = await decodeCtx.decodeAudioData(arrayBuffer.slice(0));
+    } finally {
+      // Best-effort close
+      decodeCtx.close().catch(() => {});
+    }
+
+    // Downmix to mono
+    const mono = new Float32Array(decoded.length);
+    for (let ch = 0; ch < decoded.numberOfChannels; ch++) {
+      const chData = decoded.getChannelData(ch);
+      for (let i = 0; i < chData.length; i++) {
+        mono[i] += chData[i] / decoded.numberOfChannels;
+      }
+    }
+
+    // Resample to 16kHz (Step API is most reliable at this rate)
+    const durationSec = decoded.length / decoded.sampleRate;
+    const targetLength = Math.max(1, Math.ceil(durationSec * TARGET_SAMPLE_RATE));
+
+    const offline = new OfflineAudioContext(1, targetLength, TARGET_SAMPLE_RATE);
+    const monoBuffer = offline.createBuffer(1, mono.length, decoded.sampleRate);
+    monoBuffer.getChannelData(0).set(mono);
+
+    const source = offline.createBufferSource();
+    source.buffer = monoBuffer;
+    source.connect(offline.destination);
+    source.start(0);
+
+    const rendered = await offline.startRendering();
+
+    // Enforce duration constraints (Step API requires 5-10 seconds)
+    const minSamples = MIN_SEC * TARGET_SAMPLE_RATE;
+    const maxSamples = MAX_SEC * TARGET_SAMPLE_RATE;
+    if (rendered.length < minSamples) {
+      throw new Error("录音时长不足 5 秒，请重新录制并完整朗读");
+    }
+
+    const finalSamples = rendered.getChannelData(0).slice(0, Math.min(rendered.length, maxSamples));
+
+    // Simple silence check
+    let sumSq = 0;
+    for (let i = 0; i < finalSamples.length; i++) sumSq += finalSamples[i] * finalSamples[i];
+    const rms = Math.sqrt(sumSq / finalSamples.length);
+    if (rms < 0.008) {
+      throw new Error("录音声音过小/过安静，请靠近麦克风并提高音量后重试");
+    }
+
+    // Encode WAV (PCM 16-bit LE)
+    const dataBytes = finalSamples.length * 2;
+    const buffer = new ArrayBuffer(44 + dataBytes);
+    const view = new DataView(buffer);
+
+    const writeString = (offset: number, str: string) => {
+      for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+    };
+
+    writeString(0, "RIFF");
+    view.setUint32(4, 36 + dataBytes, true);
+    writeString(8, "WAVE");
+    writeString(12, "fmt ");
+    view.setUint32(16, 16, true); // PCM header size
+    view.setUint16(20, 1, true); // PCM format
+    view.setUint16(22, 1, true); // mono
+    view.setUint32(24, TARGET_SAMPLE_RATE, true);
+    view.setUint32(28, TARGET_SAMPLE_RATE * 2, true); // byte rate
+    view.setUint16(32, 2, true); // block align
+    view.setUint16(34, 16, true); // bits per sample
+    writeString(36, "data");
+    view.setUint32(40, dataBytes, true);
+
+    let offset = 44;
+    for (let i = 0; i < finalSamples.length; i++) {
+      const s = Math.max(-1, Math.min(1, finalSamples[i]));
+      const int16 = s < 0 ? Math.round(s * 0x8000) : Math.round(s * 0x7fff);
+      view.setInt16(offset, int16, true);
+      offset += 2;
+    }
+
+    return {
+      wav: new Blob([buffer], { type: "audio/wav" }),
+      durationSec: finalSamples.length / TARGET_SAMPLE_RATE,
+      rms,
+    };
   };
 
   // Clone voice using Step TTS Mini
   const cloneVoice = async () => {
     if (!recordedAudio || !targetText.trim()) {
-      toast.error("Please record audio and enter target text first");
+      toast.error("请先录音并填写要生成的文本");
       return;
     }
 
     setIsCloning(true);
     try {
-      // Convert to WAV format for better API compatibility
-      toast.info("Converting audio format...");
-      const wavBlob = await convertToWav(recordedAudio);
-      
+      toast.info("正在处理录音格式...");
+      const { wav, durationSec } = await convertToWav(recordedAudio);
+
       // Convert WAV blob to base64
-      const arrayBuffer = await wavBlob.arrayBuffer();
-      const uint8Array = new Uint8Array(arrayBuffer);
-      let binary = '';
-      for (let i = 0; i < uint8Array.length; i++) {
-        binary += String.fromCharCode(uint8Array[i]);
+      const uint8 = new Uint8Array(await wav.arrayBuffer());
+      let binary = "";
+      const chunkSize = 0x8000;
+      for (let i = 0; i < uint8.length; i += chunkSize) {
+        binary += String.fromCharCode(...uint8.subarray(i, i + chunkSize));
       }
       const audioBase64 = btoa(binary);
 
       const { data, error } = await supabase.functions.invoke("clone-voice", {
         body: {
           audioBase64,
-          sampleText, // The text that was spoken during recording
-          targetText, // The text to generate with the cloned voice
-          mimeType: "audio/wav", // Now sending WAV format
+          sampleText, // user-read text
+          targetText, // text to synthesize with cloned voice
+          mimeType: "audio/wav",
+          meta: { durationSec },
         },
       });
 
-      if (error) {
-        throw new Error((error as any)?.message || "Voice cloning failed");
+      // Transport-level errors
+      if (error) throw new Error((error as any)?.message || "Voice cloning failed");
+
+      // Some backends return { error } with HTTP 200
+      if (data && typeof data === "object" && "error" in (data as any)) {
+        throw new Error(String((data as any).error || "Voice cloning failed"));
       }
 
-      // New function response: { audioBase64 }
+      // Expected response: { audioBase64, format }
       if (data && typeof data === "object" && "audioBase64" in (data as any)) {
         const audioBlob = base64ToBlob(String((data as any).audioBase64), "audio/mpeg");
         const url = URL.createObjectURL(audioBlob);
         setClonedAudioUrl(url);
-        toast.success("Voice cloned successfully! Audio generated with your voice.");
-
-        // Notify parent component to play in bottom bar
+        toast.success("克隆成功，已生成试听音频");
         onAudioGenerated?.(url, "Cloned Audio");
         return;
       }
 
-      // Fallback (older response)
-      const audioBlob = data instanceof Blob ? data : new Blob([data as any], { type: "audio/mpeg" });
-      const url = URL.createObjectURL(audioBlob);
-      setClonedAudioUrl(url);
-      toast.success("Voice cloned successfully! Audio generated with your voice.");
-
-      // Notify parent component to play in bottom bar
-      onAudioGenerated?.(url, "Cloned Audio");
+      throw new Error("返回数据格式异常，请稍后重试");
     } catch (error) {
       console.error("Voice cloning error:", error);
       toast.error(error instanceof Error ? error.message : "Voice cloning failed. Please try again.");
