@@ -159,23 +159,21 @@ const WaveformCardsWithScroll = ({
 
   return (
     <div className="w-full h-[45vh] min-h-[320px] flex flex-col">
-      {/* Main container - no background here */}
-      <div className="flex-1 flex items-stretch relative overflow-hidden">
-        {/* Left hover zone for scrolling */}
+      {/* Waveform row with side arrow blocks */}
+      <div className="flex-1 flex items-stretch">
+        {/* Left arrow block */}
         <div 
-          className={`absolute left-0 top-0 bottom-0 w-16 z-10 flex items-center justify-start pl-2 ${canScrollLeft ? 'cursor-pointer' : 'opacity-50'}`}
+          className={`w-12 shrink-0 bg-[hsl(210,70%,55%)] rounded-l-[10px] flex items-center justify-center cursor-pointer hover:bg-[hsl(210,75%,50%)] transition-colors ${!canScrollLeft ? 'opacity-50 cursor-not-allowed' : ''}`}
           onMouseEnter={() => handleMouseEnter('left')}
           onMouseLeave={handleMouseLeave}
         >
-          <div className="h-10 w-10 rounded-full bg-background/80 shadow-sm flex items-center justify-center">
-            <ChevronLeft className="h-5 w-5 text-muted-foreground" />
-          </div>
+          <ChevronLeft className="h-6 w-6 text-white" />
         </div>
 
         {/* Scrollable waveform container */}
         <div 
           ref={scrollContainerRef}
-          className="flex-1 overflow-x-auto scrollbar-none px-16"
+          className="flex-1 overflow-x-auto scrollbar-none bg-[hsl(210,70%,55%)]"
         >
           <div className="flex h-full min-w-max">
             {sentences.map((sentence, idx) => {
@@ -188,58 +186,64 @@ const WaveformCardsWithScroll = ({
                 return Math.max(10, Math.min(90, baseHeight + variation + randomness));
               });
               
-              const isFirst = idx === 0;
               const isLast = idx === sentences.length - 1;
               
               return (
                 <div
                   key={sentence.id}
-                  className="flex-shrink-0 min-w-[180px] max-w-[260px] flex flex-col cursor-pointer group"
+                  className="flex-shrink-0 min-w-[180px] max-w-[260px] flex items-center justify-center px-2 py-4 cursor-pointer group hover:bg-[hsl(210,75%,50%)] transition-colors"
                   onClick={() => onEditSentence(sentence.id)}
                 >
-                  {/* Waveform area with blue background */}
-                  <div className={`flex-1 flex items-center justify-center px-2 py-4 bg-[hsl(210,70%,55%)] group-hover:bg-[hsl(210,75%,50%)] transition-colors ${isFirst ? 'rounded-l-[2px]' : ''} ${isLast ? 'rounded-r-[2px]' : ''}`}>
-                    <div className="w-full h-full flex items-center justify-center gap-[2px]">
-                      {waveformBars.map((height, i) => (
-                        <div
-                          key={i}
-                          className="w-[3px] rounded-full bg-white/90 group-hover:bg-white transition-colors"
-                          style={{ height: `${height}%` }}
-                        />
-                      ))}
-                    </div>
-                    {/* Subtle separator between segments */}
-                    {!isLast && (
-                      <div className="h-2/3 w-px bg-white/30 ml-1" />
-                    )}
+                  <div className="w-full h-full flex items-center justify-center gap-[2px]">
+                    {waveformBars.map((height, i) => (
+                      <div
+                        key={i}
+                        className="w-[3px] rounded-full bg-white/90 group-hover:bg-white transition-colors"
+                        style={{ height: `${height}%` }}
+                      />
+                    ))}
                   </div>
-                  
-                  {/* Text area below waveform - no background */}
-                  <div className="h-[80px] px-3 py-2 relative">
-                    <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
-                      {sentence.text}
-                    </p>
-                    {/* Edit icon indicator */}
-                    <div className="absolute bottom-2 right-2 h-5 w-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <PencilEditIcon className="h-3.5 w-3.5 text-primary" />
-                    </div>
-                  </div>
+                  {/* Subtle separator between segments */}
+                  {!isLast && (
+                    <div className="h-2/3 w-px bg-white/30 ml-1" />
+                  )}
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* Right hover zone for scrolling */}
+        {/* Right arrow block */}
         <div 
-          className={`absolute right-0 top-0 bottom-0 w-16 z-10 flex items-center justify-end pr-2 ${canScrollRight ? 'cursor-pointer' : 'opacity-50'}`}
+          className={`w-12 shrink-0 bg-[hsl(210,70%,55%)] rounded-r-[10px] flex items-center justify-center cursor-pointer hover:bg-[hsl(210,75%,50%)] transition-colors ${!canScrollRight ? 'opacity-50 cursor-not-allowed' : ''}`}
           onMouseEnter={() => handleMouseEnter('right')}
           onMouseLeave={handleMouseLeave}
         >
-          <div className="h-10 w-10 rounded-full bg-background/80 shadow-sm flex items-center justify-center">
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
-          </div>
+          <ChevronRight className="h-6 w-6 text-white" />
         </div>
+      </div>
+
+      {/* Text area row with white background */}
+      <div className="h-[80px] bg-background rounded-b-[10px] flex overflow-x-auto scrollbar-none">
+        <div className="w-12 shrink-0" /> {/* Spacer for left arrow */}
+        <div className="flex-1 flex min-w-max">
+          {sentences.map((sentence) => (
+            <div
+              key={`text-${sentence.id}`}
+              className="flex-shrink-0 min-w-[180px] max-w-[260px] px-3 py-2 cursor-pointer group hover:bg-muted/50 transition-colors relative"
+              onClick={() => onEditSentence(sentence.id)}
+            >
+              <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
+                {sentence.text}
+              </p>
+              {/* Edit icon indicator */}
+              <div className="absolute bottom-2 right-2 h-5 w-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <PencilEditIcon className="h-3.5 w-3.5 text-primary" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="w-12 shrink-0" /> {/* Spacer for right arrow */}
       </div>
     </div>
   );
