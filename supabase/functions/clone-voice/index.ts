@@ -110,6 +110,8 @@ serve(async (req) => {
     const maxRetries = 2;
     
     while (retryCount <= maxRetries) {
+      // Do NOT pass 'text' parameter - let the API use its built-in ASR
+      // This is more forgiving when users don't read the exact sample text
       const voiceResponse = await fetch("https://api.stepfun.com/v1/audio/voices", {
         method: "POST",
         headers: {
@@ -119,7 +121,6 @@ serve(async (req) => {
         body: JSON.stringify({
           file_id: fileId,
           model: "step-tts-mini",
-          ...(sampleText ? { text: sampleText } : {}),
         }),
       });
 
