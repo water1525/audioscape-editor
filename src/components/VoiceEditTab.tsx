@@ -311,7 +311,7 @@ const WaveformCardsWithScroll = ({
       </div>
       
       {/* Waveform area */}
-      <div className="h-[40vh] min-h-[280px] flex flex-col">
+      <div className="h-[50vh] min-h-[360px] flex flex-col">
         {/* Waveform row with side arrow blocks */}
         <div className="flex-1 flex items-stretch">
         {/* Left arrow block - aligned with delete button width */}
@@ -381,7 +381,7 @@ const WaveformCardsWithScroll = ({
         </div>
       </div>
       {/* Text area row with white background - bottom rounded corners only */}
-      <div className="h-[80px] bg-white rounded-b-[10px] flex overflow-x-auto scrollbar-none shadow-sm">
+      <div className="h-[100px] bg-white rounded-b-[10px] flex overflow-x-auto scrollbar-none shadow-sm">
         <div className="w-10 shrink-0" /> {/* Spacer for left arrow */}
         <div className="flex-1 flex min-w-max">
           {sentences.map((sentence) => {
