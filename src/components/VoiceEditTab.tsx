@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Upload, Mic, RefreshCw, X, Loader2, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import DeleteIcon from "@/components/ui/DeleteIcon";
+import { PencilEditIcon } from "@/components/ui/TabIcons";
 import { toast } from "sonner";
 
 // Custom News Icon component (matching homepage/playground)
@@ -727,22 +728,12 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                     <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed pr-8">
                       {sentence.text}
                     </p>
-                    {/* Edit icon at bottom right - matching bottom timeline style */}
+                    {/* Edit icon at bottom right - using PencilEditIcon */}
                     <button
                       onClick={() => openEditModal(sentence.id)}
                       className="absolute bottom-2 right-2 h-7 w-7 flex items-center justify-center rounded-[3px] bg-[#F5F8FB] border border-border hover:bg-[#CCCCCC] transition-colors"
                     >
-                      <svg 
-                        viewBox="0 0 24 24" 
-                        className="h-4 w-4 text-foreground"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                      </svg>
+                      <PencilEditIcon className="h-4 w-4 text-foreground" />
                     </button>
                   </div>
                 </div>
