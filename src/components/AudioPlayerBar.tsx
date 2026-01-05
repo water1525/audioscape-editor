@@ -2,7 +2,8 @@ import { useRef, useEffect, useState } from "react";
 import { Download, ChevronDown, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { SkipForward10Icon, SkipBack10Icon } from "@/components/ui/TabIcons";
+import SkipBack10Icon from "@/assets/icon-skip-back-10.svg";
+import SkipForward10Icon from "@/assets/icon-skip-forward-10.svg";
 
 // Solid play icon
 const SolidPlayIcon = ({ className }: { className?: string }) => (
@@ -188,6 +189,26 @@ const AudioPlayerBar = ({
 
           {/* Right section */}
           <div className="shrink-0 flex items-center gap-3">
+            {/* Skip controls - small, light gray */}
+            {!hideSkipControls && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => skipTime(-10)}
+                  className="w-5 h-5 opacity-50 hover:opacity-80 transition-opacity"
+                  title="Back 10s"
+                >
+                  <img src={SkipBack10Icon} alt="Back 10s" className="w-full h-full" />
+                </button>
+                <button
+                  onClick={() => skipTime(10)}
+                  className="w-5 h-5 opacity-50 hover:opacity-80 transition-opacity"
+                  title="Forward 10s"
+                >
+                  <img src={SkipForward10Icon} alt="Forward 10s" className="w-full h-full" />
+                </button>
+              </div>
+            )}
+
             {/* Duration display */}
             {(typeof durationOverride === "number" || duration > 0) && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
