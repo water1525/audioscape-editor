@@ -1,8 +1,22 @@
 import { useRef, useEffect, useState } from "react";
-import { Play, Pause, Download, ChevronDown, Save, Loader2 } from "lucide-react";
+import { Download, ChevronDown, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { SkipForward10Icon, SkipBack10Icon } from "@/components/ui/TabIcons";
+
+// Solid play icon
+const SolidPlayIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 1024 1024" fill="currentColor" className={className}>
+    <path d="M896 512L128 1024V0z" />
+  </svg>
+);
+
+// Solid pause icon
+const SolidPauseIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 1024 1024" fill="currentColor" className={className}>
+    <path d="M128 0h253.155556v1024H128V0z m512 0h256v1024h-256V0z" />
+  </svg>
+);
 
 interface AudioPlayerBarProps {
   audioUrl: string | null;
@@ -155,9 +169,9 @@ const AudioPlayerBar = ({
               }`}
             >
               {(typeof isPlayingOverride === "boolean" ? isPlayingOverride : isPlaying) ? (
-                <Pause className="w-5 h-5" />
+                <SolidPauseIcon className="w-5 h-5" />
               ) : (
-                <Play className="w-5 h-5 ml-0.5" />
+                <SolidPlayIcon className="w-5 h-5" />
               )}
             </button>
           )}
