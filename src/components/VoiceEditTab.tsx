@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Upload, Mic, RefreshCw, X, Loader2, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { Play, Pause, Upload, Mic, RefreshCw, X, Loader2, ChevronLeft, ChevronRight, Sparkles, ZoomIn, ZoomOut } from "lucide-react";
 import DeleteIcon from "@/components/ui/DeleteIcon";
 import { PencilEditIcon } from "@/components/ui/TabIcons";
 import { toast } from "sonner";
@@ -104,6 +104,29 @@ const WaveformCardsWithScroll = ({
   const timeRulerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  
+  // Zoom state: 1 = 100%, 0.5 = 50%, 2 = 200%
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const minZoom = 0.5;
+  const maxZoom = 3;
+  const zoomStep = 0.25;
+  
+  const handleZoomIn = () => {
+    setZoomLevel(prev => Math.min(maxZoom, prev + zoomStep));
+  };
+  
+  const handleZoomOut = () => {
+    setZoomLevel(prev => Math.max(minZoom, prev - zoomStep));
+  };
+  
+  // Calculate card width based on zoom level
+  const baseMinWidth = 180;
+  const baseMaxWidth = 260;
+  const cardMinWidth = Math.round(baseMinWidth * zoomLevel);
+  const cardMaxWidth = Math.round(baseMaxWidth * zoomLevel);
+  
+  // Adjust number of waveform bars based on zoom
+  const waveformBarCount = Math.round(50 * zoomLevel);
 
   const checkScrollState = useCallback(() => {
     const container = scrollContainerRef.current;
@@ -220,7 +243,8 @@ const WaveformCardsWithScroll = ({
               return (
                 <div
                   key={`ruler-${sentence.id}`}
-                  className={`flex-shrink-0 min-w-[180px] max-w-[260px] h-full relative flex items-end justify-center px-2 transition-colors ${isHovered ? 'bg-[hsl(210,70%,55%)]/20' : ''}`}
+                  className={`flex-shrink-0 h-full relative flex items-end justify-center px-2 transition-colors ${isHovered ? 'bg-[hsl(210,70%,55%)]/20' : ''}`}
+                  style={{ minWidth: `${cardMinWidth}px`, maxWidth: `${cardMaxWidth}px` }}
                   onMouseEnter={() => setHoveredSentenceId(sentence.id)}
                   onMouseLeave={() => setHoveredSentenceId(null)}
                 >
@@ -308,6 +332,29 @@ const WaveformCardsWithScroll = ({
             </button>
           )}
         </div>
+        
+        {/* Zoom controls */}
+        <div className="flex items-stretch shrink-0 gap-0.5 ml-1">
+          <button
+            onClick={handleZoomOut}
+            disabled={zoomLevel <= minZoom}
+            className="h-full w-8 flex items-center justify-center bg-white hover:bg-muted text-muted-foreground transition-colors border-b border-border/30 disabled:opacity-40"
+            title="Zoom Out"
+          >
+            <ZoomOut className="h-4 w-4" />
+          </button>
+          <div className="h-full px-2 flex items-center justify-center bg-white text-xs text-muted-foreground border-b border-border/30 min-w-[48px]">
+            {Math.round(zoomLevel * 100)}%
+          </div>
+          <button
+            onClick={handleZoomIn}
+            disabled={zoomLevel >= maxZoom}
+            className="h-full w-8 flex items-center justify-center bg-white hover:bg-muted text-muted-foreground transition-colors border-b border-border/30 disabled:opacity-40"
+            title="Zoom In"
+          >
+            <ZoomIn className="h-4 w-4" />
+          </button>
+        </div>
       </div>
       
       {/* Waveform area */}
@@ -330,8 +377,8 @@ const WaveformCardsWithScroll = ({
         >
           <div className="flex h-full min-w-max">
             {sentences.map((sentence, idx) => {
-              // Generate unique waveform pattern for each sentence - more bars for bigger area
-              const waveformBars = Array.from({ length: 50 }, (_, i) => {
+              // Generate unique waveform pattern for each sentence - bars count based on zoom
+              const waveformBars = Array.from({ length: waveformBarCount }, (_, i) => {
                 const seed = idx * 100 + i;
                 const baseHeight = 30;
                 const variation = Math.sin(seed * 0.4) * 25 + Math.cos(seed * 0.6) * 20;
@@ -346,7 +393,8 @@ const WaveformCardsWithScroll = ({
               return (
                 <div
                   key={sentence.id}
-                  className={`flex-shrink-0 min-w-[180px] max-w-[260px] flex items-center justify-center px-2 py-4 cursor-pointer transition-colors ${isHovered ? 'bg-[hsl(210,75%,50%)]' : ''}`}
+                  className={`flex-shrink-0 flex items-center justify-center px-2 py-4 cursor-pointer transition-colors ${isHovered ? 'bg-[hsl(210,75%,50%)]' : ''}`}
+                  style={{ minWidth: `${cardMinWidth}px`, maxWidth: `${cardMaxWidth}px` }}
                   onClick={() => onEditSentence(sentence.id)}
                   onMouseEnter={() => setHoveredSentenceId(sentence.id)}
                   onMouseLeave={() => setHoveredSentenceId(null)}
@@ -389,7 +437,8 @@ const WaveformCardsWithScroll = ({
             return (
               <div
                 key={`text-${sentence.id}`}
-                className={`flex-shrink-0 min-w-[180px] max-w-[260px] px-3 py-2 cursor-pointer transition-colors relative ${isHovered ? "bg-muted/50" : ""}`}
+                className={`flex-shrink-0 px-3 py-2 cursor-pointer transition-colors relative ${isHovered ? "bg-muted/50" : ""}`}
+                style={{ minWidth: `${cardMinWidth}px`, maxWidth: `${cardMaxWidth}px` }}
                 onClick={() => onEditSentence(sentence.id)}
                 onMouseEnter={() => setHoveredSentenceId(sentence.id)}
                 onMouseLeave={() => setHoveredSentenceId(null)}
