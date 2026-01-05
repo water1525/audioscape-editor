@@ -360,11 +360,11 @@ const Playground = () => {
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-card border-b border-border">
         <div className="container mx-auto px-6">
-          <div className="flex items-center justify-between h-14">
+          <div className="flex items-center h-14">
             {/* Left: Logo */}
             <div className="flex items-center gap-3">
               <Link to="/" className="flex items-center gap-3">
-                <span className="text-lg font-bold text-foreground">Step Star</span>
+                <span className="text-lg font-bold text-foreground">StepFun</span>
                 <span className="text-muted-foreground">|</span>
                 <span className="text-sm text-muted-foreground">Open Platform</span>
               </Link>
