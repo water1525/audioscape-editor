@@ -99,7 +99,23 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      
+      // Check for supported MIME types - prefer webm/opus as it's widely supported
+      let mimeType = 'audio/webm;codecs=opus';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/webm';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'audio/ogg';
+          if (!MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = ''; // Let browser choose default
+          }
+        }
+      }
+      
+      const options = mimeType ? { mimeType } : undefined;
+      const mediaRecorder = new MediaRecorder(stream, options);
+      const actualMimeType = mediaRecorder.mimeType || 'audio/webm';
+      
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
@@ -110,11 +126,14 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+        // Use the actual MIME type from MediaRecorder
+        const audioBlob = new Blob(audioChunksRef.current, { type: actualMimeType });
         setRecordedAudio(audioBlob);
         const url = URL.createObjectURL(audioBlob);
         setRecordedAudioUrl(url);
-        setRecordedAudioName(`${Date.now()}.wav`);
+        // Use appropriate extension based on MIME type
+        const ext = actualMimeType.includes('webm') ? 'webm' : actualMimeType.includes('ogg') ? 'ogg' : 'wav';
+        setRecordedAudioName(`${Date.now()}.${ext}`);
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -205,6 +224,7 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
           audioBase64,
           sampleText, // The text that was spoken during recording
           targetText, // The text to generate with the cloned voice
+          mimeType: recordedAudio.type, // Pass the actual MIME type
         },
       });
 

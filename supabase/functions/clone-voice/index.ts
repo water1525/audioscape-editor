@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { audioBase64, sampleText, targetText } = await req.json();
+    const { audioBase64, sampleText, targetText, mimeType } = await req.json();
 
     if (!audioBase64) {
       return new Response(JSON.stringify({ error: "Audio data is required" }), {
@@ -35,6 +35,7 @@ serve(async (req) => {
     }
 
     console.log("Starting voice cloning process...");
+    console.log("Audio MIME type:", mimeType || "not specified");
 
     // Step 1: Upload the audio file
     console.log("Step 1: Uploading audio file...");
@@ -42,10 +43,20 @@ serve(async (req) => {
     // Convert base64 to binary
     const binaryData = Uint8Array.from(atob(audioBase64), (c) => c.charCodeAt(0));
     
+    // Determine file extension and MIME type
+    const audioMimeType = mimeType || "audio/webm";
+    let fileExt = "webm";
+    if (audioMimeType.includes("ogg")) fileExt = "ogg";
+    else if (audioMimeType.includes("mp4")) fileExt = "m4a";
+    else if (audioMimeType.includes("wav")) fileExt = "wav";
+    else if (audioMimeType.includes("mpeg") || audioMimeType.includes("mp3")) fileExt = "mp3";
+    
+    console.log("Using file extension:", fileExt, "for MIME type:", audioMimeType);
+    
     // Create form data for file upload
     const formData = new FormData();
-    const audioBlob = new Blob([binaryData], { type: "audio/wav" });
-    formData.append("file", audioBlob, "recording.wav");
+    const audioBlob = new Blob([binaryData], { type: audioMimeType });
+    formData.append("file", audioBlob, `recording.${fileExt}`);
     formData.append("purpose", "storage");
 
     const uploadResponse = await fetch("https://api.stepfun.com/v1/files", {
