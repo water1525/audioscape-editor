@@ -91,6 +91,7 @@ const WaveformCardsWithScroll = ({
   sentences: SentenceSegment[]; 
   onEditSentence: (id: number) => void;
 }) => {
+  const [hoveredSentenceId, setHoveredSentenceId] = useState<number | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -188,17 +189,21 @@ const WaveformCardsWithScroll = ({
               
               const isLast = idx === sentences.length - 1;
               
+              const isHovered = hoveredSentenceId === sentence.id;
+              
               return (
                 <div
                   key={sentence.id}
-                  className="flex-shrink-0 min-w-[180px] max-w-[260px] flex items-center justify-center px-2 py-4 cursor-pointer group hover:bg-[hsl(210,75%,50%)] transition-colors"
+                  className={`flex-shrink-0 min-w-[180px] max-w-[260px] flex items-center justify-center px-2 py-4 cursor-pointer transition-colors ${isHovered ? 'bg-[hsl(210,75%,50%)]' : ''}`}
                   onClick={() => onEditSentence(sentence.id)}
+                  onMouseEnter={() => setHoveredSentenceId(sentence.id)}
+                  onMouseLeave={() => setHoveredSentenceId(null)}
                 >
                   <div className="w-full h-full flex items-center justify-center gap-[2px]">
                     {waveformBars.map((height, i) => (
                       <div
                         key={i}
-                        className="w-[3px] rounded-full bg-white/90 group-hover:bg-white transition-colors"
+                        className={`w-[3px] rounded-full transition-colors ${isHovered ? 'bg-white' : 'bg-white/90'}`}
                         style={{ height: `${height}%` }}
                       />
                     ))}
@@ -227,21 +232,26 @@ const WaveformCardsWithScroll = ({
       <div className="h-[80px] bg-white rounded-b-[10px] flex overflow-x-auto scrollbar-none shadow-sm">
         <div className="w-12 shrink-0" /> {/* Spacer for left arrow */}
         <div className="flex-1 flex min-w-max">
-          {sentences.map((sentence) => (
-            <div
-              key={`text-${sentence.id}`}
-              className="flex-shrink-0 min-w-[180px] max-w-[260px] px-3 py-2 cursor-pointer group hover:bg-muted/50 transition-colors relative"
-              onClick={() => onEditSentence(sentence.id)}
-            >
-              <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
-                {sentence.text}
-              </p>
-              {/* Edit icon indicator */}
-              <div className="absolute bottom-2 right-2 h-5 w-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <PencilEditIcon className="h-3.5 w-3.5 text-primary" />
+          {sentences.map((sentence) => {
+            const isHovered = hoveredSentenceId === sentence.id;
+            return (
+              <div
+                key={`text-${sentence.id}`}
+                className={`flex-shrink-0 min-w-[180px] max-w-[260px] px-3 py-2 cursor-pointer transition-colors relative ${isHovered ? 'bg-muted/50' : ''}`}
+                onClick={() => onEditSentence(sentence.id)}
+                onMouseEnter={() => setHoveredSentenceId(sentence.id)}
+                onMouseLeave={() => setHoveredSentenceId(null)}
+              >
+                <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
+                  {sentence.text}
+                </p>
+                {/* Edit icon indicator */}
+                <div className={`absolute bottom-2 right-2 h-5 w-5 flex items-center justify-center transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+                  <PencilEditIcon className="h-3.5 w-3.5 text-primary" />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div className="w-12 shrink-0" /> {/* Spacer for right arrow */}
       </div>
