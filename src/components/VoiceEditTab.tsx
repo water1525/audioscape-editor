@@ -133,22 +133,23 @@ const WaveformCardsWithScroll = ({
   };
 
   return (
-    <div className="w-full flex items-center gap-2">
+    <div className="w-full flex items-center">
       {/* Left arrow */}
       <Button
         variant="ghost"
         size="icon"
-        className={`h-8 w-8 shrink-0 ${!canScrollLeft ? 'opacity-30 cursor-not-allowed' : ''}`}
+        className={`h-10 w-10 shrink-0 ${!canScrollLeft ? 'opacity-30 cursor-not-allowed' : ''}`}
         onClick={scrollLeft}
         disabled={!canScrollLeft}
       >
         <ChevronLeft className="h-5 w-5" />
       </Button>
+      {/* Left arrow - already added above */}
 
       {/* Scrollable cards container */}
       <div 
         ref={scrollContainerRef}
-        className="flex-1 flex gap-4 overflow-x-auto scrollbar-none"
+        className="flex-1 flex gap-4 overflow-x-auto scrollbar-none px-2"
       >
         {sentences.map((sentence, idx) => {
           // Generate unique waveform pattern for each sentence
@@ -203,7 +204,7 @@ const WaveformCardsWithScroll = ({
       <Button
         variant="ghost"
         size="icon"
-        className={`h-8 w-8 shrink-0 ${!canScrollRight ? 'opacity-30 cursor-not-allowed' : ''}`}
+        className={`h-10 w-10 shrink-0 ${!canScrollRight ? 'opacity-30 cursor-not-allowed' : ''}`}
         onClick={scrollRight}
         disabled={!canScrollRight}
       >
@@ -820,10 +821,12 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
 
       {/* Segmented waveform cards when sentences exist (preset/record mode) */}
       {sentences.length > 0 && audioSource === "record" && !isRecording && (
-        <WaveformCardsWithScroll 
-          sentences={sentences} 
-          onEditSentence={openEditModal} 
-        />
+        <div className="-mx-6">
+          <WaveformCardsWithScroll 
+            sentences={sentences} 
+            onEditSentence={openEditModal} 
+          />
+        </div>
       )}
 
       {/* Upload mode - show simple player */}
