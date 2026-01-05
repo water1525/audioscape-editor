@@ -245,10 +245,6 @@ const WaveformCardsWithScroll = ({
                 <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
                   {sentence.text}
                 </p>
-                {/* Edit icon indicator */}
-                <div className={`absolute bottom-2 right-2 h-5 w-5 flex items-center justify-center transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-                  <PencilEditIcon className="h-3.5 w-3.5 text-primary" />
-                </div>
               </div>
             );
           })}
