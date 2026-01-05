@@ -59,7 +59,7 @@ const SentenceItem = ({
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+    <div className="flex flex-col items-center gap-2 flex-shrink-0">
       {/* Card */}
       <div
         onClick={() => onClick(sentence)}
@@ -125,18 +125,18 @@ const SentenceItem = ({
         )}
       </div>
 
-      {/* Edit button - below the card */}
+      {/* Edit button - below the card, always visible */}
       {!isEditGenerating && !isGenerating && (
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
           onClick={(e) => {
             e.stopPropagation();
             onEdit(sentence.id);
           }}
-          className="h-7 w-7 bg-white hover:bg-[#CCCCCC] border-border"
+          className="h-8 w-8 rounded-full bg-transparent hover:bg-muted border-0"
         >
-          <PencilEditIcon className="h-4 w-4" />
+          <PencilEditIcon className="h-5 w-5 text-muted-foreground" />
         </Button>
       )}
     </div>
