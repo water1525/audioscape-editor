@@ -149,55 +149,58 @@ const WaveformCardsWithScroll = ({
       {/* Scrollable cards container */}
       <div 
         ref={scrollContainerRef}
-        className="flex-1 flex gap-4 overflow-x-auto scrollbar-none px-2"
+        className="flex-1 overflow-x-auto scrollbar-none"
       >
-        {sentences.map((sentence, idx) => {
-          // Generate unique waveform pattern for each sentence
-          const waveformBars = Array.from({ length: 35 }, (_, i) => {
-            const seed = idx * 100 + i;
-            const baseHeight = 25;
-            const variation = Math.sin(seed * 0.4) * 30 + Math.cos(seed * 0.6) * 20;
-            const randomness = Math.sin(seed * 1.7) * 15;
-            return Math.max(8, Math.min(95, baseHeight + variation + randomness));
-          });
-          
-          return (
-            <div
-              key={sentence.id}
-              className="flex-shrink-0 w-[240px] bg-[#F5F8FB] rounded-[3px] overflow-hidden"
-            >
-              {/* Waveform area */}
-              <div className="h-[120px] flex items-center justify-center px-3 py-2">
-                <div className="w-full h-full flex items-center justify-center gap-[2px]">
-                  {waveformBars.map((height, i) => (
-                    <div
-                      key={i}
-                      className="w-[4px] bg-[hsl(221,80%,75%)]"
-                      style={{ height: `${height}%` }}
-                    />
-                  ))}
+        <div className="flex">
+          {sentences.map((sentence, idx) => {
+            // Generate unique waveform pattern for each sentence
+            const waveformBars = Array.from({ length: 35 }, (_, i) => {
+              const seed = idx * 100 + i;
+              const baseHeight = 25;
+              const variation = Math.sin(seed * 0.4) * 30 + Math.cos(seed * 0.6) * 20;
+              const randomness = Math.sin(seed * 1.7) * 15;
+              return Math.max(8, Math.min(95, baseHeight + variation + randomness));
+            });
+            
+            const isFirst = idx === 0;
+            const isLast = idx === sentences.length - 1;
+            
+            return (
+              <div
+                key={sentence.id}
+                className={`flex-shrink-0 flex-1 min-w-[200px] max-w-[280px] bg-[#F5F8FB] overflow-hidden cursor-pointer group hover:bg-[#EDF2F7] transition-colors ${isFirst ? 'rounded-l-[3px]' : ''} ${isLast ? 'rounded-r-[3px]' : ''} ${!isLast ? 'border-r border-border/40' : ''}`}
+                onClick={() => onEditSentence(sentence.id)}
+              >
+                {/* Waveform area - clickable */}
+                <div className="h-[100px] flex items-center justify-center px-2 py-2">
+                  <div className="w-full h-full flex items-center justify-center gap-[1px]">
+                    {waveformBars.map((height, i) => (
+                      <div
+                        key={i}
+                        className="w-[3px] bg-[hsl(221,80%,75%)] group-hover:bg-[hsl(221,80%,65%)] transition-colors"
+                        style={{ height: `${height}%` }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Divider */}
+                <div className="h-px bg-border/30" />
+                
+                {/* Text area - clickable */}
+                <div className="p-2 min-h-[60px] relative bg-white group-hover:bg-[#F8FAFC] transition-colors">
+                  <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                    {sentence.text}
+                  </p>
+                  {/* Edit icon indicator */}
+                  <div className="absolute bottom-1 right-1 h-5 w-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <PencilEditIcon className="h-3 w-3 text-muted-foreground" />
+                  </div>
                 </div>
               </div>
-              
-              {/* Divider */}
-              <div className="h-px bg-border/30" />
-              
-              {/* Text area with edit icon */}
-              <div className="p-3 min-h-[80px] relative bg-white">
-                <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed pr-8">
-                  {sentence.text}
-                </p>
-                {/* Edit icon at bottom right */}
-                <button
-                  onClick={() => onEditSentence(sentence.id)}
-                  className="absolute bottom-2 right-2 h-7 w-7 flex items-center justify-center rounded-[3px] bg-[#F5F8FB] border border-border hover:bg-[#CCCCCC] transition-colors"
-                >
-                  <PencilEditIcon className="h-4 w-4 text-foreground" />
-                </button>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* Right arrow */}
