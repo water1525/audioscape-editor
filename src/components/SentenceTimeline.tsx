@@ -58,26 +58,57 @@ const SentenceItem = ({
 }: SentenceItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
+  // Generate waveform bars for display
+  const waveformBars = Array.from({ length: 40 }, (_, i) => {
+    // Create a natural waveform pattern
+    const baseHeight = 30;
+    const variation = Math.sin(i * 0.3) * 25 + Math.cos(i * 0.7) * 15;
+    const randomness = Math.sin(i * 2.1) * 10;
+    const height = Math.max(10, Math.min(90, baseHeight + variation + randomness));
+    return height;
+  });
+
   return (
     <div
       onClick={() => onClick(sentence)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={`
-        relative flex-shrink-0 w-[220px] h-20 rounded-[3px] cursor-pointer
-        transition-all duration-200 overflow-hidden group
+        relative flex-shrink-0 w-[200px] rounded-[3px] cursor-pointer
+        transition-all duration-200 overflow-hidden group border border-border/30
         ${isSelected || isPlaying
-          ? "bg-[#F5F8FB]"
-          : sentence.isEdited
-            ? "bg-[#F5F8FB] hover:bg-[#EBF0F5]"
-            : "bg-[#F5F8FB] hover:bg-[#EBF0F5]"
+          ? "bg-white"
+          : "bg-white hover:bg-gray-50"
         }
       `}
     >
-      {/* Text at top */}
-      <div className="absolute top-2 left-2 right-2 z-10">
+      {/* Waveform area at top */}
+      <div className="h-[100px] flex items-center justify-center px-2">
+        <div className="w-full h-full flex items-center justify-center gap-[2px]">
+          {waveformBars.map((height, i) => (
+            <div
+              key={i}
+              className={`w-[3px] transition-colors ${
+                isPlaying 
+                  ? "bg-[hsl(221,100%,43%)]/60 animate-pulse" 
+                  : "bg-[hsl(221,100%,43%)]/30"
+              }`}
+              style={{ 
+                height: `${height}%`,
+                animationDelay: isPlaying ? `${i * 0.02}s` : undefined
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Divider line */}
+      <div className="h-px bg-border/50" />
+
+      {/* Text area at bottom */}
+      <div className="p-3 min-h-[60px]">
         <p
-          className={`text-xs line-clamp-2 leading-tight ${
+          className={`text-sm line-clamp-2 leading-relaxed ${
             isSelected || isPlaying
               ? "text-foreground font-medium"
               : "text-muted-foreground"
@@ -85,28 +116,17 @@ const SentenceItem = ({
         >
           {sentence.text}
         </p>
-      </div>
 
-
-      {/* Full-width generating bar at bottom */}
-      {isEditGenerating && (
-        <div className="absolute bottom-0 left-0 right-0 h-8 bg-[hsl(221,100%,43%)] flex items-center justify-center gap-2 z-20">
-          <Loader2 className="h-4 w-4 text-white animate-spin" />
-          <span className="text-sm text-white font-medium">Generating</span>
-        </div>
-      )}
-
-      {/* Edit button / edited state - positioned at bottom right */}
-      {!isEditGenerating && (
+        {/* Edit button - bottom right corner */}
         <div className="absolute bottom-2 right-2 z-10 flex items-center gap-2">
-          {/* Non-clickable "Edited" text label for edited sentences */}
-          {sentence.isEdited && (
+          {/* Edited label */}
+          {sentence.isEdited && !isEditGenerating && (
             <span className="text-sm text-[hsl(221,100%,43%)] font-normal">
               Edited
             </span>
           )}
-          {/* Pencil edit button - show on hover or selected */}
-          {(isHovered || isSelected) && !isGenerating && (
+          {/* Pencil edit button - show on hover */}
+          {(isHovered || isSelected) && !isGenerating && !isEditGenerating && (
             <Button
               variant="outline"
               size="icon"
@@ -120,12 +140,19 @@ const SentenceItem = ({
             </Button>
           )}
         </div>
+      </div>
+
+      {/* Full-width generating bar at bottom */}
+      {isEditGenerating && (
+        <div className="absolute bottom-0 left-0 right-0 h-8 bg-[hsl(221,100%,43%)] flex items-center justify-center gap-2 z-20">
+          <Loader2 className="h-4 w-4 text-white animate-spin" />
+          <span className="text-sm text-white font-medium">Generating</span>
+        </div>
       )}
 
-
       {/* Playing indicator - bottom left */}
-      {isPlaying && !isGenerating && !isHovered && (
-        <div className="absolute bottom-1.5 left-1.5">
+      {isPlaying && !isGenerating && !isHovered && !isEditGenerating && (
+        <div className="absolute bottom-2 left-2">
           <div className="flex items-center gap-0.5">
             {[1, 2, 3].map((i) => (
               <div
@@ -140,7 +167,6 @@ const SentenceItem = ({
           </div>
         </div>
       )}
-
     </div>
   );
 };
