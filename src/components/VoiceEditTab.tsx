@@ -83,6 +83,136 @@ export interface SentenceSegment {
   currentVersionIndex: number;
 }
 
+// Waveform cards with left/right arrow navigation
+const WaveformCardsWithScroll = ({ 
+  sentences, 
+  onEditSentence 
+}: { 
+  sentences: SentenceSegment[]; 
+  onEditSentence: (id: number) => void;
+}) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScrollState = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      setCanScrollLeft(container.scrollLeft > 0);
+      setCanScrollRight(
+        container.scrollLeft < container.scrollWidth - container.clientWidth - 1
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    checkScrollState();
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', checkScrollState);
+      window.addEventListener('resize', checkScrollState);
+      return () => {
+        container.removeEventListener('scroll', checkScrollState);
+        window.removeEventListener('resize', checkScrollState);
+      };
+    }
+  }, [checkScrollState, sentences]);
+
+  const scrollLeft = () => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <div className="w-full flex items-center gap-2">
+      {/* Left arrow */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className={`h-8 w-8 shrink-0 ${!canScrollLeft ? 'opacity-30 cursor-not-allowed' : ''}`}
+        onClick={scrollLeft}
+        disabled={!canScrollLeft}
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </Button>
+
+      {/* Scrollable cards container */}
+      <div 
+        ref={scrollContainerRef}
+        className="flex-1 flex gap-4 overflow-x-auto scrollbar-none"
+      >
+        {sentences.map((sentence, idx) => {
+          // Generate unique waveform pattern for each sentence
+          const waveformBars = Array.from({ length: 35 }, (_, i) => {
+            const seed = idx * 100 + i;
+            const baseHeight = 25;
+            const variation = Math.sin(seed * 0.4) * 30 + Math.cos(seed * 0.6) * 20;
+            const randomness = Math.sin(seed * 1.7) * 15;
+            return Math.max(8, Math.min(95, baseHeight + variation + randomness));
+          });
+          
+          return (
+            <div
+              key={sentence.id}
+              className="flex-shrink-0 w-[240px] bg-[#F5F8FB] rounded-[3px] overflow-hidden"
+            >
+              {/* Waveform area */}
+              <div className="h-[120px] flex items-center justify-center px-3 py-2">
+                <div className="w-full h-full flex items-center justify-center gap-[2px]">
+                  {waveformBars.map((height, i) => (
+                    <div
+                      key={i}
+                      className="w-[4px] bg-[hsl(221,80%,75%)]"
+                      style={{ height: `${height}%` }}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              {/* Divider */}
+              <div className="h-px bg-border/30" />
+              
+              {/* Text area with edit icon */}
+              <div className="p-3 min-h-[80px] relative bg-white">
+                <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed pr-8">
+                  {sentence.text}
+                </p>
+                {/* Edit icon at bottom right */}
+                <button
+                  onClick={() => onEditSentence(sentence.id)}
+                  className="absolute bottom-2 right-2 h-7 w-7 flex items-center justify-center rounded-[3px] bg-[#F5F8FB] border border-border hover:bg-[#CCCCCC] transition-colors"
+                >
+                  <PencilEditIcon className="h-4 w-4 text-foreground" />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Right arrow */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className={`h-8 w-8 shrink-0 ${!canScrollRight ? 'opacity-30 cursor-not-allowed' : ''}`}
+        onClick={scrollRight}
+        disabled={!canScrollRight}
+      >
+        <ChevronRight className="h-5 w-5" />
+      </Button>
+    </div>
+  );
+};
+
 interface VoiceEditTabProps {
   onAudioGenerated?: (audioUrl: string, title: string) => void;
   onAudioDeleted?: () => void;
@@ -690,57 +820,10 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
 
       {/* Segmented waveform cards when sentences exist (preset/record mode) */}
       {sentences.length > 0 && audioSource === "record" && !isRecording && (
-        <div className="w-full">
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-none">
-            {sentences.map((sentence, idx) => {
-              // Generate unique waveform pattern for each sentence
-              const waveformBars = Array.from({ length: 35 }, (_, i) => {
-                const seed = idx * 100 + i;
-                const baseHeight = 25;
-                const variation = Math.sin(seed * 0.4) * 30 + Math.cos(seed * 0.6) * 20;
-                const randomness = Math.sin(seed * 1.7) * 15;
-                return Math.max(8, Math.min(95, baseHeight + variation + randomness));
-              });
-              
-              return (
-                <div
-                  key={sentence.id}
-                  className="flex-shrink-0 w-[240px] bg-[#F5F8FB] rounded-[3px] overflow-hidden"
-                >
-                  {/* Waveform area */}
-                  <div className="h-[120px] flex items-center justify-center px-3 py-2">
-                    <div className="w-full h-full flex items-center justify-center gap-[2px]">
-                      {waveformBars.map((height, i) => (
-                        <div
-                          key={i}
-                          className="w-[4px] bg-[hsl(221,80%,75%)]"
-                          style={{ height: `${height}%` }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Divider */}
-                  <div className="h-px bg-border/30" />
-                  
-                  {/* Text area with edit icon */}
-                  <div className="p-3 min-h-[80px] relative bg-white">
-                    <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed pr-8">
-                      {sentence.text}
-                    </p>
-                    {/* Edit icon at bottom right - using PencilEditIcon */}
-                    <button
-                      onClick={() => openEditModal(sentence.id)}
-                      className="absolute bottom-2 right-2 h-7 w-7 flex items-center justify-center rounded-[3px] bg-[#F5F8FB] border border-border hover:bg-[#CCCCCC] transition-colors"
-                    >
-                      <PencilEditIcon className="h-4 w-4 text-foreground" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <WaveformCardsWithScroll 
+          sentences={sentences} 
+          onEditSentence={openEditModal} 
+        />
       )}
 
       {/* Upload mode - show simple player */}
