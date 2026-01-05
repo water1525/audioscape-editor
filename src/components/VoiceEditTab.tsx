@@ -159,15 +159,15 @@ const WaveformCardsWithScroll = ({
 
   return (
     <div className="w-full h-[45vh] min-h-[320px] flex flex-col">
-      {/* Main waveform area with unified background */}
-      <div className="flex-1 flex items-stretch relative bg-gradient-to-b from-[#E8F4FD] to-[#F0F7FC] rounded-lg overflow-hidden">
+      {/* Main container - no background here */}
+      <div className="flex-1 flex items-stretch relative overflow-hidden">
         {/* Left hover zone for scrolling */}
         <div 
-          className={`absolute left-0 top-0 bottom-0 w-16 z-10 flex items-center justify-start pl-2 bg-gradient-to-r from-[#E8F4FD]/90 to-transparent ${canScrollLeft ? 'cursor-pointer' : 'opacity-50'}`}
+          className={`absolute left-0 top-0 bottom-0 w-16 z-10 flex items-center justify-start pl-2 ${canScrollLeft ? 'cursor-pointer' : 'opacity-50'}`}
           onMouseEnter={() => handleMouseEnter('left')}
           onMouseLeave={handleMouseLeave}
         >
-          <div className="h-10 w-10 rounded-full bg-white/80 shadow-sm flex items-center justify-center">
+          <div className="h-10 w-10 rounded-full bg-background/80 shadow-sm flex items-center justify-center">
             <ChevronLeft className="h-5 w-5 text-muted-foreground" />
           </div>
         </div>
@@ -197,25 +197,25 @@ const WaveformCardsWithScroll = ({
                   className="flex-shrink-0 min-w-[180px] max-w-[260px] flex flex-col cursor-pointer group"
                   onClick={() => onEditSentence(sentence.id)}
                 >
-                  {/* Waveform area - takes most of the height */}
-                  <div className="flex-1 flex items-center justify-center px-1 py-4">
+                  {/* Waveform area with blue background */}
+                  <div className={`flex-1 flex items-center justify-center px-2 py-4 bg-[hsl(210,70%,55%)] group-hover:bg-[hsl(210,75%,50%)] transition-colors ${isFirst ? 'rounded-l-[2px]' : ''} ${isLast ? 'rounded-r-[2px]' : ''}`}>
                     <div className="w-full h-full flex items-center justify-center gap-[2px]">
                       {waveformBars.map((height, i) => (
                         <div
                           key={i}
-                          className="w-[3px] rounded-full bg-[hsl(210,70%,70%)] group-hover:bg-[hsl(210,80%,55%)] transition-colors"
+                          className="w-[3px] rounded-full bg-white/90 group-hover:bg-white transition-colors"
                           style={{ height: `${height}%` }}
                         />
                       ))}
                     </div>
                     {/* Subtle separator between segments */}
                     {!isLast && (
-                      <div className="h-2/3 w-px bg-[hsl(210,40%,80%)] ml-1" />
+                      <div className="h-2/3 w-px bg-white/30 ml-1" />
                     )}
                   </div>
                   
-                  {/* Text area below waveform */}
-                  <div className="h-[80px] px-3 py-2 bg-white/60 group-hover:bg-white/90 transition-colors relative border-t border-[hsl(210,30%,90%)]">
+                  {/* Text area below waveform - no background */}
+                  <div className="h-[80px] px-3 py-2 relative">
                     <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
                       {sentence.text}
                     </p>
@@ -232,11 +232,11 @@ const WaveformCardsWithScroll = ({
 
         {/* Right hover zone for scrolling */}
         <div 
-          className={`absolute right-0 top-0 bottom-0 w-16 z-10 flex items-center justify-end pr-2 bg-gradient-to-l from-[#E8F4FD]/90 to-transparent ${canScrollRight ? 'cursor-pointer' : 'opacity-50'}`}
+          className={`absolute right-0 top-0 bottom-0 w-16 z-10 flex items-center justify-end pr-2 ${canScrollRight ? 'cursor-pointer' : 'opacity-50'}`}
           onMouseEnter={() => handleMouseEnter('right')}
           onMouseLeave={handleMouseLeave}
         >
-          <div className="h-10 w-10 rounded-full bg-white/80 shadow-sm flex items-center justify-center">
+          <div className="h-10 w-10 rounded-full bg-background/80 shadow-sm flex items-center justify-center">
             <ChevronRight className="h-5 w-5 text-muted-foreground" />
           </div>
         </div>
