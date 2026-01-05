@@ -169,49 +169,47 @@ const WaveformCardsWithScroll = ({
   return (
     <div className="w-full flex flex-col">
       {/* Toolbar row: Timeline ruler - Edit All - Delete */}
-      <div className="flex items-center justify-between px-4 py-2 bg-card border-b border-border">
+      <div className="flex items-center justify-between py-3">
         {/* Left side: Time ruler */}
         <div className="flex items-center gap-2 text-muted-foreground">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10"/>
             <polyline points="12 6 12 12 16 14"/>
           </svg>
           <span className="text-sm font-medium">0:00 / 0:00</span>
         </div>
         
-        {/* Right side: Edit All + Delete */}
-        <div className="flex items-center gap-2">
-          {/* Edit All button - blue background */}
+        {/* Right side: Edit All + Delete - no gap, no border */}
+        <div className="flex items-stretch">
+          {/* Edit All button - blue background, no border */}
           {onEditAll && (
-            <Button
+            <button
               onClick={onEditAll}
               disabled={isBatchGenerating}
-              className="h-8 gap-1.5 shrink-0 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,35%)] text-white font-medium"
+              className="h-10 px-5 flex items-center gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,35%)] text-white font-medium disabled:opacity-50 transition-colors"
             >
               {isBatchGenerating ? (
                 <>
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  Generating ({batchProgress?.current || 0}/{batchProgress?.total || 0})
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Generating ({batchProgress?.current || 0}/{batchProgress?.total || 0})</span>
                 </>
               ) : (
                 <>
-                  <PencilEditIcon className="h-3.5 w-3.5" />
-                  Edit All
+                  <PencilEditIcon className="h-4 w-4" />
+                  <span>Edit All</span>
                 </>
               )}
-            </Button>
+            </button>
           )}
           
-          {/* Delete button */}
+          {/* Delete button - no border, matches height */}
           {onDeleteAll && (
-            <Button
-              variant="outline"
-              size="icon"
+            <button
               onClick={onDeleteAll}
-              className="h-8 w-8 shrink-0 border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50"
+              className="h-10 w-10 flex items-center justify-center bg-card hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors border-l border-border"
             >
               <DeleteIcon className="h-4 w-4" />
-            </Button>
+            </button>
           )}
         </div>
       </div>
