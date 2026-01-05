@@ -101,6 +101,7 @@ const WaveformCardsWithScroll = ({
 }) => {
   const [hoveredSentenceId, setHoveredSentenceId] = useState<number | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const timeRulerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
@@ -114,18 +115,29 @@ const WaveformCardsWithScroll = ({
     }
   }, []);
 
+  // Sync time ruler scroll with waveform scroll
+  const syncScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    const timeRuler = timeRulerRef.current;
+    if (container && timeRuler) {
+      timeRuler.scrollLeft = container.scrollLeft;
+    }
+  }, []);
+
   useEffect(() => {
     checkScrollState();
     const container = scrollContainerRef.current;
     if (container) {
       container.addEventListener('scroll', checkScrollState);
+      container.addEventListener('scroll', syncScroll);
       window.addEventListener('resize', checkScrollState);
       return () => {
         container.removeEventListener('scroll', checkScrollState);
+        container.removeEventListener('scroll', syncScroll);
         window.removeEventListener('resize', checkScrollState);
       };
     }
-  }, [checkScrollState, sentences]);
+  }, [checkScrollState, syncScroll, sentences]);
 
   const scrollLeft = () => {
     const container = scrollContainerRef.current;
@@ -186,17 +198,10 @@ const WaveformCardsWithScroll = ({
   
   const timeMarkers = generateTimeMarkers();
 
-  // Calculate sentence positions for time ruler selection indicator
-  const sentenceDuration = 3; // Each sentence is ~3 seconds
-  const getSentenceTimeRange = (sentenceId: number) => {
-    const index = sentences.findIndex(s => s.id === sentenceId);
-    if (index === -1) return null;
-    const startTime = index * sentenceDuration;
-    const endTime = startTime + sentenceDuration;
-    return { startTime, endTime };
-  };
-
-  const hoveredTimeRange = hoveredSentenceId ? getSentenceTimeRange(hoveredSentenceId) : null;
+  // Get hovered sentence index for position calculation
+  const hoveredSentenceIndex = hoveredSentenceId 
+    ? sentences.findIndex(s => s.id === hoveredSentenceId) 
+    : -1;
 
   return (
     <div className="w-full flex flex-col">
@@ -205,55 +210,47 @@ const WaveformCardsWithScroll = ({
         {/* Left spacer - matches left arrow width */}
         <div className="w-10 shrink-0 bg-white border-b border-border/30" />
         
-        {/* Time ruler with scale - aligned with waveform area */}
-        <div className="flex-1 bg-white flex items-end overflow-hidden border-b border-border/30">
-          {/* Ruler scale */}
-          <div className="flex items-end h-full w-full relative">
-            {/* Selection indicator on time ruler */}
-            {hoveredTimeRange && (
-              <div 
-                className="absolute top-0 bottom-0 bg-[hsl(210,70%,55%)]/20 border-l-2 border-r-2 border-[hsl(210,70%,55%)] transition-all duration-150"
-                style={{ 
-                  left: `${(hoveredTimeRange.startTime / totalDuration) * 100}%`,
-                  width: `${((hoveredTimeRange.endTime - hoveredTimeRange.startTime) / totalDuration) * 100}%`
-                }}
-              >
-                {/* Start and end time labels */}
-                <div className="absolute -top-0.5 left-0 transform -translate-x-1/2">
-                  <span className="text-[9px] font-medium text-[hsl(210,70%,55%)] bg-white px-0.5 rounded">{formatTime(hoveredTimeRange.startTime)}</span>
-                </div>
-                <div className="absolute -top-0.5 right-0 transform translate-x-1/2">
-                  <span className="text-[9px] font-medium text-[hsl(210,70%,55%)] bg-white px-0.5 rounded">{formatTime(hoveredTimeRange.endTime)}</span>
-                </div>
-              </div>
-            )}
-            {/* Time scale ticks */}
-            {timeMarkers.map((time, idx) => (
-              <div 
-                key={time} 
-                className="flex flex-col items-center absolute bottom-0"
-                style={{ 
-                  left: `${(time / totalDuration) * 100}%`,
-                  transform: 'translateX(-50%)'
-                }}
-              >
-                {/* Tick mark */}
-                <div className={`w-px ${idx === 0 || idx === timeMarkers.length - 1 ? 'h-3' : 'h-2'} bg-muted-foreground/40`} />
-                {/* Time label */}
-                <span className="text-[10px] text-muted-foreground/70 mb-1">{formatTime(time)}</span>
-              </div>
-            ))}
-            {/* Minor ticks between major markers */}
-            {Array.from({ length: Math.min(totalDuration, 20) }, (_, i) => i).map((tick) => {
-              if (timeMarkers.includes(tick)) return null;
+        {/* Time ruler with scale - scrollable, synced with waveform */}
+        <div 
+          ref={timeRulerRef}
+          className="flex-1 bg-white overflow-x-auto scrollbar-none border-b border-border/30"
+        >
+          <div className="flex h-full min-w-max">
+            {sentences.map((sentence, idx) => {
+              const isHovered = hoveredSentenceId === sentence.id;
+              const startTime = idx * 3;
+              const endTime = startTime + 3;
+              
               return (
-                <div 
-                  key={`minor-${tick}`}
-                  className="absolute w-px h-1.5 bg-muted-foreground/20 bottom-5"
-                  style={{ 
-                    left: `${(tick / totalDuration) * 100}%`
-                  }}
-                />
+                <div
+                  key={`ruler-${sentence.id}`}
+                  className={`flex-shrink-0 min-w-[180px] max-w-[260px] h-full relative flex items-end justify-center transition-colors ${isHovered ? 'bg-[hsl(210,70%,55%)]/20' : ''}`}
+                  onMouseEnter={() => setHoveredSentenceId(sentence.id)}
+                  onMouseLeave={() => setHoveredSentenceId(null)}
+                >
+                  {/* Selection indicator borders */}
+                  {isHovered && (
+                    <>
+                      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[hsl(210,70%,55%)]" />
+                      <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-[hsl(210,70%,55%)]" />
+                      {/* Start time label */}
+                      <div className="absolute top-1 left-1">
+                        <span className="text-[9px] font-medium text-[hsl(210,70%,55%)] bg-white px-0.5 rounded">{formatTime(startTime)}</span>
+                      </div>
+                      {/* End time label */}
+                      <div className="absolute top-1 right-1">
+                        <span className="text-[9px] font-medium text-[hsl(210,70%,55%)] bg-white px-0.5 rounded">{formatTime(endTime)}</span>
+                      </div>
+                    </>
+                  )}
+                  {/* Tick marks at segment boundaries */}
+                  <div className="absolute left-0 bottom-0 w-px h-3 bg-muted-foreground/40" />
+                  {idx === sentences.length - 1 && (
+                    <div className="absolute right-0 bottom-0 w-px h-3 bg-muted-foreground/40" />
+                  )}
+                  {/* Center tick */}
+                  <div className="absolute left-1/2 bottom-0 w-px h-2 bg-muted-foreground/20 -translate-x-1/2" />
+                </div>
               );
             })}
           </div>
