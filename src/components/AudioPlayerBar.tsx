@@ -187,7 +187,7 @@ const AudioPlayerBar = ({
             </p>
           </div>
 
-          {/* Skip controls - small, light gray, positioned left */}
+          {/* Skip controls with duration in center */}
           {!hideSkipControls && (
             <div className="flex items-center gap-4 mr-4">
               <button
@@ -197,6 +197,20 @@ const AudioPlayerBar = ({
               >
                 <img src={SkipBack10Icon} alt="Back 10s" className="w-full h-full" />
               </button>
+              
+              {/* Duration display - centered between icons */}
+              {(typeof durationOverride === "number" || duration > 0) && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <span>
+                    {formatTime(typeof currentTimeOverride === "number" ? currentTimeOverride : currentTime)}
+                  </span>
+                  <span>/</span>
+                  <span>
+                    {formatTime(typeof durationOverride === "number" ? durationOverride : duration)}
+                  </span>
+                </div>
+              )}
+              
               <button
                 onClick={() => skipTime(10)}
                 className="w-5 h-5 opacity-50 hover:opacity-80 transition-opacity"
@@ -207,20 +221,21 @@ const AudioPlayerBar = ({
             </div>
           )}
 
+          {/* Duration display when skip controls hidden */}
+          {hideSkipControls && (typeof durationOverride === "number" || duration > 0) && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground mr-4">
+              <span>
+                {formatTime(typeof currentTimeOverride === "number" ? currentTimeOverride : currentTime)}
+              </span>
+              <span>/</span>
+              <span>
+                {formatTime(typeof durationOverride === "number" ? durationOverride : duration)}
+              </span>
+            </div>
+          )}
+
           {/* Right section */}
           <div className="shrink-0 flex items-center gap-3">
-            {(typeof durationOverride === "number" || duration > 0) && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <span>
-                  {formatTime(typeof currentTimeOverride === "number" ? currentTimeOverride : currentTime)}
-                </span>
-                <span>/</span>
-                <span>
-                  {formatTime(typeof durationOverride === "number" ? durationOverride : duration)}
-                </span>
-              </div>
-            )}
-
             {/* Actions */}
             {showSaveVoice && onSaveVoice && (
               <Button
