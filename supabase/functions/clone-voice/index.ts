@@ -43,19 +43,42 @@ serve(async (req) => {
     // Convert base64 to binary
     const binaryData = Uint8Array.from(atob(audioBase64), (c) => c.charCodeAt(0));
     
-    // Determine file extension and MIME type
+    // StepFun API only supports: mp3, wav, m4a, ogg (not webm!)
+    // Since browser MediaRecorder typically outputs webm, we need to use a supported format
+    // We'll upload as WAV which is most universally supported
     const audioMimeType = mimeType || "audio/webm";
-    let fileExt = "webm";
-    if (audioMimeType.includes("ogg")) fileExt = "ogg";
-    else if (audioMimeType.includes("mp4")) fileExt = "m4a";
-    else if (audioMimeType.includes("wav")) fileExt = "wav";
-    else if (audioMimeType.includes("mpeg") || audioMimeType.includes("mp3")) fileExt = "mp3";
+    console.log("Original MIME type:", audioMimeType);
     
-    console.log("Using file extension:", fileExt, "for MIME type:", audioMimeType);
+    // For webm audio, we need to convert or use a workaround
+    // StepFun supports: mp3, wav, m4a, ogg
+    // We'll try uploading with .ogg extension as it's closest to webm/opus
+    let fileExt = "wav";
+    let uploadMimeType = "audio/wav";
+    
+    if (audioMimeType.includes("ogg")) {
+      fileExt = "ogg";
+      uploadMimeType = "audio/ogg";
+    } else if (audioMimeType.includes("mp4") || audioMimeType.includes("m4a")) {
+      fileExt = "m4a";
+      uploadMimeType = "audio/mp4";
+    } else if (audioMimeType.includes("wav")) {
+      fileExt = "wav";
+      uploadMimeType = "audio/wav";
+    } else if (audioMimeType.includes("mpeg") || audioMimeType.includes("mp3")) {
+      fileExt = "mp3";
+      uploadMimeType = "audio/mpeg";
+    } else if (audioMimeType.includes("webm") || audioMimeType.includes("opus")) {
+      // WebM/Opus is not supported by StepFun, but ogg container with opus codec might work
+      // Try ogg as it's the closest supported format
+      fileExt = "ogg";
+      uploadMimeType = "audio/ogg";
+    }
+    
+    console.log("Using file extension:", fileExt, "upload MIME type:", uploadMimeType);
     
     // Create form data for file upload
     const formData = new FormData();
-    const audioBlob = new Blob([binaryData], { type: audioMimeType });
+    const audioBlob = new Blob([binaryData], { type: uploadMimeType });
     formData.append("file", audioBlob, `recording.${fileExt}`);
     formData.append("purpose", "storage");
 
