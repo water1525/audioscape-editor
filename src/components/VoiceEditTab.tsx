@@ -398,20 +398,23 @@ const WaveformCardsWithScroll = ({
                   onMouseEnter={() => setHoveredSentenceId(sentence.id)}
                   onMouseLeave={() => setHoveredSentenceId(null)}
                 >
-                  {/* Loading overlay when generating - animated waveform style */}
+                  {/* Loading overlay when generating - wave animation style */}
                   {isEditing && (
                     <div className="absolute inset-0 flex items-center justify-center gap-[2px] z-10">
-                      {Array.from({ length: waveformBarCount }, (_, i) => (
-                        <div
-                          key={i}
-                          className="w-[3px] rounded-full bg-white animate-pulse"
-                          style={{ 
-                            height: `${30 + Math.sin(i * 0.5) * 25}%`,
-                            animationDelay: `${(i % 8) * 0.1}s`,
-                            animationDuration: '0.8s'
-                          }}
-                        />
-                      ))}
+                      {Array.from({ length: waveformBarCount }, (_, i) => {
+                        const baseHeight = 30 + Math.sin(i * 0.4) * 20;
+                        return (
+                          <div
+                            key={i}
+                            className="w-[3px] rounded-full bg-white origin-center"
+                            style={{ 
+                              height: `${baseHeight}%`,
+                              animation: `waveMove 1s ease-in-out infinite`,
+                              animationDelay: `${(i * 0.05)}s`,
+                            }}
+                          />
+                        );
+                      })}
                     </div>
                   )}
                   <div className="w-full h-full flex items-center justify-center gap-[2px]">
