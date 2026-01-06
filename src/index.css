@@ -186,7 +186,7 @@
     font-family: 'Morganite', sans-serif;
     font-weight: 800;
     font-style: normal;
-    letter-spacing: 0.25em;
+    letter-spacing: 1em;
     font-size: 8rem;
     background: linear-gradient(90deg, hsl(185 100% 64%) 0%, hsl(172 100% 96%) 100%);
     -webkit-background-clip: text;
