@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import heroBg from "@/assets/hero-bg.png";
+import { useState, useEffect, useRef } from "react";
+import heroBgVideo from "@/assets/hero-bg-video.mp4";
 
 // Banner data
 const banners = [{
@@ -68,14 +68,18 @@ const HeroSection = () => {
   }, []);
   const currentBanner = banners[activeIndex];
   return <section className="hero-section relative min-h-screen flex items-center overflow-hidden">
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-no-repeat"
-        style={{
-          backgroundImage: `url(${heroBg})`,
-          backgroundPosition: "70% center"
-        }}
-      />
+      {/* Background Video */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ objectPosition: "70% center" }}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+      >
+        <source src={heroBgVideo} type="video/mp4" />
+      </video>
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-[hsl(220,25%,8%)] via-[hsl(220,25%,8%)/0.7] to-transparent" />
