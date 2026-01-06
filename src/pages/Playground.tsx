@@ -734,18 +734,6 @@ const Playground = () => {
         onClose={handleClosePlayerBar}
         showSaveVoice={showSaveVoice && activeTab === "clone"}
         onSaveVoice={saveVoiceCallback || undefined}
-        hideProgressBar={activeTab === "edit"}
-        hideSkipControls={activeTab === "edit"}
-        onTogglePlay={
-          activeTab === "edit" && !editIsGenerating
-            ? () => sentenceTimelineRef.current?.togglePlayFrom(editSelectedSentenceId)
-            : undefined
-        }
-        isPlayingOverride={
-          activeTab === "edit" ? editPlayingSentenceId !== null : undefined
-        }
-        durationOverride={activeTab === "edit" ? editDuration : undefined}
-        currentTimeOverride={activeTab === "edit" ? editCurrentTime : undefined}
         isGenerating={activeTab === "edit" && editIsGenerating}
       />
     </div>
