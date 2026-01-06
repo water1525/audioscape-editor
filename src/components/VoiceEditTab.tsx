@@ -240,83 +240,86 @@ const WaveformCardsWithScroll = ({
   return (
     <div ref={containerRef} className="w-full flex flex-col">
       {/* Toolbar row: Timeline ruler with scale + Edit All + Delete */}
-      <div className="relative flex items-stretch h-10 rounded-t-[10px] overflow-hidden">
-        {/* Left spacer - matches left arrow width */}
-        <div className="w-10 shrink-0 bg-white border-b border-border/30" />
-        
-        {/* Time ruler with scale - scrollable, synced with waveform */}
-        <div 
-          ref={timeRulerRef}
-          className="flex-1 bg-white overflow-x-auto scrollbar-none border-b border-border/30 pr-56"
-        >
-          <div className="flex h-full min-w-max">
-            {sentences.map((sentence, idx) => {
-              const isHovered = hoveredSentenceId === sentence.id;
-              const startTime = idx * 3;
-              const endTime = startTime + 3;
-              const isLast = idx === sentences.length - 1;
+      <div className="relative flex items-stretch h-10 rounded-t-[10px]">
+        {/* Left part: spacer + ruler + spacer (scrollable) */}
+        <div className="flex items-stretch flex-1 overflow-hidden">
+          {/* Left spacer - matches left arrow width */}
+          <div className="w-10 shrink-0 bg-white border-b border-border/30" />
+          
+          {/* Time ruler with scale - scrollable, synced with waveform */}
+          <div 
+            ref={timeRulerRef}
+            className="flex-1 bg-white overflow-x-auto scrollbar-none border-b border-border/30"
+          >
+            <div className="flex h-full min-w-max">
+              {sentences.map((sentence, idx) => {
+                const isHovered = hoveredSentenceId === sentence.id;
+                const startTime = idx * 3;
+                const endTime = startTime + 3;
+                const isLast = idx === sentences.length - 1;
 
-              return (
-                <div
-                  key={`ruler-${sentence.id}`}
-                  className={`flex-shrink-0 h-full relative flex items-end justify-center px-2 transition-colors ${isHovered ? 'bg-[hsl(210,70%,55%)]/20' : ''}`}
-                  style={{ minWidth: `${cardMinWidth}px`, maxWidth: `${cardMaxWidth}px` }}
-                  onMouseEnter={() => setHoveredSentenceId(sentence.id)}
-                  onMouseLeave={() => setHoveredSentenceId(null)}
-                >
-                  {/* Selection indicator borders */}
-                  {isHovered && (
-                    <>
-                      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[hsl(210,70%,55%)]" />
-                      <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-[hsl(210,70%,55%)]" />
-                      {/* Start time label */}
-                      <div className="absolute top-1 left-1">
-                        <span className="text-[9px] font-medium text-[hsl(210,70%,55%)] bg-white px-0.5 rounded">{formatTime(startTime)}</span>
-                      </div>
-                      {/* End time label */}
-                      <div className="absolute top-1 right-1">
-                        <span className="text-[9px] font-medium text-[hsl(210,70%,55%)] bg-white px-0.5 rounded">{formatTime(endTime)}</span>
-                      </div>
-                    </>
-                  )}
+                return (
+                  <div
+                    key={`ruler-${sentence.id}`}
+                    className={`flex-shrink-0 h-full relative flex items-end justify-center px-2 transition-colors ${isHovered ? 'bg-[hsl(210,70%,55%)]/20' : ''}`}
+                    style={{ minWidth: `${cardMinWidth}px`, maxWidth: `${cardMaxWidth}px` }}
+                    onMouseEnter={() => setHoveredSentenceId(sentence.id)}
+                    onMouseLeave={() => setHoveredSentenceId(null)}
+                  >
+                    {/* Selection indicator borders */}
+                    {isHovered && (
+                      <>
+                        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[hsl(210,70%,55%)]" />
+                        <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-[hsl(210,70%,55%)]" />
+                        {/* Start time label */}
+                        <div className="absolute top-1 left-1">
+                          <span className="text-[9px] font-medium text-[hsl(210,70%,55%)] bg-white px-0.5 rounded">{formatTime(startTime)}</span>
+                        </div>
+                        {/* End time label */}
+                        <div className="absolute top-1 right-1">
+                          <span className="text-[9px] font-medium text-[hsl(210,70%,55%)] bg-white px-0.5 rounded">{formatTime(endTime)}</span>
+                        </div>
+                      </>
+                    )}
 
-                  {/* Primary ticks at segment boundaries */}
-                  <div className="absolute left-0 bottom-0 w-px h-3 bg-muted-foreground/40" />
-                  {isLast && (
-                    <div className="absolute right-0 bottom-0 w-px h-3 bg-muted-foreground/40" />
-                  )}
-                  
-                  {/* Secondary tick at center (1.5s mark) */}
-                  <div className="absolute left-1/2 bottom-0 w-px h-2.5 bg-muted-foreground/30 -translate-x-1/2" />
-                  
-                  {/* Tertiary ticks at quarter positions (0.75s, 2.25s marks) */}
-                  <div className="absolute left-1/4 bottom-0 w-px h-1.5 bg-muted-foreground/20 -translate-x-1/2" />
-                  <div className="absolute left-3/4 bottom-0 w-px h-1.5 bg-muted-foreground/20 -translate-x-1/2" />
-                  
-                  {/* Fine ticks at eighth positions */}
-                  <div className="absolute left-[12.5%] bottom-0 w-px h-1 bg-muted-foreground/10 -translate-x-1/2" />
-                  <div className="absolute left-[37.5%] bottom-0 w-px h-1 bg-muted-foreground/10 -translate-x-1/2" />
-                  <div className="absolute left-[62.5%] bottom-0 w-px h-1 bg-muted-foreground/10 -translate-x-1/2" />
-                  <div className="absolute left-[87.5%] bottom-0 w-px h-1 bg-muted-foreground/10 -translate-x-1/2" />
-                  
-                  {/* Segment separator line */}
-                  {!isLast && (
-                    <div className="absolute right-0 top-0 bottom-0 w-px bg-muted-foreground/10" />
-                  )}
+                    {/* Primary ticks at segment boundaries */}
+                    <div className="absolute left-0 bottom-0 w-px h-3 bg-muted-foreground/40" />
+                    {isLast && (
+                      <div className="absolute right-0 bottom-0 w-px h-3 bg-muted-foreground/40" />
+                    )}
+                    
+                    {/* Secondary tick at center (1.5s mark) */}
+                    <div className="absolute left-1/2 bottom-0 w-px h-2.5 bg-muted-foreground/30 -translate-x-1/2" />
+                    
+                    {/* Tertiary ticks at quarter positions (0.75s, 2.25s marks) */}
+                    <div className="absolute left-1/4 bottom-0 w-px h-1.5 bg-muted-foreground/20 -translate-x-1/2" />
+                    <div className="absolute left-3/4 bottom-0 w-px h-1.5 bg-muted-foreground/20 -translate-x-1/2" />
+                    
+                    {/* Fine ticks at eighth positions */}
+                    <div className="absolute left-[12.5%] bottom-0 w-px h-1 bg-muted-foreground/10 -translate-x-1/2" />
+                    <div className="absolute left-[37.5%] bottom-0 w-px h-1 bg-muted-foreground/10 -translate-x-1/2" />
+                    <div className="absolute left-[62.5%] bottom-0 w-px h-1 bg-muted-foreground/10 -translate-x-1/2" />
+                    <div className="absolute left-[87.5%] bottom-0 w-px h-1 bg-muted-foreground/10 -translate-x-1/2" />
+                    
+                    {/* Segment separator line */}
+                    {!isLast && (
+                      <div className="absolute right-0 top-0 bottom-0 w-px bg-muted-foreground/10" />
+                    )}
 
-                  {/* Reserve the same separator space as waveform (ml-1) */}
-                  {!isLast && <div className="h-2/3 w-px ml-1 opacity-0" />}
-                </div>
-              );
-            })}
+                    {/* Reserve the same separator space as waveform (ml-1) */}
+                    {!isLast && <div className="h-2/3 w-px ml-1 opacity-0" />}
+                  </div>
+                );
+              })}
+            </div>
           </div>
+          
+          {/* Right spacer - matches right arrow width */}
+          <div className="w-10 shrink-0 bg-white border-b border-border/30" />
         </div>
         
-        {/* Right spacer - matches right arrow width */}
-        <div className="w-10 shrink-0 bg-white border-b border-border/30" />
-        
-        {/* Right side: Edit All + Delete - absolutely positioned so zoom/scroll never affects it */}
-        <div className="absolute right-0 top-0 h-full flex items-stretch z-20">
+        {/* Right side: Edit All + Delete - completely outside scrollable area */}
+        <div className="flex items-stretch shrink-0">
           {/* Edit All button - blue background */}
           {onEditAll && (
             <button
@@ -342,7 +345,7 @@ const WaveformCardsWithScroll = ({
           {onDeleteAll && (
             <button
               onClick={onDeleteAll}
-              className="h-full w-10 flex items-center justify-center bg-white hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors border-b border-border/30"
+              className="h-full w-10 flex items-center justify-center bg-white hover:bg-destructive/10 hover:text-destructive text-muted-foreground transition-colors border-b border-border/30 rounded-tr-[10px]"
             >
               <DeleteIcon className="h-4 w-4" />
             </button>
