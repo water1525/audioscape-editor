@@ -474,8 +474,8 @@ const Playground = () => {
         <div className="w-56 flex-shrink-0" />
 
         {/* Main Content */}
-        <main className="flex-1 p-6">
-          <div className="max-w-4xl">
+        <main className={`flex-1 ${activeTab === "edit" ? "p-0" : "p-6"}`}>
+          <div className={activeTab === "edit" ? "" : "max-w-4xl"}>
             {activeTab === "tts" && (
               <>
                 {/* Text Input Area */}

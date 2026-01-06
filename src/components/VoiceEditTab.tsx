@@ -1100,7 +1100,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
 
       {/* Segmented waveform cards when sentences exist (preset/record mode) */}
       {sentences.length > 0 && audioSource === "record" && !isRecording && (
-        <div className="-mx-6">
+        <div>
           <WaveformCardsWithScroll 
             sentences={sentences} 
             onEditSentence={openEditModal}
