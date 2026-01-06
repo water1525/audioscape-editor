@@ -315,8 +315,8 @@ const WaveformCardsWithScroll = ({
         {/* Right spacer - matches right arrow width */}
         <div className="w-10 shrink-0 bg-white border-b border-border/30" />
         
-        {/* Right side: Edit All + Delete - no gap */}
-        <div className="flex items-stretch shrink-0">
+        {/* Right side: Edit All + Delete - fixed position, not affected by zoom */}
+        <div className="flex items-stretch shrink-0 sticky right-0 z-10">
           {/* Edit All button - blue background */}
           {onEditAll && (
             <button
