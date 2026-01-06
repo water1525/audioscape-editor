@@ -201,7 +201,7 @@
   }
 
   .hero-tag {
-    @apply px-3 py-1.5 text-sm font-medium;
+    @apply px-3 py-2.5 text-sm font-medium;
     background: hsl(0 0% 100% / 0.3);
     color: hsl(0 0% 100%);
     border: none;
