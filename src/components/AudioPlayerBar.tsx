@@ -19,6 +19,11 @@ const SolidPauseIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+interface PlaylistItem {
+  id: number;
+  url: string;
+}
+
 interface AudioPlayerBarProps {
   audioUrl: string | null;
   title: string;
@@ -34,6 +39,10 @@ interface AudioPlayerBarProps {
   durationOverride?: number;
   currentTimeOverride?: number;
   isGenerating?: boolean;
+  // Playlist mode props
+  playlist?: PlaylistItem[];
+  startFromId?: number | null;
+  onPlayingSentenceChange?: (id: number | null) => void;
 }
 
 const AudioPlayerBar = ({
@@ -51,19 +60,37 @@ const AudioPlayerBar = ({
   durationOverride,
   currentTimeOverride,
   isGenerating,
+  playlist,
+  startFromId,
+  onPlayingSentenceChange,
 }: AudioPlayerBarProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [currentPlaylistIndex, setCurrentPlaylistIndex] = useState(0);
+  const [playlistMode, setPlaylistMode] = useState(false);
+
+  // Determine current audio URL
+  const currentAudioUrl = playlistMode && playlist && playlist.length > 0
+    ? playlist[currentPlaylistIndex]?.url
+    : audioUrl;
 
   useEffect(() => {
-    if (audioUrl && audioRef.current) {
+    if (currentAudioUrl && audioRef.current) {
       audioRef.current.load();
       setCurrentTime(0);
-      setIsPlaying(false);
+      // Don't reset isPlaying in playlist mode - auto-continue
     }
-  }, [audioUrl]);
+  }, [currentAudioUrl]);
+
+  // Reset playlist mode when audioUrl changes (not in playlist mode)
+  useEffect(() => {
+    if (audioUrl && !playlist) {
+      setPlaylistMode(false);
+      setCurrentPlaylistIndex(0);
+    }
+  }, [audioUrl, playlist]);
 
   const togglePlayPause = async () => {
     if (onTogglePlay) {
@@ -71,21 +98,85 @@ const AudioPlayerBar = ({
       return;
     }
 
+    // Handle playlist mode - play from selected sentence
+    if (playlist && playlist.length > 0 && startFromId !== null && startFromId !== undefined) {
+      const startIndex = playlist.findIndex(p => p.id === startFromId);
+      if (startIndex !== -1) {
+        if (isPlaying && playlistMode && currentPlaylistIndex >= startIndex) {
+          // Currently playing from this point, pause
+          audioRef.current?.pause();
+          setIsPlaying(false);
+          onPlayingSentenceChange?.(null);
+          return;
+        }
+        // Start playing from selected sentence
+        setPlaylistMode(true);
+        setCurrentPlaylistIndex(startIndex);
+        onPlayingSentenceChange?.(playlist[startIndex].id);
+        
+        // Need to wait for the audio source to update
+        setTimeout(async () => {
+          if (audioRef.current) {
+            try {
+              await audioRef.current.play();
+              setIsPlaying(true);
+            } catch (err) {
+              console.error("Audio play failed:", err);
+              setIsPlaying(false);
+              onPlayingSentenceChange?.(null);
+            }
+          }
+        }, 100);
+        return;
+      }
+    }
+
     if (!audioRef.current) return;
 
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
+      if (playlistMode) {
+        onPlayingSentenceChange?.(null);
+      }
       return;
     }
 
     try {
       await audioRef.current.play();
       setIsPlaying(true);
+      if (playlistMode && playlist) {
+        onPlayingSentenceChange?.(playlist[currentPlaylistIndex]?.id ?? null);
+      }
     } catch (err) {
       console.error("Audio play failed:", err);
       setIsPlaying(false);
       toast.error("Audio playback failed, please try again");
+    }
+  };
+
+  const handleEnded = () => {
+    // Check if we're in playlist mode and have more items
+    if (playlistMode && playlist && currentPlaylistIndex < playlist.length - 1) {
+      const nextIndex = currentPlaylistIndex + 1;
+      setCurrentPlaylistIndex(nextIndex);
+      onPlayingSentenceChange?.(playlist[nextIndex].id);
+      // Auto-play next item
+      setTimeout(async () => {
+        if (audioRef.current) {
+          try {
+            await audioRef.current.play();
+          } catch (err) {
+            console.error("Auto-play next failed:", err);
+            setIsPlaying(false);
+            onPlayingSentenceChange?.(null);
+          }
+        }
+      }, 100);
+    } else {
+      setIsPlaying(false);
+      setPlaylistMode(false);
+      onPlayingSentenceChange?.(null);
     }
   };
 
@@ -121,9 +212,10 @@ const AudioPlayerBar = ({
   };
 
   const handleDownload = () => {
-    if (audioUrl) {
+    const urlToDownload = currentAudioUrl || audioUrl;
+    if (urlToDownload) {
       const a = document.createElement("a");
-      a.href = audioUrl;
+      a.href = urlToDownload;
       a.download = `${title || "audio"}.mp3`;
       a.click();
     }
@@ -137,18 +229,19 @@ const AudioPlayerBar = ({
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-  if (!isVisible || (!audioUrl && !isGenerating)) return null;
+  if (!isVisible || (!audioUrl && !currentAudioUrl && !isGenerating)) return null;
 
   return (
     <div className="fixed bottom-0 left-56 right-0 z-50 bg-card border-t border-l border-border rounded-tl-[3px]">
       <audio
         ref={audioRef}
-        src={audioUrl}
+        src={currentAudioUrl || audioUrl || undefined}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
-        onEnded={() => setIsPlaying(false)}
+        onEnded={handleEnded}
         onError={() => {
           setIsPlaying(false);
+          onPlayingSentenceChange?.(null);
           toast.error("Audio loading failed, please regenerate");
         }}
       />
