@@ -242,14 +242,15 @@ const WaveformCardsWithScroll = ({
       {/* Toolbar row: Timeline ruler with scale + Edit All + Delete */}
       <div className="relative flex items-stretch h-10 rounded-t-[10px]">
         {/* Left part: spacer + ruler + spacer (scrollable) */}
-        <div className="flex items-stretch flex-1 overflow-hidden">
+        <div className="flex items-stretch flex-1 min-w-0 overflow-hidden">
           {/* Left spacer - matches left arrow width */}
           <div className="w-10 shrink-0 bg-white border-b border-border/30" />
           
           {/* Time ruler with scale - scrollable, synced with waveform */}
           <div 
             ref={timeRulerRef}
-            className="flex-1 bg-white overflow-x-auto scrollbar-none border-b border-border/30"
+            className="flex-1 min-w-0 bg-white overflow-x-auto scrollbar-none border-b border-border/30"
+            style={{ scrollbarGutter: "stable" }}
           >
             <div className="flex h-full min-w-max">
               {sentences.map((sentence, idx) => {
@@ -375,7 +376,8 @@ const WaveformCardsWithScroll = ({
         {/* Scrollable waveform container */}
         <div 
           ref={scrollContainerRef}
-          className="flex-1 overflow-x-auto scrollbar-none bg-[hsl(210,70%,55%)]"
+          className="flex-1 min-w-0 overflow-x-auto scrollbar-none bg-[hsl(210,70%,55%)]"
+          style={{ scrollbarGutter: "stable" }}
         >
           <div className="flex h-full min-w-max">
             {sentences.map((sentence, idx) => {
@@ -452,9 +454,9 @@ const WaveformCardsWithScroll = ({
         </div>
       </div>
       {/* Text area row with white background - bottom rounded corners only */}
-      <div className="h-[100px] bg-white rounded-b-[10px] flex overflow-x-auto scrollbar-none shadow-sm">
+      <div className="h-[100px] bg-white rounded-b-[10px] flex overflow-x-auto scrollbar-none shadow-sm" style={{ scrollbarGutter: "stable" }}>
         <div className="w-10 shrink-0" /> {/* Spacer for left arrow */}
-        <div className="flex-1 flex min-w-max">
+        <div className="flex-1 min-w-0 flex">
           {sentences.map((sentence) => {
             const isHovered = hoveredSentenceId === sentence.id;
             return (
