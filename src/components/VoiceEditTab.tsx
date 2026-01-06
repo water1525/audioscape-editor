@@ -92,6 +92,8 @@ const WaveformCardsWithScroll = ({
   isBatchGenerating,
   batchProgress,
   editGeneratingId,
+  selectedSentenceId,
+  onSelectSentence,
 }: { 
   sentences: SentenceSegment[]; 
   onEditSentence: (id: number) => void;
@@ -100,6 +102,8 @@ const WaveformCardsWithScroll = ({
   isBatchGenerating?: boolean;
   batchProgress?: { current: number; total: number };
   editGeneratingId?: number | null;
+  selectedSentenceId?: number | null;
+  onSelectSentence?: (id: number) => void;
 }) => {
   const [hoveredSentenceId, setHoveredSentenceId] = useState<number | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -255,20 +259,23 @@ const WaveformCardsWithScroll = ({
             <div className="flex h-full min-w-max">
               {sentences.map((sentence, idx) => {
                 const isHovered = hoveredSentenceId === sentence.id;
+                const isSelected = selectedSentenceId === sentence.id;
                 const startTime = idx * 3;
                 const endTime = startTime + 3;
                 const isLast = idx === sentences.length - 1;
+                const isHighlighted = isSelected || isHovered;
 
                 return (
                   <div
                     key={`ruler-${sentence.id}`}
-                    className={`flex-shrink-0 h-full relative flex items-end justify-center px-2 transition-colors ${isHovered ? 'bg-[hsl(210,70%,55%)]/20' : ''}`}
+                    className={`flex-shrink-0 h-full relative flex items-end justify-center px-2 transition-colors cursor-pointer ${isHighlighted ? 'bg-[hsl(210,70%,55%)]/20' : ''}`}
                     style={{ minWidth: `${cardMinWidth}px`, maxWidth: `${cardMaxWidth}px` }}
                     onMouseEnter={() => setHoveredSentenceId(sentence.id)}
                     onMouseLeave={() => setHoveredSentenceId(null)}
+                    onClick={() => onSelectSentence?.(sentence.id)}
                   >
                     {/* Selection indicator borders */}
-                    {isHovered && (
+                    {isHighlighted && (
                       <>
                         <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[hsl(210,70%,55%)]" />
                         <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-[hsl(210,70%,55%)]" />
@@ -393,14 +400,19 @@ const WaveformCardsWithScroll = ({
               const isLast = idx === sentences.length - 1;
               
               const isHovered = hoveredSentenceId === sentence.id;
+              const isSelected = selectedSentenceId === sentence.id;
               const isEditing = editGeneratingId === sentence.id;
+              const isHighlighted = isSelected || isHovered;
               
               return (
                 <div
                   key={sentence.id}
-                  className={`flex-shrink-0 flex items-center justify-center px-2 py-4 cursor-pointer transition-colors relative ${isHovered ? 'bg-[hsl(210,75%,50%)]' : ''}`}
+                  className={`flex-shrink-0 flex items-center justify-center px-2 py-4 cursor-pointer transition-colors relative ${isHighlighted ? 'bg-[hsl(210,75%,50%)]' : ''}`}
                   style={{ minWidth: `${cardMinWidth}px`, maxWidth: `${cardMaxWidth}px` }}
-                  onClick={() => !isEditing && onEditSentence(sentence.id)}
+                  onClick={() => {
+                    onSelectSentence?.(sentence.id);
+                  }}
+                  onDoubleClick={() => !isEditing && onEditSentence(sentence.id)}
                   onMouseEnter={() => setHoveredSentenceId(sentence.id)}
                   onMouseLeave={() => setHoveredSentenceId(null)}
                 >
@@ -427,7 +439,7 @@ const WaveformCardsWithScroll = ({
                       waveformBars.map((height, i) => (
                         <div
                           key={i}
-                          className={`w-[3px] rounded-full transition-colors ${isHovered ? 'bg-white' : 'bg-white/90'}`}
+                          className={`w-[3px] rounded-full transition-colors ${isHighlighted ? 'bg-white' : 'bg-white/90'}`}
                           style={{ height: `${height}%` }}
                         />
                       ))
@@ -459,12 +471,16 @@ const WaveformCardsWithScroll = ({
         <div className="flex-1 min-w-0 flex">
           {sentences.map((sentence) => {
             const isHovered = hoveredSentenceId === sentence.id;
+            const isSelected = selectedSentenceId === sentence.id;
+            const isHighlighted = isSelected || isHovered;
+            const showEditButton = isSelected || isHovered;
             return (
               <div
                 key={`text-${sentence.id}`}
-                className={`flex-shrink-0 px-3 py-2 cursor-pointer transition-colors relative ${isHovered ? "bg-muted/50" : ""}`}
+                className={`flex-shrink-0 px-3 py-2 cursor-pointer transition-colors relative ${isHighlighted ? "bg-muted/50" : ""}`}
                 style={{ minWidth: `${cardMinWidth}px`, maxWidth: `${cardMaxWidth}px` }}
-                onClick={() => onEditSentence(sentence.id)}
+                onClick={() => onSelectSentence?.(sentence.id)}
+                onDoubleClick={() => onEditSentence(sentence.id)}
                 onMouseEnter={() => setHoveredSentenceId(sentence.id)}
                 onMouseLeave={() => setHoveredSentenceId(null)}
               >
@@ -473,20 +489,22 @@ const WaveformCardsWithScroll = ({
                     {sentence.text}
                   </p>
 
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 shrink-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEditSentence(sentence.id);
-                    }}
-                    aria-label="Edit segment"
-                    title="Edit"
-                  >
-                    <PencilEditIcon className="h-4 w-4 text-foreground/80" />
-                  </Button>
+                  {showEditButton && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEditSentence(sentence.id);
+                      }}
+                      aria-label="Edit segment"
+                      title="Edit"
+                    >
+                      <PencilEditIcon className="h-4 w-4 text-foreground/80" />
+                    </Button>
+                  )}
                 </div>
               </div>
             );
@@ -522,6 +540,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
   // Sentence segments state
   const [sentences, setSentences] = useState<SentenceSegment[]>([]);
   const [editingSentenceId, setEditingSentenceId] = useState<number | null>(null);
+  const [selectedSentenceId, setSelectedSentenceId] = useState<number | null>(null);
   const [isBatchEdit, setIsBatchEdit] = useState(false);
   
   // Edit state
@@ -542,6 +561,13 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
   useEffect(() => {
     onSentencesChange?.(sentences);
   }, [sentences, onSentencesChange]);
+
+  // Default select the first sentence when sentences are populated
+  useEffect(() => {
+    if (sentences.length > 0 && selectedSentenceId === null) {
+      setSelectedSentenceId(sentences[0].id);
+    }
+  }, [sentences, selectedSentenceId]);
 
   // Split text into sentences by punctuation (Chinese and English)
   const splitIntoSentences = (text: string): string[] => {
@@ -1114,6 +1140,8 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
             isBatchGenerating={isBatchGenerating}
             batchProgress={batchProgress}
             editGeneratingId={isGenerating ? editingSentenceId : null}
+            selectedSentenceId={selectedSentenceId}
+            onSelectSentence={setSelectedSentenceId}
           />
         </div>
       )}
