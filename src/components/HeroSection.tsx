@@ -86,25 +86,25 @@ const HeroSection = () => {
 
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-6 md:px-12 lg:px-20">
-        <div className="max-w-2xl">
+      <div className="relative z-10 container mx-auto px-6 md:px-12 lg:px-20 min-[1920px]:px-32">
+        <div className="max-w-2xl min-[1920px]:max-w-4xl">
           {/* Title */}
-          <h1 key={currentBanner.id} className="hero-title text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 animate-fade-in">
+          <h1 key={currentBanner.id} className="hero-title text-5xl md:text-6xl lg:text-7xl min-[1920px]:text-8xl font-extrabold mb-4 min-[1920px]:mb-6 animate-fade-in">
             {currentBanner.title}
           </h1>
 
           {/* Subtitle */}
-          <p className="hero-subtitle text-3xl md:text-4xl mb-6 animate-fade-in" style={{
+          <p className="hero-subtitle text-3xl md:text-4xl min-[1920px]:text-5xl mb-6 min-[1920px]:mb-10 animate-fade-in" style={{
           animationDelay: "0.1s"
         }}>
             {currentBanner.subtitle}
           </p>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-[3px] mb-16 animate-fade-in" style={{
+          <div className="flex flex-wrap gap-[3px] mb-16 min-[1920px]:mb-20 animate-fade-in" style={{
           animationDelay: "0.2s"
         }}>
-            {currentBanner.tags.map(tag => <span key={tag} className="hero-tag">
+            {currentBanner.tags.map(tag => <span key={tag} className="hero-tag min-[1920px]:text-lg min-[1920px]:px-6 min-[1920px]:py-2">
                 {tag}
               </span>)}
           </div>
@@ -115,7 +115,7 @@ const HeroSection = () => {
         }}>
             <button 
               onClick={() => setActiveButton('use')}
-              className={`px-10 py-4 text-lg transition-colors duration-200 ${
+              className={`px-10 py-4 text-lg min-[1920px]:px-14 min-[1920px]:py-6 min-[1920px]:text-xl transition-colors duration-200 ${
                 activeButton === 'use' 
                   ? 'bg-[#AD0606] text-white font-semibold' 
                   : 'bg-white text-foreground hover:bg-gray-100'
@@ -125,7 +125,7 @@ const HeroSection = () => {
             </button>
             <button 
               onClick={() => setActiveButton('intro')}
-              className={`px-10 py-4 text-lg transition-colors duration-200 ${
+              className={`px-10 py-4 text-lg min-[1920px]:px-14 min-[1920px]:py-6 min-[1920px]:text-xl transition-colors duration-200 ${
                 activeButton === 'intro' 
                   ? 'bg-[#AD0606] text-white font-semibold' 
                   : 'bg-white text-foreground hover:bg-gray-100'
