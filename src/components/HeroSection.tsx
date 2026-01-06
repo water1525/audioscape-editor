@@ -97,7 +97,7 @@ const HeroSection = () => {
           </p>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-3 mb-16 animate-fade-in" style={{
+          <div className="flex flex-wrap gap-2 mb-16 animate-fade-in" style={{
           animationDelay: "0.2s"
         }}>
             {currentBanner.tags.map(tag => <span key={tag} className="hero-tag">
