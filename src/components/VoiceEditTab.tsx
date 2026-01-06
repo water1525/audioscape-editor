@@ -615,7 +615,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
     
     setIsGeneratingPreset(scenario.id);
     
-    // Immediately show next step with sentences
+    // Split text into sentences first
     const sentenceTexts = splitIntoSentences(scenario.text);
     const newSentences: SentenceSegment[] = sentenceTexts.map((text, index) => ({
       id: index,
@@ -630,35 +630,64 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
     // Notify parent that we're generating
     onGeneratingChange?.(true, `${scenario.title} - ${scenario.subtitle}`);
     
+    // Enable batch generating mode
+    setIsBatchGenerating(true);
+    setBatchProgress({ current: 0, total: sentenceTexts.length });
+    onBatchGeneratingChange?.(true, { current: 0, total: sentenceTexts.length });
+    
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            text: scenario.text,
-            voice: "tianmeinvsheng",
-          }),
+      // Generate audio for each sentence
+      const updatedSentences = [...newSentences];
+      
+      for (let i = 0; i < sentenceTexts.length; i++) {
+        const sentenceText = sentenceTexts[i];
+        setBatchProgress({ current: i + 1, total: sentenceTexts.length });
+        onBatchGeneratingChange?.(true, { current: i + 1, total: sentenceTexts.length });
+        
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+                Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+              },
+              body: JSON.stringify({
+                text: sentenceText,
+                voice: "tianmeinvsheng",
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to generate audio");
+          }
+
+          const audioBlob = await response.blob();
+          const url = URL.createObjectURL(audioBlob);
+          
+          // Update sentence with generated audio
+          updatedSentences[i] = {
+            ...updatedSentences[i],
+            versions: [{ url, tags: [] }],
+            currentVersionIndex: 0,
+          };
+          
+          // Update state progressively
+          setSentences([...updatedSentences]);
+          
+          // Notify parent with the first sentence's audio
+          if (i === 0) {
+            onAudioGenerated?.(url, `${scenario.title} - ${scenario.subtitle}`);
+          }
+        } catch (error) {
+          console.error(`Error generating audio for sentence ${i}:`, error);
+          // Continue with other sentences even if one fails
         }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to generate audio");
       }
-
-      const audioBlob = await response.blob();
-      const url = URL.createObjectURL(audioBlob);
       
-      setOriginalAudioBlob(audioBlob);
-      setOriginalAudioUrl(url);
-      setOriginalFileName(`${scenario.title}_${scenario.subtitle}.wav`);
-      
-      onAudioGenerated?.(url, `${scenario.title} - ${scenario.subtitle}`);
       toast.success(`${scenario.title} audio generated successfully`);
     } catch (error) {
       console.error("Error generating preset audio:", error);
@@ -668,6 +697,9 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
       setAudioSource("none");
     } finally {
       setIsGeneratingPreset(null);
+      setIsBatchGenerating(false);
+      setBatchProgress({ current: 0, total: 0 });
+      onBatchGeneratingChange?.(false, { current: 0, total: 0 });
       onGeneratingChange?.(false);
     }
   };
