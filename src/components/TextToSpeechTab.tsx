@@ -114,10 +114,11 @@ const TextToSpeechTab = () => {
   const currentCase = cases.find((c) => c.id === activeCase) || cases[0];
   const { playAudio, stopGlobalAudio } = useGlobalAudio();
 
-  // Check storage for pre-generated audio on mount
+  // Check storage for pre-generated audio on mount and preload them
   useEffect(() => {
-    const checkStorageFiles = async () => {
+    const checkAndPreloadStorageFiles = async () => {
       const urls: Record<string, string> = {};
+      const preloadPromises: Promise<void>[] = [];
       
       for (const [caseId, filePath] of Object.entries(storageFiles)) {
         const { data } = supabase.storage.from("audio").getPublicUrl(filePath);
@@ -128,6 +129,16 @@ const TextToSpeechTab = () => {
           });
           if (response.ok) {
             urls[caseId] = data.publicUrl;
+            // Preload audio by creating Audio element and loading it
+            preloadPromises.push(
+              new Promise<void>((resolve) => {
+                const audio = new Audio();
+                audio.preload = "auto";
+                audio.oncanplaythrough = () => resolve();
+                audio.onerror = () => resolve(); // Still resolve on error
+                audio.src = data.publicUrl;
+              })
+            );
           }
         } catch {
           // File doesn't exist
@@ -135,9 +146,12 @@ const TextToSpeechTab = () => {
       }
       
       setStorageUrls(urls);
+      
+      // Wait for all audio to preload
+      await Promise.all(preloadPromises);
     };
     
-    checkStorageFiles();
+    checkAndPreloadStorageFiles();
   }, []);
 
   // Generate single audio on demand
