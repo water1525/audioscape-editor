@@ -460,85 +460,85 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
   }, []);
 
   return (
-    <div className="animate-fade-in space-y-6">
+    <div className="animate-fade-in space-y-6 min-[1920px]:space-y-8">
       {/* Step 1: Record Audio */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-medium text-foreground">Step 1: Record Audio</h3>
+      <div className="space-y-3 min-[1920px]:space-y-4">
+        <h3 className="text-sm min-[1920px]:text-base font-medium text-foreground">Step 1: Record Audio</h3>
         
         {!recordedAudioUrl ? (
-          <div className="bg-[#F5F8FB] border border-border rounded-[3px] p-6">
-            <p className="text-sm text-muted-foreground text-center mb-4">
+          <div className="bg-[#F5F8FB] border border-border rounded-[3px] p-6 min-[1920px]:p-8">
+            <p className="text-sm min-[1920px]:text-base text-muted-foreground text-center mb-4 min-[1920px]:mb-6">
               Please read the following text in a quiet environment, recording 5-10 seconds
             </p>
             
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <p className="text-base text-foreground text-center leading-relaxed max-w-lg">
+            <div className="flex items-center justify-center gap-2 min-[1920px]:gap-3 mb-6 min-[1920px]:mb-8">
+              <p className="text-base min-[1920px]:text-lg text-foreground text-center leading-relaxed max-w-lg min-[1920px]:max-w-2xl">
                 {sampleText}
               </p>
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8 shrink-0 bg-white hover:bg-[#CCCCCC] border-border"
+                className="h-8 w-8 min-[1920px]:h-10 min-[1920px]:w-10 shrink-0 bg-white hover:bg-[#CCCCCC] border-border"
                 onClick={generateRandomText}
                 disabled={isRecording}
               >
-                <RefreshCw className="h-4 w-4" />
+                <RefreshCw className="h-4 w-4 min-[1920px]:h-5 min-[1920px]:w-5" />
               </Button>
             </div>
 
             {isRecording ? (
-              <div className="flex flex-col items-center gap-4">
-                <div className="text-4xl font-bold text-[hsl(221,100%,43%)]">{countdown}S</div>
+              <div className="flex flex-col items-center gap-4 min-[1920px]:gap-6">
+                <div className="text-4xl min-[1920px]:text-5xl font-bold text-[hsl(221,100%,43%)]">{countdown}S</div>
                 <Button
                   onClick={stopRecording}
                   disabled={countdown > 5}
-                  className="min-w-[120px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
+                  className="min-w-[120px] min-[1920px]:min-w-[160px] min-[1920px]:py-6 min-[1920px]:text-base bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
                 >
                   Stop Recording
                 </Button>
                 {countdown > 5 && (
-                  <p className="text-xs text-muted-foreground">Can stop manually after 5 seconds</p>
+                  <p className="text-xs min-[1920px]:text-sm text-muted-foreground">Can stop manually after 5 seconds</p>
                 )}
               </div>
             ) : (
               <div className="flex justify-center">
-                <Button onClick={startRecording} className="min-w-[180px] bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold">
-                  <MicrophoneIcon className="h-4 w-4 mr-2" />
+                <Button onClick={startRecording} className="min-w-[180px] min-[1920px]:min-w-[220px] min-[1920px]:py-6 min-[1920px]:text-base bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold">
+                  <MicrophoneIcon className="h-4 w-4 min-[1920px]:h-5 min-[1920px]:w-5 mr-2" />
                   Start Recording
                 </Button>
               </div>
             )}
           </div>
         ) : (
-          <div className="bg-card border border-border rounded-[3px] p-4">
-            <div className="flex items-center gap-3">
+          <div className="bg-card border border-border rounded-[3px] p-4 min-[1920px]:p-6">
+            <div className="flex items-center gap-3 min-[1920px]:gap-4">
                 <button
                   type="button"
                   onClick={togglePlayRecorded}
-                  className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center transition-colors hover:bg-primary/20 text-primary"
+                  className="h-10 w-10 min-[1920px]:h-12 min-[1920px]:w-12 rounded-full bg-primary/10 flex items-center justify-center transition-colors hover:bg-primary/20 text-primary"
                 >
                   {isPlayingRecorded ? (
-                    <Pause className="h-4 w-4" />
+                    <Pause className="h-4 w-4 min-[1920px]:h-5 min-[1920px]:w-5" />
                   ) : (
-                    <Play className="h-4 w-4" />
+                    <Play className="h-4 w-4 min-[1920px]:h-5 min-[1920px]:w-5" />
                   )}
                 </button>
               {isPlayingRecorded && (
                 <WaveformAnimation isPlaying={true} variant="small" barCount={4} />
               )}
               <div className="flex-1">
-                <p className="text-sm font-medium text-foreground">
+                <p className="text-sm min-[1920px]:text-base font-medium text-foreground">
                   {recordedAudioName}
                 </p>
-                <p className="text-xs text-muted-foreground">00:10</p>
+                <p className="text-xs min-[1920px]:text-sm text-muted-foreground">00:10</p>
               </div>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                className="h-8 w-8 min-[1920px]:h-10 min-[1920px]:w-10 text-muted-foreground hover:text-destructive"
                 onClick={deleteRecordedAudio}
               >
-                <DeleteIcon className="h-4 w-4" />
+                <DeleteIcon className="h-4 w-4 min-[1920px]:h-5 min-[1920px]:w-5" />
               </Button>
             </div>
           </div>
@@ -546,27 +546,27 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
       </div>
 
       {/* Step 2: Target Text */}
-      <div className="space-y-3">
-        <h3 className="text-sm font-medium text-foreground">Step 2: Enter Target Text</h3>
+      <div className="space-y-3 min-[1920px]:space-y-4">
+        <h3 className="text-sm min-[1920px]:text-base font-medium text-foreground">Step 2: Enter Target Text</h3>
         <div className="relative">
           <Textarea
             placeholder="Enter the text you want to generate audio for"
             value={targetText}
             onChange={(e) => setTargetText(e.target.value.slice(0, 1000))}
-            className="min-h-[120px] resize-none pr-16"
+            className="min-h-[120px] min-[1920px]:min-h-[160px] min-[1920px]:text-base resize-none pr-16"
           />
-          <div className="absolute bottom-3 right-3 flex items-center gap-3">
-            <span className="text-xs text-muted-foreground">
+          <div className="absolute bottom-3 right-3 min-[1920px]:bottom-4 min-[1920px]:right-4 flex items-center gap-3 min-[1920px]:gap-4">
+            <span className="text-xs min-[1920px]:text-sm text-muted-foreground">
               {targetText.length}/1000 chars
             </span>
             <button
               onClick={generateAITargetText}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white text-xs font-semibold rounded-[3px] transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 min-[1920px]:px-4 min-[1920px]:py-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white text-xs min-[1920px]:text-sm font-semibold rounded-[3px] transition-colors"
             >
-              <Sparkles className="h-3.5 w-3.5" />
+              <Sparkles className="h-3.5 w-3.5 min-[1920px]:h-4 min-[1920px]:w-4" />
               <span>AI</span>
               {aiTargetTexts.includes(targetText) && (
-                <RefreshCw className="h-3 w-3" />
+                <RefreshCw className="h-3 w-3 min-[1920px]:h-3.5 min-[1920px]:w-3.5" />
               )}
             </button>
           </div>
@@ -576,16 +576,16 @@ const VoiceCloneTab = ({ onAudioGenerated, onSaveVoiceReady, onAudioDeleted }: V
       {/* Clone Button */}
       {recordedAudioUrl && targetText.trim() && (
         isCloning ? (
-          <div className="w-full h-10 bg-[hsl(221,100%,43%)] rounded-[3px] overflow-hidden relative">
+          <div className="w-full h-10 min-[1920px]:h-14 bg-[hsl(221,100%,43%)] rounded-[3px] overflow-hidden relative">
             <div className="h-full bg-[hsl(221,100%,30%)] animate-pulse" style={{ width: '100%' }} />
-            <span className="absolute inset-0 flex items-center justify-center text-white font-semibold">
+            <span className="absolute inset-0 flex items-center justify-center text-white font-semibold min-[1920px]:text-lg">
               Generating...
             </span>
           </div>
         ) : (
           <Button
             onClick={cloneVoice}
-            className="w-full bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
+            className="w-full min-[1920px]:py-6 min-[1920px]:text-lg bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
           >
             Clone Voice
           </Button>
