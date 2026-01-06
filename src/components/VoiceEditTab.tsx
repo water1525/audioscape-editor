@@ -240,14 +240,14 @@ const WaveformCardsWithScroll = ({
   return (
     <div ref={containerRef} className="w-full flex flex-col">
       {/* Toolbar row: Timeline ruler with scale + Edit All + Delete */}
-      <div className="flex items-stretch h-10 rounded-t-[10px] overflow-hidden">
+      <div className="relative flex items-stretch h-10 rounded-t-[10px] overflow-hidden">
         {/* Left spacer - matches left arrow width */}
         <div className="w-10 shrink-0 bg-white border-b border-border/30" />
         
         {/* Time ruler with scale - scrollable, synced with waveform */}
         <div 
           ref={timeRulerRef}
-          className="flex-1 bg-white overflow-x-auto scrollbar-none border-b border-border/30"
+          className="flex-1 bg-white overflow-x-auto scrollbar-none border-b border-border/30 pr-56"
         >
           <div className="flex h-full min-w-max">
             {sentences.map((sentence, idx) => {
@@ -315,8 +315,8 @@ const WaveformCardsWithScroll = ({
         {/* Right spacer - matches right arrow width */}
         <div className="w-10 shrink-0 bg-white border-b border-border/30" />
         
-        {/* Right side: Edit All + Delete - fixed position, not affected by zoom */}
-        <div className="flex items-stretch shrink-0 sticky right-0 z-10">
+        {/* Right side: Edit All + Delete - absolutely positioned so zoom/scroll never affects it */}
+        <div className="absolute right-0 top-0 h-full flex items-stretch z-20">
           {/* Edit All button - blue background */}
           {onEditAll && (
             <button
@@ -338,7 +338,7 @@ const WaveformCardsWithScroll = ({
             </button>
           )}
           
-        {/* Delete button - white background */}
+          {/* Delete button - white background */}
           {onDeleteAll && (
             <button
               onClick={onDeleteAll}
