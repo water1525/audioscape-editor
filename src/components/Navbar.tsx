@@ -20,23 +20,23 @@ const Navbar = () => {
             <Link to="/" className="text-sm text-[hsl(0,0%,100%)] hover:text-[hsl(195,100%,50%)] transition-colors">
               Home
             </Link>
-            <a href="#" className="text-sm text-white/80 hover:text-white transition-colors">
+            <a href="#" className="text-sm text-white/60 hover:text-white transition-colors">
               Documentation
             </a>
-            <Link to="/playground" className="flex items-center gap-1 text-sm text-white/80 hover:text-white transition-colors">
+            <Link to="/playground" className="flex items-center gap-1 text-sm text-white/60 hover:text-white transition-colors">
               Playground
               <ChevronDown size={14} />
             </Link>
-            <a href="#" className="text-sm text-white/80 hover:text-white transition-colors">
+            <a href="#" className="text-sm text-white/60 hover:text-white transition-colors">
               Star Program
             </a>
-            <a href="#" className="text-sm text-white/80 hover:text-white transition-colors">
+            <a href="#" className="text-sm text-white/60 hover:text-white transition-colors">
               Official Website
             </a>
           </div>
 
           {/* Right: User Center */}
-          <button className="flex items-center gap-1 text-sm text-white/80 hover:text-white transition-colors">
+          <button className="flex items-center gap-1 text-sm text-white/60 hover:text-white transition-colors">
             User Center
             <ChevronDown size={14} />
           </button>
