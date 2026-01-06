@@ -610,6 +610,7 @@ const Playground = () => {
                 onAudioDeleted={() => {
                   setShowPlayerBar(false);
                   setEditSentences([]);
+                  setEditSelectedSentenceId(null);
                   setEditIsGenerating(false);
                   setEditGeneratingSentenceId(null);
                   setIsBatchGenerating(false);
@@ -629,6 +630,7 @@ const Playground = () => {
                   setIsBatchGenerating(generating);
                   setBatchProgress(progress);
                 }}
+                onSelectedSentenceChange={setEditSelectedSentenceId}
               />
             )}
           </div>
@@ -735,6 +737,15 @@ const Playground = () => {
         showSaveVoice={showSaveVoice && activeTab === "clone"}
         onSaveVoice={saveVoiceCallback || undefined}
         isGenerating={activeTab === "edit" && editIsGenerating}
+        playlist={activeTab === "edit" ? editSentences
+          .filter(s => s.versions.length > 0)
+          .map(s => ({
+            id: s.id,
+            url: s.versions[s.currentVersionIndex]?.url || s.versions[0]?.url
+          }))
+          .filter(p => p.url) : undefined}
+        startFromId={activeTab === "edit" ? editSelectedSentenceId : undefined}
+        onPlayingSentenceChange={setEditPlayingSentenceId}
       />
     </div>
   );

@@ -268,17 +268,17 @@ const WaveformCardsWithScroll = ({
                 return (
                   <div
                     key={`ruler-${sentence.id}`}
-                    className={`flex-shrink-0 h-full relative flex items-end justify-center px-2 transition-colors cursor-pointer ${isHighlighted ? 'bg-[hsl(210,70%,55%)]/20' : ''}`}
+                    className={`flex-shrink-0 h-full relative flex items-end justify-center px-2 transition-colors cursor-pointer ${isSelected ? 'bg-[hsl(210,70%,55%)]/30' : isHovered ? 'bg-[hsl(210,70%,55%)]/15' : ''}`}
                     style={{ minWidth: `${cardMinWidth}px`, maxWidth: `${cardMaxWidth}px` }}
                     onMouseEnter={() => setHoveredSentenceId(sentence.id)}
                     onMouseLeave={() => setHoveredSentenceId(null)}
                     onClick={() => onSelectSentence?.(sentence.id)}
                   >
-                    {/* Selection indicator borders */}
+                    {/* Selection indicator borders - thicker for selected */}
                     {isHighlighted && (
                       <>
-                        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[hsl(210,70%,55%)]" />
-                        <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-[hsl(210,70%,55%)]" />
+                        <div className={`absolute left-0 top-0 bottom-0 ${isSelected ? 'w-1 bg-[hsl(210,70%,45%)]' : 'w-0.5 bg-[hsl(210,70%,55%)]'}`} />
+                        <div className={`absolute right-0 top-0 bottom-0 ${isSelected ? 'w-1 bg-[hsl(210,70%,45%)]' : 'w-0.5 bg-[hsl(210,70%,55%)]'}`} />
                         {/* Start time label */}
                         <div className="absolute top-1 left-1">
                           <span className="text-[9px] font-medium text-[hsl(210,70%,55%)] bg-white px-0.5 rounded">{formatTime(startTime)}</span>
@@ -407,7 +407,7 @@ const WaveformCardsWithScroll = ({
               return (
                 <div
                   key={sentence.id}
-                  className={`flex-shrink-0 flex items-center justify-center px-2 py-4 cursor-pointer transition-colors relative ${isHighlighted ? 'bg-[hsl(210,75%,50%)]' : ''}`}
+                  className={`flex-shrink-0 flex items-center justify-center px-2 py-4 cursor-pointer transition-colors relative ${isSelected ? 'bg-[hsl(210,80%,45%)]' : isHovered ? 'bg-[hsl(210,75%,50%)]' : ''}`}
                   style={{ minWidth: `${cardMinWidth}px`, maxWidth: `${cardMaxWidth}px` }}
                   onClick={() => {
                     onSelectSentence?.(sentence.id);
@@ -416,6 +416,13 @@ const WaveformCardsWithScroll = ({
                   onMouseEnter={() => setHoveredSentenceId(sentence.id)}
                   onMouseLeave={() => setHoveredSentenceId(null)}
                 >
+                  {/* Selection indicator borders */}
+                  {isSelected && (
+                    <>
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-white/60" />
+                      <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/60" />
+                    </>
+                  )}
                   {/* Waveform bars - show loading animation or static bars */}
                   <div className="w-full h-full flex items-center justify-center gap-[2px]">
                     {isEditing ? (
@@ -474,36 +481,45 @@ const WaveformCardsWithScroll = ({
             const isSelected = selectedSentenceId === sentence.id;
             const isHighlighted = isSelected || isHovered;
             const showEditButton = isSelected || isHovered;
+            const showEditedTag = sentence.isEdited && isHighlighted;
             return (
               <div
                 key={`text-${sentence.id}`}
-                className={`flex-shrink-0 px-3 py-2 cursor-pointer transition-colors relative ${isHighlighted ? "bg-muted/50" : ""}`}
+                className={`flex-shrink-0 px-3 py-2 cursor-pointer transition-colors relative ${isSelected ? "bg-[hsl(210,70%,55%)]/20 border-l-2 border-[hsl(210,70%,55%)]" : isHovered ? "bg-muted/50" : ""}`}
                 style={{ minWidth: `${cardMinWidth}px`, maxWidth: `${cardMaxWidth}px` }}
                 onClick={() => onSelectSentence?.(sentence.id)}
                 onDoubleClick={() => onEditSentence(sentence.id)}
                 onMouseEnter={() => setHoveredSentenceId(sentence.id)}
                 onMouseLeave={() => setHoveredSentenceId(null)}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
-                    {sentence.text}
-                  </p>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed flex-1">
+                      {sentence.text}
+                    </p>
 
-                  {showEditButton && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 shrink-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEditSentence(sentence.id);
-                      }}
-                      aria-label="Edit segment"
-                      title="Edit"
-                    >
-                      <PencilEditIcon className="h-4 w-4 text-foreground/80" />
-                    </Button>
+                    {showEditButton && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 shrink-0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditSentence(sentence.id);
+                        }}
+                        aria-label="Edit segment"
+                        title="Edit"
+                      >
+                        <PencilEditIcon className="h-4 w-4 text-foreground/80" />
+                      </Button>
+                    )}
+                  </div>
+                  {/* Edited tag - only show when sentence is edited and highlighted */}
+                  {showEditedTag && (
+                    <span className="inline-flex items-center self-start px-1.5 py-0.5 text-[10px] font-medium bg-[hsl(210,70%,55%)]/20 text-[hsl(210,70%,45%)] rounded">
+                      Edited
+                    </span>
                   )}
                 </div>
               </div>
@@ -523,9 +539,10 @@ interface VoiceEditTabProps {
   onGeneratingChange?: (isGenerating: boolean, title?: string) => void;
   onEditGeneratingChange?: (sentenceId: number | null) => void;
   onBatchGeneratingChange?: (isGenerating: boolean, progress: { current: number; total: number }) => void;
+  onSelectedSentenceChange?: (sentenceId: number | null) => void;
 }
 
-const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onGeneratingChange, onEditGeneratingChange, onBatchGeneratingChange }: VoiceEditTabProps) => {
+const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onGeneratingChange, onEditGeneratingChange, onBatchGeneratingChange, onSelectedSentenceChange }: VoiceEditTabProps) => {
   // Upload/Record state
   const [audioSource, setAudioSource] = useState<"none" | "upload" | "record">("none");
   const [originalAudioBlob, setOriginalAudioBlob] = useState<Blob | null>(null);
@@ -568,6 +585,11 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
       setSelectedSentenceId(sentences[0].id);
     }
   }, [sentences, selectedSentenceId]);
+
+  // Notify parent when selected sentence changes
+  useEffect(() => {
+    onSelectedSentenceChange?.(selectedSentenceId);
+  }, [selectedSentenceId, onSelectedSentenceChange]);
 
   // Split text into sentences by punctuation (Chinese and English)
   const splitIntoSentences = (text: string): string[] => {
