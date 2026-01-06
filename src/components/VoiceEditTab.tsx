@@ -349,10 +349,6 @@ const WaveformCardsWithScroll = ({
           )}
         </div>
         
-        {/* Zoom level indicator */}
-        <div className="flex items-center px-2 bg-white border-b border-border/30 text-xs text-muted-foreground">
-          {Math.round(zoomLevel * 100)}%
-        </div>
       </div>
       
       {/* Waveform area */}
@@ -444,6 +440,11 @@ const WaveformCardsWithScroll = ({
           onMouseLeave={handleMouseLeave}
         >
           <ChevronRight className="h-5 w-5 text-white" />
+        </div>
+        
+        {/* Zoom level indicator - on the blue waveform area */}
+        <div className="flex items-center px-3 bg-[hsl(210,70%,55%)] text-sm font-medium text-white">
+          {Math.round(zoomLevel * 100)}%
         </div>
         </div>
       </div>
