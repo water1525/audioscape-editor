@@ -352,7 +352,12 @@ const WaveformCardsWithScroll = ({
       </div>
       
       {/* Waveform area */}
-      <div className="h-[50vh] min-h-[360px] flex flex-col">
+      <div className="h-[50vh] min-h-[360px] flex flex-col relative">
+        {/* Zoom level indicator - positioned at top-left of waveform area */}
+        <div className="absolute top-2 left-12 z-10 text-sm font-medium text-white">
+          {Math.round(zoomLevel * 100)}%
+        </div>
+        
         {/* Waveform row with side arrow blocks */}
         <div className="flex-1 flex items-stretch">
         {/* Left arrow block - aligned with delete button width */}
@@ -440,11 +445,6 @@ const WaveformCardsWithScroll = ({
           onMouseLeave={handleMouseLeave}
         >
           <ChevronRight className="h-5 w-5 text-white" />
-        </div>
-        
-        {/* Zoom level indicator - on the blue waveform area */}
-        <div className="flex items-center px-3 bg-[hsl(210,70%,55%)] text-sm font-medium text-white">
-          {Math.round(zoomLevel * 100)}%
         </div>
         </div>
       </div>
