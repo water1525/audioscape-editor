@@ -398,10 +398,11 @@ const WaveformCardsWithScroll = ({
                   onMouseEnter={() => setHoveredSentenceId(sentence.id)}
                   onMouseLeave={() => setHoveredSentenceId(null)}
                 >
-                  {/* Loading overlay when generating - wave animation style */}
-                  {isEditing && (
-                    <div className="absolute inset-0 flex items-center justify-center gap-[2px] z-10">
-                      {Array.from({ length: waveformBarCount }, (_, i) => {
+                  {/* Waveform bars - show loading animation or static bars */}
+                  <div className="w-full h-full flex items-center justify-center gap-[2px]">
+                    {isEditing ? (
+                      // Loading animation - wave style
+                      Array.from({ length: waveformBarCount }, (_, i) => {
                         const baseHeight = 30 + Math.sin(i * 0.4) * 20;
                         return (
                           <div
@@ -414,17 +415,17 @@ const WaveformCardsWithScroll = ({
                             }}
                           />
                         );
-                      })}
-                    </div>
-                  )}
-                  <div className="w-full h-full flex items-center justify-center gap-[2px]">
-                    {waveformBars.map((height, i) => (
-                      <div
-                        key={i}
-                        className={`w-[3px] rounded-full transition-colors ${isHovered ? 'bg-white' : 'bg-white/90'}`}
-                        style={{ height: `${height}%` }}
-                      />
-                    ))}
+                      })
+                    ) : (
+                      // Static waveform bars
+                      waveformBars.map((height, i) => (
+                        <div
+                          key={i}
+                          className={`w-[3px] rounded-full transition-colors ${isHovered ? 'bg-white' : 'bg-white/90'}`}
+                          style={{ height: `${height}%` }}
+                        />
+                      ))
+                    )}
                   </div>
                   {/* Subtle separator between segments */}
                   {!isLast && (
