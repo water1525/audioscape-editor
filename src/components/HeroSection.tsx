@@ -86,25 +86,25 @@ const HeroSection = () => {
 
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-6 md:px-12 lg:px-20 2xl:px-32">
-        <div className="max-w-2xl 2xl:max-w-4xl">
+      <div className="relative z-10 container mx-auto px-6 md:px-12 lg:px-20">
+        <div className="max-w-2xl">
           {/* Title */}
-          <h1 key={currentBanner.id} className="hero-title text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-extrabold mb-4 2xl:mb-6 animate-fade-in">
+          <h1 key={currentBanner.id} className="hero-title text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 animate-fade-in">
             {currentBanner.title}
           </h1>
 
           {/* Subtitle */}
-          <p className="hero-subtitle text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl mb-6 2xl:mb-10 animate-fade-in" style={{
+          <p className="hero-subtitle text-3xl md:text-4xl mb-6 animate-fade-in" style={{
           animationDelay: "0.1s"
         }}>
             {currentBanner.subtitle}
           </p>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-[3px] 2xl:gap-1 mb-16 2xl:mb-24 animate-fade-in" style={{
+          <div className="flex flex-wrap gap-[3px] mb-16 animate-fade-in" style={{
           animationDelay: "0.2s"
         }}>
-            {currentBanner.tags.map(tag => <span key={tag} className="hero-tag text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl px-3 py-1 md:px-4 md:py-1.5 lg:px-5 lg:py-2 xl:px-6 xl:py-2.5 2xl:px-8 2xl:py-3">
+            {currentBanner.tags.map(tag => <span key={tag} className="hero-tag">
                 {tag}
               </span>)}
           </div>
@@ -115,7 +115,7 @@ const HeroSection = () => {
         }}>
             <button 
               onClick={() => setActiveButton('use')}
-              className={`px-8 py-3 md:px-10 md:py-4 lg:px-12 lg:py-5 xl:px-14 xl:py-6 2xl:px-20 2xl:py-8 text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl transition-colors duration-200 ${
+              className={`px-10 py-4 text-lg transition-colors duration-200 ${
                 activeButton === 'use' 
                   ? 'bg-[#AD0606] text-white font-semibold' 
                   : 'bg-white text-foreground hover:bg-gray-100'
@@ -125,7 +125,7 @@ const HeroSection = () => {
             </button>
             <button 
               onClick={() => setActiveButton('intro')}
-              className={`px-8 py-3 md:px-10 md:py-4 lg:px-12 lg:py-5 xl:px-14 xl:py-6 2xl:px-20 2xl:py-8 text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl transition-colors duration-200 ${
+              className={`px-10 py-4 text-lg transition-colors duration-200 ${
                 activeButton === 'intro' 
                   ? 'bg-[#AD0606] text-white font-semibold' 
                   : 'bg-white text-foreground hover:bg-gray-100'
