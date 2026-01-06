@@ -91,6 +91,7 @@ const WaveformCardsWithScroll = ({
   onDeleteAll,
   isBatchGenerating,
   batchProgress,
+  editGeneratingId,
 }: { 
   sentences: SentenceSegment[]; 
   onEditSentence: (id: number) => void;
@@ -98,6 +99,7 @@ const WaveformCardsWithScroll = ({
   onDeleteAll?: () => void;
   isBatchGenerating?: boolean;
   batchProgress?: { current: number; total: number };
+  editGeneratingId?: number | null;
 }) => {
   const [hoveredSentenceId, setHoveredSentenceId] = useState<number | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -385,16 +387,24 @@ const WaveformCardsWithScroll = ({
               const isLast = idx === sentences.length - 1;
               
               const isHovered = hoveredSentenceId === sentence.id;
+              const isEditing = editGeneratingId === sentence.id;
               
               return (
                 <div
                   key={sentence.id}
-                  className={`flex-shrink-0 flex items-center justify-center px-2 py-4 cursor-pointer transition-colors ${isHovered ? 'bg-[hsl(210,75%,50%)]' : ''}`}
+                  className={`flex-shrink-0 flex items-center justify-center px-2 py-4 cursor-pointer transition-colors relative ${isHovered ? 'bg-[hsl(210,75%,50%)]' : ''}`}
                   style={{ minWidth: `${cardMinWidth}px`, maxWidth: `${cardMaxWidth}px` }}
-                  onClick={() => onEditSentence(sentence.id)}
+                  onClick={() => !isEditing && onEditSentence(sentence.id)}
                   onMouseEnter={() => setHoveredSentenceId(sentence.id)}
                   onMouseLeave={() => setHoveredSentenceId(null)}
                 >
+                  {/* Loading overlay when generating */}
+                  {isEditing && (
+                    <div className="absolute inset-0 bg-[hsl(210,70%,45%)] flex flex-col items-center justify-center gap-2 z-10">
+                      <Loader2 className="h-6 w-6 text-white animate-spin" />
+                      <span className="text-xs text-white font-medium">Generating...</span>
+                    </div>
+                  )}
                   <div className="w-full h-full flex items-center justify-center gap-[2px]">
                     {waveformBars.map((height, i) => (
                       <div
@@ -1084,6 +1094,7 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
             onDeleteAll={deleteAudio}
             isBatchGenerating={isBatchGenerating}
             batchProgress={batchProgress}
+            editGeneratingId={isGenerating ? editingSentenceId : null}
           />
         </div>
       )}
