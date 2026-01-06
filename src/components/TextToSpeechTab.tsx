@@ -303,18 +303,18 @@ const TextToSpeechTab = () => {
   return (
     <div className="animate-fade-in">
       {/* Text Display Area */}
-      <div className="bg-card border border-border rounded-[3px] p-6 mb-4 min-h-[160px] shadow-soft flex flex-col">
-        <p className="text-foreground text-sm whitespace-pre-wrap leading-relaxed flex-1">
+      <div className="bg-card border border-border rounded-[3px] p-6 min-[1920px]:p-8 mb-4 min-[1920px]:mb-6 min-h-[160px] min-[1920px]:min-h-[200px] shadow-soft flex flex-col">
+        <p className="text-foreground text-sm min-[1920px]:text-base whitespace-pre-wrap leading-relaxed flex-1">
           {currentCase.text}
         </p>
-        <p className="text-sm text-muted-foreground mt-4 pt-4 border-t border-border/50">
+        <p className="text-sm min-[1920px]:text-base text-muted-foreground mt-4 min-[1920px]:mt-6 pt-4 min-[1920px]:pt-6 border-t border-border/50">
           <span className="text-foreground font-medium">@Step-tts-2</span>{" "}
           Generate hyper-realistic speech with rich emotions and styles
         </p>
       </div>
 
       {/* Case Selector */}
-      <div className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-center gap-3 min-[1920px]:gap-4 mb-6 min-[1920px]:mb-8">
         {cases.map((caseItem) => {
           const isActive = activeCase === caseItem.id;
           // 未选中状态：浅色背景
@@ -338,14 +338,14 @@ const TextToSpeechTab = () => {
             <button
               key={caseItem.id}
               onClick={() => handleCaseChange(caseItem.id)}
-              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-[3px] transition-all duration-200 font-hfterse ${bgColor}`}
+              className={`flex items-center gap-2.5 min-[1920px]:gap-3 px-4 py-2.5 min-[1920px]:px-5 min-[1920px]:py-3 rounded-[3px] transition-all duration-200 font-hfterse ${bgColor}`}
             >
-              {caseItem.icon === "news" && <NewsIcon className={`w-5 h-5 ${textColor} shrink-0`} />}
-              {caseItem.icon === "book" && <BookIcon className={`w-5 h-5 ${textColor} shrink-0`} />}
-              {caseItem.icon === "service" && <CustomerServiceIcon className={`w-5 h-5 ${textColor} shrink-0`} />}
-              <span className={`text-sm font-medium ${textColor}`}>{caseItem.label}</span>
+              {caseItem.icon === "news" && <NewsIcon className={`w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6 ${textColor} shrink-0`} />}
+              {caseItem.icon === "book" && <BookIcon className={`w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6 ${textColor} shrink-0`} />}
+              {caseItem.icon === "service" && <CustomerServiceIcon className={`w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6 ${textColor} shrink-0`} />}
+              <span className={`text-sm min-[1920px]:text-base font-medium ${textColor}`}>{caseItem.label}</span>
               <span className={`${isActive ? 'text-white/50' : caseItem.iconColor + '/50'}`}>|</span>
-              <span className={`text-sm ${textColor}`}>{caseItem.description}</span>
+              <span className={`text-sm min-[1920px]:text-base ${textColor}`}>{caseItem.description}</span>
             </button>
           );
         })}
@@ -354,16 +354,16 @@ const TextToSpeechTab = () => {
       {/* Play Button */}
       <div className="flex items-center justify-end">
         <Button 
-          className="gap-2.5 px-6 py-2.5 h-auto text-base font-semibold bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white transition-all duration-300"
+          className="gap-2.5 min-[1920px]:gap-3 px-6 py-2.5 min-[1920px]:px-8 min-[1920px]:py-4 h-auto text-base min-[1920px]:text-lg font-semibold bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white transition-all duration-300"
           onClick={handlePlayPause}
           disabled={isGenerating}
         >
           {isGenerating ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 min-[1920px]:h-5 min-[1920px]:w-5 animate-spin" />
           ) : isPlaying ? (
             <WaveformAnimation isPlaying={true} variant="small" barCount={3} className="[&>div]:bg-white" />
           ) : (
-            <Play className="h-4 w-4" />
+            <Play className="h-4 w-4 min-[1920px]:h-5 min-[1920px]:w-5" />
           )}
           {isGenerating ? "Generating..." : isPlaying ? "Playing" : "Play"}
         </Button>
