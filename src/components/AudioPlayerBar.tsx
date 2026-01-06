@@ -232,7 +232,7 @@ const AudioPlayerBar = ({
   if (!isVisible || (!audioUrl && !currentAudioUrl && !isGenerating)) return null;
 
   return (
-    <div className="fixed bottom-0 left-56 right-0 z-50 bg-card border-t border-l border-border rounded-tl-[3px]">
+    <div className="fixed bottom-0 left-56 min-[1920px]:left-72 right-0 z-50 bg-card border-t border-l border-border rounded-tl-[3px]">
       <audio
         ref={audioRef}
         src={currentAudioUrl || audioUrl || undefined}
@@ -246,53 +246,53 @@ const AudioPlayerBar = ({
         }}
       />
 
-      <div className="px-6 py-3">
-        <div className="flex items-center gap-4">
+      <div className="px-6 py-3 min-[1920px]:px-8 min-[1920px]:py-4">
+        <div className="flex items-center gap-4 min-[1920px]:gap-6">
           {/* Left: Play/Pause Button */}
           {isGenerating ? (
-            <div className="w-12 h-12 rounded-[3px] bg-muted text-muted-foreground flex items-center justify-center shrink-0">
-              <Loader2 className="w-5 h-5 animate-spin" />
+            <div className="w-12 h-12 min-[1920px]:w-14 min-[1920px]:h-14 rounded-[3px] bg-muted text-muted-foreground flex items-center justify-center shrink-0">
+              <Loader2 className="w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6 animate-spin" />
             </div>
           ) : (
             <button
               onClick={togglePlayPause}
-              className={`w-12 h-12 rounded-[3px] flex items-center justify-center transition-colors shrink-0 ${
+              className={`w-12 h-12 min-[1920px]:w-14 min-[1920px]:h-14 rounded-[3px] flex items-center justify-center transition-colors shrink-0 ${
                 (typeof isPlayingOverride === "boolean" ? isPlayingOverride : isPlaying)
                   ? "bg-[#AD0606] hover:bg-[#8a0505] text-white"
                   : "bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white"
               }`}
             >
               {(typeof isPlayingOverride === "boolean" ? isPlayingOverride : isPlaying) ? (
-                <SolidPauseIcon className="w-5 h-5" />
+                <SolidPauseIcon className="w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6" />
               ) : (
-                <SolidPlayIcon className="w-5 h-5" />
+                <SolidPlayIcon className="w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6" />
               )}
             </button>
           )}
 
           {/* Title and Voice Info */}
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-foreground">
+            <p className="text-sm min-[1920px]:text-base font-medium text-foreground">
               {title || "Untitled Audio"}
             </p>
-            <p className="text-xs text-muted-foreground truncate">
+            <p className="text-xs min-[1920px]:text-sm text-muted-foreground truncate">
               {voiceName} · Just generated
             </p>
           </div>
 
           {/* Skip controls - small, light gray, positioned left */}
           {!hideSkipControls && (
-            <div className="flex items-center gap-4 mr-4">
+            <div className="flex items-center gap-4 min-[1920px]:gap-6 mr-4 min-[1920px]:mr-6">
               <button
                 onClick={() => skipTime(-10)}
-                className="w-5 h-5 opacity-50 hover:opacity-80 transition-opacity"
+                className="w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6 opacity-50 hover:opacity-80 transition-opacity"
                 title="Back 10s"
               >
                 <img src={SkipBack10Icon} alt="Back 10s" className="w-full h-full" />
               </button>
               <button
                 onClick={() => skipTime(10)}
-                className="w-5 h-5 opacity-50 hover:opacity-80 transition-opacity"
+                className="w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6 opacity-50 hover:opacity-80 transition-opacity"
                 title="Forward 10s"
               >
                 <img src={SkipForward10Icon} alt="Forward 10s" className="w-full h-full" />
@@ -301,9 +301,9 @@ const AudioPlayerBar = ({
           )}
 
           {/* Right section */}
-          <div className="shrink-0 flex items-center gap-3">
+          <div className="shrink-0 flex items-center gap-3 min-[1920px]:gap-4">
             {(typeof durationOverride === "number" || duration > 0) && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1 text-xs min-[1920px]:text-sm text-muted-foreground">
                 <span>
                   {formatTime(typeof currentTimeOverride === "number" ? currentTimeOverride : currentTime)}
                 </span>
@@ -321,9 +321,9 @@ const AudioPlayerBar = ({
                 size="sm"
                 onClick={onSaveVoice}
                 disabled={isGenerating}
-                className="gap-1.5"
+                className="gap-1.5 min-[1920px]:gap-2 min-[1920px]:h-10 min-[1920px]:px-4 min-[1920px]:text-sm"
               >
-                <Save className="w-4 h-4" />
+                <Save className="w-4 h-4 min-[1920px]:w-5 min-[1920px]:h-5" />
                 Save Voice
               </Button>
             )}
@@ -333,9 +333,9 @@ const AudioPlayerBar = ({
               size="icon"
               onClick={handleDownload}
               disabled={isGenerating}
-              className="text-muted-foreground hover:text-foreground disabled:opacity-50"
+              className="text-muted-foreground hover:text-foreground disabled:opacity-50 min-[1920px]:w-10 min-[1920px]:h-10"
             >
-              <Download className="w-5 h-5" />
+              <Download className="w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6" />
             </Button>
 
           </div>

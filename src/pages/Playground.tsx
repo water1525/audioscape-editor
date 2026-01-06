@@ -359,41 +359,41 @@ const Playground = () => {
     <div className="min-h-screen bg-background">
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-card border-b border-border">
-        <div className="container mx-auto px-6">
-          <div className="flex items-center h-14">
+        <div className="container mx-auto px-6 min-[1920px]:px-12">
+          <div className="flex items-center h-14 min-[1920px]:h-18">
             {/* Left: Logo */}
-            <div className="flex items-center gap-3">
-              <Link to="/" className="flex items-center gap-3">
-                <span className="text-lg font-bold text-foreground">StepFun</span>
+            <div className="flex items-center gap-3 min-[1920px]:gap-4">
+              <Link to="/" className="flex items-center gap-3 min-[1920px]:gap-4">
+                <span className="text-lg min-[1920px]:text-xl font-bold text-foreground">StepFun</span>
                 <span className="text-muted-foreground">|</span>
-                <span className="text-sm text-muted-foreground">Open Platform</span>
+                <span className="text-sm min-[1920px]:text-base text-muted-foreground">Open Platform</span>
               </Link>
             </div>
 
             {/* Center: Navigation Links */}
-            <div className="hidden md:flex items-center gap-8">
-              <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <div className="hidden md:flex items-center gap-8 min-[1920px]:gap-12">
+              <Link to="/" className="text-sm min-[1920px]:text-base text-muted-foreground hover:text-foreground transition-colors">
                 Home
               </Link>
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <a href="#" className="text-sm min-[1920px]:text-base text-muted-foreground hover:text-foreground transition-colors">
                 Documentation
               </a>
-              <Link to="/playground" className="flex items-center gap-1 text-sm text-[hsl(221,100%,43%)] font-medium">
+              <Link to="/playground" className="flex items-center gap-1 text-sm min-[1920px]:text-base text-[hsl(221,100%,43%)] font-medium">
                 Playground
-                <ChevronDown size={14} />
+                <ChevronDown size={14} className="min-[1920px]:w-4 min-[1920px]:h-4" />
               </Link>
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <a href="#" className="text-sm min-[1920px]:text-base text-muted-foreground hover:text-foreground transition-colors">
                 Star Program
               </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <a href="#" className="text-sm min-[1920px]:text-base text-muted-foreground hover:text-foreground transition-colors">
                 Official Website
               </a>
             </div>
 
             {/* Right: User Center */}
-            <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <button className="flex items-center gap-1 text-sm min-[1920px]:text-base text-muted-foreground hover:text-foreground transition-colors">
               User Center
-              <ChevronDown size={14} />
+              <ChevronDown size={14} className="min-[1920px]:w-4 min-[1920px]:h-4" />
             </button>
           </div>
         </div>
@@ -401,10 +401,10 @@ const Playground = () => {
 
       <div className="flex">
         {/* Left Sidebar */}
-        <aside className="w-56 h-[calc(100vh-56px)] fixed top-14 left-0 border-r border-border bg-card/50 p-4 flex flex-col z-30">
-          <h2 className="text-lg font-semibold text-foreground mb-6">Playground</h2>
+        <aside className="w-56 min-[1920px]:w-72 h-[calc(100vh-56px)] min-[1920px]:h-[calc(100vh-72px)] fixed top-14 min-[1920px]:top-[72px] left-0 border-r border-border bg-card/50 p-4 min-[1920px]:p-6 flex flex-col z-30">
+          <h2 className="text-lg min-[1920px]:text-xl font-semibold text-foreground mb-6 min-[1920px]:mb-8">Playground</h2>
           
-          <nav className="space-y-1 flex-1">
+          <nav className="space-y-1 min-[1920px]:space-y-2 flex-1">
             {sidebarTabs.map((tab) => {
               const IconComponent = tab.icon;
               const isActive = activeTab === tab.id;
@@ -412,13 +412,13 @@ const Playground = () => {
                 <button
                   key={tab.id}
                   onClick={() => handleTabChange(tab.id)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[3px] text-sm transition-all duration-200 ${
+                  className={`w-full flex items-center gap-3 min-[1920px]:gap-4 px-3 py-2.5 min-[1920px]:px-4 min-[1920px]:py-3 rounded-[3px] text-sm min-[1920px]:text-base transition-all duration-200 ${
                     isActive
                       ? "text-[hsl(221,100%,43%)] font-semibold"
                       : "text-foreground hover:text-[hsl(221,100%,43%)]"
                   }`}
                 >
-                  <IconComponent className="w-4 h-4" />
+                  <IconComponent className="w-4 h-4 min-[1920px]:w-5 min-[1920px]:h-5" />
                   {tab.label}
                 </button>
               );
@@ -471,21 +471,21 @@ const Playground = () => {
         </aside>
 
         {/* Spacer for fixed sidebar */}
-        <div className="w-56 flex-shrink-0" />
+        <div className="w-56 min-[1920px]:w-72 flex-shrink-0" />
 
         {/* Main Content */}
-        <main className={`flex-1 ${activeTab === "edit" ? "p-0" : "p-6"}`}>
-          <div className={activeTab === "edit" ? "" : "max-w-4xl"}>
+        <main className={`flex-1 ${activeTab === "edit" ? "p-0" : "p-6 min-[1920px]:p-10"}`}>
+          <div className={activeTab === "edit" ? "" : "max-w-4xl min-[1920px]:max-w-6xl"}>
             {activeTab === "tts" && (
               <>
                 {/* Text Input Area */}
-                <div className="bg-accent/30 border border-border rounded-[3px] p-1 mb-6 relative">
+                <div className="bg-accent/30 border border-border rounded-[3px] p-1 mb-6 min-[1920px]:mb-8 relative">
                   {text.length > 0 && (
                     <button
                       onClick={handleClear}
-                      className="absolute top-3 right-3 p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded-[3px] transition-colors z-10"
+                      className="absolute top-3 right-3 min-[1920px]:top-4 min-[1920px]:right-4 p-1.5 min-[1920px]:p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-[3px] transition-colors z-10"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-4 h-4 min-[1920px]:w-5 min-[1920px]:h-5" />
                     </button>
                   )}
                   <Textarea
@@ -493,19 +493,19 @@ const Playground = () => {
                     value={text}
                     onChange={handleTextChange}
                     maxLength={10000}
-                    className="min-h-[300px] bg-transparent border-0 resize-none focus-visible:ring-0 text-foreground placeholder:text-muted-foreground pb-8 pr-10"
+                    className="min-h-[300px] min-[1920px]:min-h-[400px] min-[1920px]:text-base bg-transparent border-0 resize-none focus-visible:ring-0 text-foreground placeholder:text-muted-foreground pb-8 pr-10"
                   />
-                  <div className="absolute bottom-3 right-4 text-sm text-muted-foreground">
+                  <div className="absolute bottom-3 right-4 min-[1920px]:bottom-4 min-[1920px]:right-6 text-sm min-[1920px]:text-base text-muted-foreground">
                     {text.length}/10000 chars
                   </div>
                 </div>
 
                 {/* Generate Button - Show when text is entered but no audio yet */}
                 {text.trim() && !audioUrl && !isGenerating && (
-                  <div className="mb-6 flex justify-center">
+                  <div className="mb-6 min-[1920px]:mb-8 flex justify-center">
                     <Button
                       onClick={handleGenerateClick}
-                      className="gap-2 h-11 px-12 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
+                      className="gap-2 min-[1920px]:gap-3 h-11 min-[1920px]:h-14 px-12 min-[1920px]:px-16 min-[1920px]:text-lg bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
                     >
                       Generate Audio
                     </Button>
@@ -514,12 +514,12 @@ const Playground = () => {
 
                 {/* Generating State */}
                 {isGenerating && (
-                  <div className="mb-6 flex justify-center">
+                  <div className="mb-6 min-[1920px]:mb-8 flex justify-center">
                     <Button
                       disabled
-                      className="gap-2 h-11 px-12 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
+                      className="gap-2 min-[1920px]:gap-3 h-11 min-[1920px]:h-14 px-12 min-[1920px]:px-16 min-[1920px]:text-lg bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
                     >
-                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <RefreshCw className="w-4 h-4 min-[1920px]:w-5 min-[1920px]:h-5 animate-spin" />
                       Generating...
                     </Button>
                   </div>
@@ -527,13 +527,13 @@ const Playground = () => {
 
                 {/* Audio Ready State - Show regenerate button */}
                 {audioUrl && !isGenerating && (
-                  <div className="mb-6 flex justify-center">
+                  <div className="mb-6 min-[1920px]:mb-8 flex justify-center">
                     <Button
                       onClick={handleGenerateClick}
                       disabled={isGenerating || !text.trim()}
-                      className="gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
+                      className="gap-2 min-[1920px]:gap-3 min-[1920px]:h-12 min-[1920px]:px-8 min-[1920px]:text-base bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
                     >
-                      <RefreshCw className="w-4 h-4" />
+                      <RefreshCw className="w-4 h-4 min-[1920px]:w-5 min-[1920px]:h-5" />
                       Regenerate
                     </Button>
                   </div>
@@ -542,8 +542,8 @@ const Playground = () => {
                 {/* Case Samples - Compact horizontal tags */}
                 {!text.trim() && (
                   <div>
-                    <p className="text-sm text-muted-foreground mb-4">Select a scenario to experience voice synthesis</p>
-                    <div className="flex flex-wrap gap-3">
+                    <p className="text-sm min-[1920px]:text-base text-muted-foreground mb-4 min-[1920px]:mb-6">Select a scenario to experience voice synthesis</p>
+                    <div className="flex flex-wrap gap-3 min-[1920px]:gap-4">
                       {caseSamples.map((sample) => {
                         const bgColorMap: Record<string, string> = {
                           "text-blue-500": "bg-blue-100 hover:bg-blue-200",
@@ -559,17 +559,17 @@ const Playground = () => {
                           <button
                             key={sample.id}
                             onClick={() => handleCaseClick(sample)}
-                            className={`group flex items-center gap-2 px-4 py-2.5 rounded-[3px] ${bgColor} transition-all duration-200 font-hfterse`}
+                            className={`group flex items-center gap-2 min-[1920px]:gap-3 px-4 py-2.5 min-[1920px]:px-5 min-[1920px]:py-3 rounded-[3px] ${bgColor} transition-all duration-200 font-hfterse`}
                           >
-                            {sample.icon === "news" && <NewsIcon className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
-                            {sample.icon === "book" && <BookIcon className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
-                            {sample.icon === "service" && <CustomerServiceIcon className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
-                            {sample.icon === "mic" && <MicrophoneIcon className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
-                            {sample.icon === "education" && <EducationIcon className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
-                            {sample.icon === "sparkles" && <Sparkles className={`w-5 h-5 ${sample.iconColor} shrink-0`} />}
-                            <span className={`font-medium text-sm ${sample.iconColor}`}>{sample.title}</span>
+                            {sample.icon === "news" && <NewsIcon className={`w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6 ${sample.iconColor} shrink-0`} />}
+                            {sample.icon === "book" && <BookIcon className={`w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6 ${sample.iconColor} shrink-0`} />}
+                            {sample.icon === "service" && <CustomerServiceIcon className={`w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6 ${sample.iconColor} shrink-0`} />}
+                            {sample.icon === "mic" && <MicrophoneIcon className={`w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6 ${sample.iconColor} shrink-0`} />}
+                            {sample.icon === "education" && <EducationIcon className={`w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6 ${sample.iconColor} shrink-0`} />}
+                            {sample.icon === "sparkles" && <Sparkles className={`w-5 h-5 min-[1920px]:w-6 min-[1920px]:h-6 ${sample.iconColor} shrink-0`} />}
+                            <span className={`font-medium text-sm min-[1920px]:text-base ${sample.iconColor}`}>{sample.title}</span>
                             <span className={`${sample.iconColor}/50`}>|</span>
-                            <span className={`text-sm ${sample.iconColor}`}>{sample.description}</span>
+                            <span className={`text-sm min-[1920px]:text-base ${sample.iconColor}`}>{sample.description}</span>
                           </button>
                         );
                       })}
@@ -638,28 +638,28 @@ const Playground = () => {
 
         {/* Right Sidebar - Controls (only for TTS tab) */}
         {activeTab === "tts" && (
-          <aside className="w-64 min-h-[calc(100vh-56px)] border-l border-border bg-card/50 p-6">
-            <div className="space-y-6">
+          <aside className="w-64 min-[1920px]:w-80 min-h-[calc(100vh-56px)] min-[1920px]:min-h-[calc(100vh-72px)] border-l border-border bg-card/50 p-6 min-[1920px]:p-8">
+            <div className="space-y-6 min-[1920px]:space-y-8">
               {/* Voice Select */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Voice</label>
+                <label className="text-sm min-[1920px]:text-base font-medium text-foreground mb-2 min-[1920px]:mb-3 block">Voice</label>
                 <Select value={voice} onValueChange={setVoice}>
-                  <SelectTrigger className="w-full bg-background">
+                  <SelectTrigger className="w-full min-[1920px]:h-12 min-[1920px]:text-base bg-background">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-popover">
                     <SelectGroup>
                       {voiceOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
+                        <SelectItem key={option.value} value={option.value} className="min-[1920px]:text-base">
                           {option.label}
                         </SelectItem>
                       ))}
                     </SelectGroup>
                     {customVoices.length > 0 && (
                       <SelectGroup>
-                        <SelectLabel className="text-xs text-muted-foreground">My Voices</SelectLabel>
+                        <SelectLabel className="text-xs min-[1920px]:text-sm text-muted-foreground">My Voices</SelectLabel>
                         {customVoices.map((cv) => (
-                          <SelectItem key={cv.id} value={cv.id}>
+                          <SelectItem key={cv.id} value={cv.id} className="min-[1920px]:text-base">
                             {cv.name}
                           </SelectItem>
                         ))}
@@ -671,9 +671,9 @@ const Playground = () => {
 
               {/* Speed Slider */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-foreground">Speed</label>
-                  <span className="text-sm text-muted-foreground">{speed[0]}</span>
+                <div className="flex items-center justify-between mb-2 min-[1920px]:mb-3">
+                  <label className="text-sm min-[1920px]:text-base font-medium text-foreground">Speed</label>
+                  <span className="text-sm min-[1920px]:text-base text-muted-foreground">{speed[0]}</span>
                 </div>
                 <Slider
                   value={speed}
@@ -687,9 +687,9 @@ const Playground = () => {
 
               {/* Volume Slider */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-foreground">Volume</label>
-                  <span className="text-sm text-muted-foreground">{volume[0]}</span>
+                <div className="flex items-center justify-between mb-2 min-[1920px]:mb-3">
+                  <label className="text-sm min-[1920px]:text-base font-medium text-foreground">Volume</label>
+                  <span className="text-sm min-[1920px]:text-base text-muted-foreground">{volume[0]}</span>
                 </div>
                 <Slider
                   value={volume}
@@ -703,14 +703,14 @@ const Playground = () => {
 
               {/* Format Select */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Format</label>
+                <label className="text-sm min-[1920px]:text-base font-medium text-foreground mb-2 min-[1920px]:mb-3 block">Format</label>
                 <Select value={format} onValueChange={setFormat}>
-                  <SelectTrigger className="w-full bg-background">
+                  <SelectTrigger className="w-full min-[1920px]:h-12 min-[1920px]:text-base bg-background">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {formatOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
+                      <SelectItem key={option.value} value={option.value} className="min-[1920px]:text-base">
                         {option.label}
                       </SelectItem>
                     ))}
