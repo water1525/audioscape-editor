@@ -554,6 +554,10 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
   const [isRecording, setIsRecording] = useState(false);
   const [countdown, setCountdown] = useState(30);
   
+  // Upload mode - text input state
+  const [uploadText, setUploadText] = useState("");
+  const [isProcessingUpload, setIsProcessingUpload] = useState(false);
+  
   // Sentence segments state
   const [sentences, setSentences] = useState<SentenceSegment[]>([]);
   const [editingSentenceId, setEditingSentenceId] = useState<number | null>(null);
@@ -725,7 +729,109 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
     setOriginalFileName(file.name);
     setAudioSource("upload");
     setSentences([]);
-    toast.success("Audio uploaded successfully");
+    setUploadText("");
+    toast.success("Audio uploaded, please enter the text content below");
+  };
+
+  // Handle upload text confirm - process text into sentences and generate TTS
+  const handleUploadTextConfirm = async () => {
+    if (!uploadText.trim()) {
+      toast.error("Please enter text content");
+      return;
+    }
+
+    const sentenceTexts = splitIntoSentences(uploadText);
+    if (sentenceTexts.length === 0) {
+      toast.error("Cannot split sentences, please check text content");
+      return;
+    }
+
+    setIsProcessingUpload(true);
+    
+    // Create sentence segments
+    const newSentences: SentenceSegment[] = sentenceTexts.map((text, index) => ({
+      id: index,
+      text,
+      isEdited: false,
+      versions: [],
+      currentVersionIndex: -1,
+    }));
+    setSentences(newSentences);
+    
+    // Notify parent that we're generating
+    onGeneratingChange?.(true, originalFileName || "Uploaded Audio");
+    
+    // Enable batch generating mode
+    setIsBatchGenerating(true);
+    setBatchProgress({ current: 0, total: sentenceTexts.length });
+    onBatchGeneratingChange?.(true, { current: 0, total: sentenceTexts.length });
+    
+    try {
+      // Generate audio for each sentence
+      const updatedSentences = [...newSentences];
+      
+      for (let i = 0; i < sentenceTexts.length; i++) {
+        const sentenceText = sentenceTexts[i];
+        setBatchProgress({ current: i + 1, total: sentenceTexts.length });
+        onBatchGeneratingChange?.(true, { current: i + 1, total: sentenceTexts.length });
+        
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/step-tts`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+                Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+              },
+              body: JSON.stringify({
+                text: sentenceText,
+                voice: "tianmeinvsheng",
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to generate audio");
+          }
+
+          const audioBlob = await response.blob();
+          const url = URL.createObjectURL(audioBlob);
+          
+          // Update sentence with generated audio
+          updatedSentences[i] = {
+            ...updatedSentences[i],
+            versions: [{ url, tags: [] }],
+            currentVersionIndex: 0,
+          };
+          
+          // Update state progressively
+          setSentences([...updatedSentences]);
+          
+          // Notify parent with the first sentence's audio
+          if (i === 0) {
+            onAudioGenerated?.(url, originalFileName || "Uploaded Audio");
+          }
+        } catch (error) {
+          console.error(`Error generating audio for sentence ${i}:`, error);
+          // Continue with other sentences even if one fails
+        }
+      }
+      
+      // Switch to record mode to show the sentence cards UI
+      setAudioSource("record");
+      toast.success("Text processed successfully, you can now edit each sentence");
+    } catch (error) {
+      console.error("Error processing upload text:", error);
+      toast.error("Processing failed, please try again");
+    } finally {
+      setIsProcessingUpload(false);
+      setIsBatchGenerating(false);
+      setBatchProgress({ current: 0, total: 0 });
+      onBatchGeneratingChange?.(false, { current: 0, total: 0 });
+      onGeneratingChange?.(false);
+    }
   };
 
   // Start recording
@@ -1200,10 +1306,10 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
         </div>
       )}
 
-      {/* Upload mode - show simple player */}
+      {/* Upload mode - show text input for sentence splitting */}
       {originalAudioUrl && audioSource === "upload" && (
-        <div className="space-y-3">
-          <h3 className="text-sm font-medium text-foreground">Uploaded Audio</h3>
+        <div className="space-y-4">
+          {/* Uploaded file info */}
           <div className="relative group bg-gradient-to-br from-secondary via-secondary/80 to-secondary rounded-[3px] p-4 border border-border/50">
             <div className="relative flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -1228,8 +1334,42 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
                 size="icon"
                 className="h-8 w-8 text-destructive/60 hover:text-destructive hover:bg-destructive/10"
                 onClick={deleteAudio}
+                disabled={isProcessingUpload}
               >
                 <DeleteIcon className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Text input section */}
+          <div className="bg-[#F5F8FB] border border-border rounded-[3px] p-6">
+            <p className="text-sm text-muted-foreground mb-3">
+              Enter the text content of the uploaded audio, which will be split into sentences for editing
+            </p>
+            <textarea
+              className="w-full h-32 p-3 border border-border rounded-[3px] resize-none bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              placeholder="Enter audio text content here, will be split by punctuation (. , ! ? etc.)"
+              value={uploadText}
+              onChange={(e) => setUploadText(e.target.value)}
+              disabled={isProcessingUpload}
+            />
+            <div className="flex items-center justify-between mt-3">
+              <p className="text-xs text-muted-foreground">
+                {uploadText.length} characters
+              </p>
+              <Button
+                onClick={handleUploadTextConfirm}
+                disabled={isProcessingUpload || !uploadText.trim()}
+                className="bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
+              >
+                {isProcessingUpload ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Processing...
+                  </>
+                ) : (
+                  "Start Editing"
+                )}
               </Button>
             </div>
           </div>
