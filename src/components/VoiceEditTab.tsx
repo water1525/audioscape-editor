@@ -1162,21 +1162,13 @@ const VoiceEditTab = ({ onAudioGenerated, onAudioDeleted, onSentencesChange, onG
               </div>
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">
-                  Select an audio file or record directly
+                  Record directly to experience voice editing
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Supports mp3/wav format, duration 10-30s
+                  Supports 10-30 seconds recording
                 </p>
               </div>
               <div className="flex items-center gap-3 mt-2">
-                <Button
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="gap-2 font-semibold"
-                >
-                  <Upload className="h-4 w-4" />
-                  Upload Audio
-                </Button>
                 <Button
                   onClick={startRecording}
                   className="gap-2 bg-[hsl(221,100%,43%)] hover:bg-[hsl(221,100%,30%)] text-white font-semibold"
